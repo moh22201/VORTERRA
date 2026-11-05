@@ -3,99 +3,132 @@ const enterButton=document.getElementById("enter-button");
 const intro=document.getElementById("intro");
 
 if(particleLayer){
-  for(let i=0;i<42;i++){
+  for(let i=0;i<54;i++){
     const coin=document.createElement("span");
-    coin.className="coin"+(i%4===0?" blue":"");
+    coin.className="coin"+(i%5===0?" blue":"");
     coin.style.left=(Math.random()*100)+"%";
-    coin.style.animationDelay=(-Math.random()*14)+"s";
-    coin.style.animationDuration=(9+Math.random()*10)+"s";
-    coin.style.transform="scale("+(0.5+Math.random()*.9)+")";
+    coin.style.animationDelay=(-Math.random()*18)+"s";
+    coin.style.animationDuration=(8+Math.random()*12)+"s";
+    coin.style.opacity=".0";
     particleLayer.appendChild(coin);
   }
+}
+
+function renderMemberCard(first,last,country,city,reference){
+  return `
+    <div class="card-preview-result">
+      <div class="member-card-scene">
+        <article class="member-card" id="finished-member-card" aria-label="VORTERRA electronic membership card">
+          <div class="member-card-inner">
+            <div class="member-brand"><span>VORTERRA</span><small>WORLD MEMBER • 2026</small></div>
+            <div class="member-card-middle">
+              <span class="member-chip" aria-hidden="true"></span>
+              <span class="member-contactless" aria-hidden="true">)))</span>
+            </div>
+            <div class="member-card-name">${first} ${last}</div>
+            <div class="member-card-foot"><span>MEMBER REFERENCE<strong>${reference}</strong></span><span>${city.toUpperCase()}<br>${country.toUpperCase()}</span></div>
+          </div>
+          <span class="member-card-monogram" aria-hidden="true">V</span>
+        </article>
+      </div>
+      <div class="card-result-actions">
+        <button class="card-back-button" id="edit-identity" type="button">EDIT DETAILS</button>
+        <button class="card-continue" id="continue-registration" type="button">CONTINUE →</button>
+      </div>
+    </div>`;
 }
 
 function showIdentityCard(){
   const content=document.querySelector(".intro-content");
   content.innerHTML=`
     <section class="identity-stage" aria-labelledby="identity-title">
-      <p class="identity-heading" id="identity-title">VORTERRA • MEMBER ENROLMENT</p>
-      <p class="identity-subtitle">Your personal electronic identity — a member credential for the VORTERRA world.</p>
-      <div class="identity-card-wrap" id="identity-card-wrap">
-        <div class="identity-card" id="identity-card">
-          <form class="identity-face identity-front" id="identity-form">
-            <div class="card-topline"><span>VORTERRA INTERNATIONAL</span><span>MEMBER • 2026</span></div>
-            <div class="card-chip" aria-hidden="true"></div>
-            <div class="identity-fields">
-              <label class="identity-field">GIVEN NAME<input name="firstName" autocomplete="given-name" maxlength="28" placeholder="First name" required></label>
-              <label class="identity-field">FAMILY NAME<input name="lastName" autocomplete="family-name" maxlength="28" placeholder="Last name" required></label>
-              <label class="identity-field">COUNTRY<input name="country" autocomplete="country-name" maxlength="40" placeholder="Country" required></label>
-              <label class="identity-field">CITY<input name="city" maxlength="40" placeholder="Chosen city" required></label>
+      <p class="identity-heading" id="identity-title">VORTERRA • YOUR WORLD IDENTITY</p>
+      <p class="identity-subtitle">Create your member profile and preview your personal electronic card.</p>
+      <div class="identity-layout">
+        <div class="member-card-scene">
+          <article class="member-card" id="live-member-card" aria-label="VORTERRA electronic membership card preview">
+            <div class="member-card-inner">
+              <div class="member-brand"><span>VORTERRA</span><small>WORLD MEMBER • 2026</small></div>
+              <div class="member-card-middle"><span class="member-chip" aria-hidden="true"></span><span class="member-contactless" aria-hidden="true">)))</span></div>
+              <div class="member-card-name" id="live-card-name">YOUR NAME</div>
+              <div class="member-card-foot"><span>MEMBER REFERENCE<strong>VOR • PENDING</strong></span><span id="live-card-location">YOUR CITY<br>YOUR COUNTRY</span></div>
             </div>
-            <button class="card-submit" type="submit">PERSONALISE MY CARD <span aria-hidden="true">↗</span></button>
-            <span class="card-watermark" aria-hidden="true">V</span>
-          </form>
-          <div class="identity-face identity-back">
-            <div>
-              <div class="card-topline"><span>VORTERRA</span><span>WORLD MEMBER</span></div>
-              <h2 class="card-back-title">MEMBER CREDENTIAL</h2>
-              <p class="card-player-name" id="card-player-name">PLAYER NAME</p>
-              <p class="card-player-location" id="card-player-location">CITY · COUNTRY</p>
-              <p class="card-id-label">MEMBER REFERENCE</p>
-              <div class="card-player-id" id="card-player-id">VOR-000000</div>
-              <p class="card-note">Your selected city identifies your in-game region. This visual card is a preview; secure account registration will assign your permanent member ID.</p>
-            </div>
-            <div class="identity-actions">
-              <button class="card-back-button" id="edit-identity" type="button">EDIT DETAILS</button>
-              <button class="card-continue" id="continue-registration" type="button">CONTINUE →</button>
-            </div>
-            <span class="card-watermark" aria-hidden="true">V</span>
-          </div>
+            <span class="member-card-monogram" aria-hidden="true">V</span>
+          </article>
         </div>
+        <form class="card-form-panel" id="identity-form">
+          <h2 class="card-form-title">PERSONAL DETAILS</h2>
+          <p class="card-form-help">These details will appear on your VORTERRA member card. Choose your in-game city, not your home address.</p>
+          <div class="identity-fields">
+            <label class="identity-field">GIVEN NAME<input name="firstName" autocomplete="given-name" maxlength="28" placeholder="First name" required></label>
+            <label class="identity-field">FAMILY NAME<input name="lastName" autocomplete="family-name" maxlength="28" placeholder="Family name" required></label>
+            <label class="identity-field">COUNTRY<input name="country" autocomplete="country-name" maxlength="40" placeholder="Country" required></label>
+            <label class="identity-field">CITY<input name="city" maxlength="40" placeholder="Chosen city" required></label>
+          </div>
+          <button class="card-submit" type="submit">ISSUE MY MEMBER CARD <span aria-hidden="true">✦</span></button>
+        </form>
       </div>
     </section>`;
   const form=document.getElementById("identity-form");
-  const card=document.getElementById("identity-card");
-  const wrap=document.getElementById("identity-card-wrap");
-  wrap.addEventListener("pointermove",(event)=>{
-    if(event.pointerType==="touch") return;
-    const rect=wrap.getBoundingClientRect();
+  const card=document.getElementById("live-member-card");
+  const cardName=document.getElementById("live-card-name");
+  const cardLocation=document.getElementById("live-card-location");
+  const scene=document.querySelector(".member-card-scene");
+  const updateCard=()=>{
+    const data=new FormData(form);
+    const first=String(data.get("firstName")||"").trim();
+    const last=String(data.get("lastName")||"").trim();
+    const country=String(data.get("country")||"").trim();
+    const city=String(data.get("city")||"").trim();
+    cardName.textContent=(first+" "+last).trim()||"YOUR NAME";
+    cardLocation.innerHTML=(city?city.toUpperCase():"YOUR CITY")+"<br>"+(country?country.toUpperCase():"YOUR COUNTRY");
+  };
+  form.addEventListener("input",updateCard);
+  scene.addEventListener("pointermove",(event)=>{
+    if(event.pointerType==="touch")return;
+    const rect=scene.getBoundingClientRect();
     const x=(event.clientX-rect.left)/rect.width-.5;
     const y=(event.clientY-rect.top)/rect.height-.5;
-    wrap.style.transform="rotateX("+(-y*5)+"deg) rotateY("+(x*7)+"deg)";
+    card.style.transform="rotateY("+(-13+x*20)+"deg) rotateX("+(7-y*14)+"deg) translateY(-3px)";
   });
-  wrap.addEventListener("pointerleave",()=>{wrap.style.transform="rotateX(0deg) rotateY(0deg)";});
+  scene.addEventListener("pointerleave",()=>{card.style.transform="rotateY(-13deg) rotateX(7deg)";});
   form.addEventListener("submit",(event)=>{
     event.preventDefault();
-    if(!form.reportValidity()) return;
+    if(!form.reportValidity())return;
     const data=new FormData(form);
     const first=String(data.get("firstName")).trim();
     const last=String(data.get("lastName")).trim();
     const country=String(data.get("country")).trim();
     const city=String(data.get("city")).trim();
-    document.getElementById("card-player-name").textContent=first+" "+last;
-    document.getElementById("card-player-location").textContent=city+" · "+country;
     const reference="VOR-"+Math.random().toString(36).slice(2,8).toUpperCase();
-    document.getElementById("card-player-id").textContent=reference;
-    card.classList.add("is-flipped");
-  });
-  document.getElementById("edit-identity").addEventListener("click",()=>card.classList.remove("is-flipped"));
-  document.getElementById("continue-registration").addEventListener("click",()=>{
     content.innerHTML=`
-      <div class="identity-stage">
-        <p class="identity-heading">IDENTITY CARD COMPLETE</p>
-        <h1 class="wordmark">VORTERRA</h1>
-        <p class="identity-subtitle">The next stage is account registration with Google or email and password.</p>
-        <p class="next-stage-note">ACCOUNT REGISTRATION — NEXT DEVELOPMENT STAGE</p>
-      </div>`;
+      <section class="identity-stage">
+        <p class="identity-heading">YOUR VORTERRA MEMBER CARD</p>
+        <p class="identity-subtitle">Your personal identity card is ready for preview.</p>
+        ${renderMemberCard(first,last,country,city,reference)}
+      </section>`;
+    const resultCard=document.getElementById("finished-member-card");
+    const resultScene=resultCard.parentElement;
+    resultScene.addEventListener("pointermove",(e)=>{
+      if(e.pointerType==="touch")return;
+      const r=resultCard.getBoundingClientRect();
+      const x=(e.clientX-r.left)/r.width-.5;
+      const y=(e.clientY-r.top)/r.height-.5;
+      resultCard.style.transform="rotateY("+(-x*18)+"deg) rotateX("+(y*12)+"deg) translateY(-5px)";
+    });
+    resultScene.addEventListener("pointerleave",()=>{resultCard.style.transform="rotateY(0) rotateX(0)";});
+    document.getElementById("edit-identity").addEventListener("click",showIdentityCard);
+    document.getElementById("continue-registration").addEventListener("click",()=>{
+      content.innerHTML=`<div class="identity-stage"><p class="identity-heading">MEMBER CARD PREVIEW COMPLETE</p><h1 class="wordmark">VORTERRA</h1><p class="identity-subtitle">Account registration with Google or email and password will be the next stage.</p><p class="next-stage-note">ACCOUNT REGISTRATION — NEXT DEVELOPMENT STAGE</p></div>`;
+    });
   });
 }
 
 enterButton?.addEventListener("click",()=>{
   intro.classList.add("leaving");
   enterButton.disabled=true;
-  enterButton.setAttribute("aria-label","Introduction complete");
   window.setTimeout(()=>{
     intro.classList.remove("leaving");
     showIdentityCard();
-  },780);
+  },900);
 });
