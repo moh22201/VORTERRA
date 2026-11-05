@@ -133,8 +133,8 @@ markers.forEach(marker=>marker.addEventListener('click',()=>{
 document.querySelectorAll('.region').forEach(btn=>btn.addEventListener('click',()=>{
  document.querySelectorAll('.region').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
  const r=btn.dataset.region;
- markers.forEach(m=>{const x=parseFloat(m.style.left);let show=r==='ALL'||(r==='AMERICA'&&x<40)||(r==='EUROPE'&&x>=45&&x<56)||(r==='AFRICA'&&x>=54&&x<67)||(r==='ASIA'&&x>=67&&x<86)||(r==='OCEANIA'&&x>=86);m.style.display=show?'block':'none';});
- document.querySelectorAll('.marker-caption').forEach(label=>{const x=parseFloat(label.style.left);label.style.display=r==='ALL'||(r==='AMERICA'&&x<40)||(r==='EUROPE'&&x>=45&&x<56)||(r==='AFRICA'&&x>=54&&x<67)||(r==='ASIA'&&x>=67&&x<86)||(r==='OCEANIA'&&x>=86)?'block':'none';});
+ markers.forEach(m=>{m.style.display=(r==='ALL'||m.dataset.region===r)?'block':'none';});
+ document.querySelectorAll('.marker-caption').forEach(label=>{label.style.display=(r==='ALL'||label.dataset.region===r)?'block':'none';});
 }));
 document.getElementById('exploreButton').addEventListener('click',()=>alert('City entry and account registration will be connected in the next development stage.'));
 </script>
