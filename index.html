@@ -277,6 +277,19 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 
 
 #dashboard .dform{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}#dashboard .dform label{display:flex;flex-direction:column;gap:6px;color:#d9d2c1;font-size:12px}#dashboard .dform input{width:100%;min-width:0;padding:10px;border:1px solid #ffffff24;border-radius:8px;background:#080d18;color:#fff;font:inherit}#dashboard .dform .dprimary{grid-column:1/-1;margin:0;cursor:pointer}#dashboard .dsubpanel{padding:14px 0;border-bottom:1px solid #ffffff18}#dashboard .dsubpanel:last-child{border-bottom:0}#dashboard .dsubpanel h3{font-size:15px;color:#f0d38c;margin-bottom:8px}#dashboard .dlisting-list{display:grid;gap:8px;margin-top:12px}#dashboard .dlisting{padding:11px;border:1px solid #ffffff20;border-radius:9px;background:#ffffff06;display:flex;justify-content:space-between;gap:12px;align-items:center}#dashboard .dlisting strong{display:block;color:#f2d58d;font-size:13px}#dashboard .dlisting small{display:block;color:#aaa;font-size:11px;margin-top:4px}#dashboard .dlisting button{padding:6px 9px;border:1px solid #ffffff30;border-radius:7px;background:#ffffff0b;color:#eee}#dashboard .dempty{color:#999;font-size:12px;padding:12px 0}@media(max-width:680px){#dashboard .dform{grid-template-columns:1fr}}
+
+/* Mobile navigation: show every section without requiring horizontal scrolling. */
+@media(max-width:680px){
+ #dashboard .dside{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:10px;overflow:visible!important;}
+ #dashboard .dside button{min-width:0;width:100%;min-height:48px;flex:initial;flex-direction:row;justify-content:flex-start;gap:7px;padding:9px 7px;white-space:normal;text-align:left;font-size:10px;line-height:1.25;}
+ #dashboard .dside button span:first-child{flex:0 0 18px;text-align:center;font-size:15px;}
+ #dashboard .dside button span+span{min-width:0;font-size:10px;overflow-wrap:anywhere;}
+}
+@media(max-width:380px){
+ #dashboard .dside{grid-template-columns:repeat(2,minmax(0,1fr));}
+ #dashboard .dside button{min-height:45px;}
+}
+
 </style></head><body>
 <canvas id="c"></canvas><div id="dashboard">
 <header class="dtop"><div class="dbrand"><div class="demblem"><b>V</b></div><div><strong>VORTERRA</strong><small>WORLD OF INDUSTRY &amp; TRADE</small></div></div>
