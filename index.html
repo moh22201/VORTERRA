@@ -167,6 +167,78 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 #dashboard [dir="rtl"] .dcheck{flex-direction:row-reverse}
 @media(max-width:680px){#dashboard .dsector-grid,#dashboard .dasset-grid,#dashboard .dquick-large{grid-template-columns:1fr}#dashboard .dlang-switch button{padding:7px 8px}#dashboard .dasset-visual{height:145px}}
 
+
+/* Responsive dashboard layout: mobile-first navigation and readable controls */
+@media(max-width:680px){
+ #dashboard{min-height:100svh;height:auto;overflow-x:hidden;overflow-y:auto}
+ #dashboard .dtop{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:10px 12px;min-height:0;flex-wrap:wrap}
+ #dashboard .dbrand{flex:1 1 100%;min-width:0;display:flex;align-items:center;gap:9px}
+ #dashboard .dbrand strong{font-size:19px;letter-spacing:3px}
+ #dashboard .dbrand small{font-size:7px;letter-spacing:1px}
+ #dashboard .demblem{width:32px;height:32px;flex:0 0 32px}
+ #dashboard .dlang-switch{order:2;flex:0 0 auto;margin:0;gap:3px;padding:3px}
+ #dashboard .dlang-switch button{min-width:43px;padding:8px 7px;font-size:10px}
+ #dashboard .daccount{order:3;flex:1 1 auto;justify-content:flex-end;min-width:0;gap:7px}
+ #dashboard .dbalance{padding:6px 8px}
+ #dashboard .dbalance small{font-size:7px}
+ #dashboard .dbalance b{font-size:12px}
+ #dashboard .dmember{display:none}
+ #dashboard .davatar{width:29px;height:29px;flex:0 0 29px}
+ #dashboard .dlayout{display:flex;flex-direction:column;min-height:0}
+ #dashboard .dside{order:0;display:flex;flex-direction:row;align-items:stretch;gap:6px;width:100%;padding:8px 10px;border:0;border-top:1px solid #f6d88935;border-bottom:1px solid #f6d88935;background:#08090bf5;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#9e7c3d #111}
+ #dashboard .dside button{display:flex;flex:0 0 auto;flex-direction:row;align-items:center;justify-content:center;gap:7px;min-height:39px;padding:8px 11px;white-space:nowrap;border:1px solid #f6d88924;border-radius:9px;font-size:11px}
+ #dashboard .dside button span{width:auto;font-size:14px}
+ #dashboard .dside button span+span{font-size:11px}
+ #dashboard .dside button:hover,#dashboard .dside button.active{box-shadow:inset 0 -2px #f6d889;background:#f6d88912}
+ #dashboard .dmain{order:1;width:100%;min-width:0;overflow:visible;padding:16px 12px 28px}
+ #dashboard .dview{min-width:0}
+ #dashboard .dwelcome{gap:8px}
+ #dashboard .dwelcome h1{font-size:23px;line-height:1.2}
+ #dashboard .dwelcome p{font-size:11px;line-height:1.6}
+ #dashboard .dstats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ #dashboard .dstat{min-width:0;padding:11px;min-height:100px}
+ #dashboard .dstat>small{font-size:8px;letter-spacing:.6px}
+ #dashboard .dstat strong{font-size:20px;overflow-wrap:anywhere}
+ #dashboard .dstat em{font-size:9px;line-height:1.4}
+ #dashboard .dcols{grid-template-columns:minmax(0,1fr);gap:11px}
+ #dashboard .dpanel{min-width:0}
+ #dashboard .dpanelhead{gap:8px;padding:12px}
+ #dashboard .dpanelhead b{font-size:14px}
+ #dashboard .dpanelhead small{font-size:7px}
+ #dashboard .dpanelbody{padding:12px}
+ #dashboard .dactivity{grid-template-columns:28px minmax(0,1fr) auto;gap:8px}
+ #dashboard .dactivity small{line-height:1.5;overflow-wrap:anywhere}
+ #dashboard .dtoolbar{gap:9px;align-items:flex-start}
+ #dashboard .dtoolbar h2{font-size:20px;line-height:1.3}
+ #dashboard .dtoolbar p{font-size:11px;line-height:1.6}
+ #dashboard .dsector-grid,#dashboard .dasset-grid,#dashboard .dquick-large{grid-template-columns:minmax(0,1fr);gap:9px}
+ #dashboard .dsector{min-height:0;padding:13px}
+ #dashboard .dasset-browser{padding:11px}
+ #dashboard .dasset-card{min-width:0}
+ #dashboard .dasset-meta{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #dashboard .dasset-meta span{overflow-wrap:anywhere;line-height:1.4}
+ #dashboard .dquick-large button{min-height:0}
+ #dashboard .dplaceholder{padding:22px;min-height:200px}
+ #dashboard .dplaceholder p{font-size:11px;line-height:1.7}
+ #dashboard .dnote{font-size:11px;line-height:1.7}
+ #dashboard .dcheck{align-items:flex-start;line-height:1.5}
+}
+@media(max-width:380px){
+ #dashboard .dbrand strong{font-size:17px;letter-spacing:2px}
+ #dashboard .dlang-switch button{min-width:39px;padding:7px 5px;font-size:9px}
+ #dashboard .dbalance{padding:5px 6px}
+ #dashboard .dbalance b{font-size:11px}
+ #dashboard .dmain{padding-inline:9px}
+ #dashboard .dstat{padding:9px}
+}
+@media(min-width:681px) and (max-width:900px){
+ #dashboard .dlayout{grid-template-columns:180px minmax(0,1fr)}
+ #dashboard .dside{padding:16px 9px}
+ #dashboard .dside button{gap:8px;padding:10px 8px;font-size:10px}
+ #dashboard .dmain{padding:22px 16px}
+ #dashboard .dcols{grid-template-columns:minmax(0,1fr)}
+ #dashboard .dstats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 </style></head><body>
 <canvas id="c"></canvas><div id="dashboard">
 <header class="dtop"><div class="dbrand"><div class="demblem"><b>V</b></div><div><strong>VORTERRA</strong><small>WORLD OF INDUSTRY &amp; TRADE</small></div></div>
