@@ -67,3 +67,94 @@
 @keyframes card-sheen{0%,30%{transform:translateX(-55%) rotate(12deg)}65%,100%{transform:translateX(55%) rotate(12deg)}}
 @media(max-width:760px){.intro-content{padding:26px 18px}.identity-stage{padding:22px 8px}.identity-layout{grid-template-columns:1fr;gap:12px}.member-card-scene{padding:10px 0 18px}.member-card{max-width:480px;transform:rotateY(-5deg) rotateX(3deg)}.card-form-panel{padding:21px}.identity-heading{margin-bottom:6px}.identity-subtitle{margin-bottom:18px}.intro-footer{bottom:22px}}
 @media(max-width:420px){.member-card-inner{padding:17px}.member-brand{font-size:9px}.member-chip{width:49px;height:38px}.member-card-monogram{font-size:70px}.card-form-panel{padding:17px}.identity-fields{gap:9px}.identity-field input{height:40px}.wordmark{font-size:43px}}
+
+
+/* VORTERRA black-crystal / brilliant-gold bank-card finish */
+.member-card{
+  aspect-ratio:1.586/1;
+  min-height:0;
+  border-radius:20px;
+  border:1px solid rgba(255,226,157,.92);
+  background:
+    radial-gradient(ellipse at 12% 8%,rgba(255,255,255,.12),transparent 28%),
+    radial-gradient(ellipse at 88% 92%,rgba(209,158,61,.17),transparent 38%),
+    linear-gradient(135deg,#242424 0%,#080808 24%,#151515 51%,#030303 76%,#17130c 100%);
+  box-shadow:
+    0 32px 75px rgba(0,0,0,.82),
+    0 0 0 1px rgba(255,220,145,.36),
+    0 0 34px rgba(224,177,76,.24),
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 0 -18px 36px rgba(0,0,0,.55);
+}
+.member-card:before{
+  inset:7px;
+  border:1px solid rgba(255,218,133,.46);
+  border-radius:14px;
+  background:
+    linear-gradient(125deg,rgba(255,255,255,.065),transparent 22%,transparent 68%,rgba(255,211,119,.07)),
+    repeating-linear-gradient(135deg,transparent 0 11px,rgba(255,255,255,.018) 12px,transparent 13px);
+}
+.member-card:after{
+  inset:-90% -45%;
+  background:linear-gradient(105deg,transparent 43%,rgba(255,255,255,.23) 48%,rgba(255,220,148,.14) 50%,transparent 56%);
+  animation:card-sheen 5.8s ease-in-out infinite;
+}
+.member-card-inner{padding:clamp(17px,3vw,29px)}
+.member-brand{
+  gap:14px;
+  color:#ffe6a8;
+  font:700 14px Cinzel,serif;
+  letter-spacing:.22em;
+  text-shadow:0 0 12px rgba(255,211,116,.36);
+}
+.member-brand span{white-space:nowrap}
+.member-brand small{
+  margin-left:auto;
+  padding-left:10px;
+  text-align:right;
+  color:#d8bd7c;
+  font:600 8px Inter,sans-serif;
+  letter-spacing:.2em;
+  white-space:nowrap;
+}
+.member-card-middle{justify-content:flex-start;gap:22px}
+.member-chip{
+  width:58px;height:45px;
+  border:1px solid #fff0bd;
+  background:linear-gradient(135deg,#fff1bd 0%,#d7b45e 22%,#8e6828 48%,#f5d987 72%,#a77b32 100%);
+  box-shadow:inset 0 0 0 2px rgba(67,45,15,.4),0 3px 13px rgba(0,0,0,.8),0 0 12px rgba(255,211,112,.18);
+}
+.member-chip:before{border-color:rgba(74,49,15,.82)}
+.member-contactless{margin-left:auto;color:#f2d58e;text-shadow:0 0 12px rgba(255,218,137,.42)}
+.member-card-name{
+  color:#fff0c9;
+  font:600 clamp(15px,2.5vw,22px) Cinzel,serif;
+  letter-spacing:.14em;
+  text-shadow:0 2px 8px #000,0 0 15px rgba(255,218,145,.15);
+}
+.member-card-foot{color:#cbb783;letter-spacing:.17em}
+.member-card-foot strong{
+  color:#f4d88e;
+  font:600 10px Cinzel,serif;
+  letter-spacing:.19em;
+  text-shadow:0 0 9px rgba(255,210,113,.22);
+}
+.member-card-monogram{
+  right:18px;bottom:25px;
+  color:rgba(255,219,145,.075);
+  text-shadow:0 0 35px rgba(255,207,105,.12);
+}
+.card-preview-result{width:min(620px,96vw)}
+.card-preview-result .member-card{transform:none}
+.card-result-actions{width:min(540px,100%);margin:22px auto 0}
+@media(max-width:520px){
+  .member-card{border-radius:15px}
+  .member-card-inner{padding:15px}
+  .member-brand{font-size:10px;letter-spacing:.14em;gap:7px}
+  .member-brand small{font-size:6px;letter-spacing:.12em}
+  .member-chip{width:43px;height:34px}
+  .member-card-middle{gap:12px}
+  .member-card-name{font-size:clamp(12px,4vw,17px);letter-spacing:.1em}
+  .member-card-foot{font-size:6px;letter-spacing:.1em}
+  .member-card-foot strong{font-size:8px;letter-spacing:.12em}
+}
