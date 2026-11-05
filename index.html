@@ -420,16 +420,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
  @keyframes emblemCrystal{from{filter:drop-shadow(0 0 2px rgba(83,207,255,.25))}to{filter:drop-shadow(0 0 9px rgba(83,207,255,.75)) drop-shadow(0 0 5px rgba(244,210,126,.45))}}
 }
 
-
-/* Central glass panels: preserve all existing section content and behavior */
-#dashboard.modal-open:after{content:"";position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.72);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
-#dashboard.modal-open .dmain{overflow:visible;padding:0;position:static}
-#dashboard.modal-open .dview:not([data-panel="overview"]){display:none}
-#dashboard.modal-open .dview:not([data-panel="overview"]).active{display:block;position:fixed;z-index:41;left:50%;top:50%;transform:translate(-50%,-50%);width:min( min(1120px, calc(100vw - 42px)), calc(100vw - 42px));height:min( min(820px, calc(100dvh - 110px)), calc(100dvh - 110px));overflow:auto;padding:clamp(16px,2.5vw,30px);border:1px solid #f6d889a8;border-radius:18px;background:linear-gradient(145deg,rgba(34,37,41,.98),rgba(7,9,12,.985));box-shadow:0 35px 100px #000e,0 0 35px #f6d88920,inset 0 1px #ffffff2a;backdrop-filter:blur(22px);animation:panelPop .28s ease both}
-@keyframes panelPop{from{opacity:0;transform:translate(-50%,-47%) scale(.97)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-#dashboard.modal-open .dview-close{position:sticky;top:0;float:right;z-index:3;margin:-8px -8px 8px 10px}
-#dashboard.modal-open[dir=rtl] .dview-close{float:left;margin:-8px 10px 8px -8px}
-@media(max-width:680px){#dashboard.modal-open .dview:not([data-panel="overview"]).active{width:calc(100vw - 18px);height:calc(100dvh - 86px);top:calc(50% + 8px);padding:15px 12px;border-radius:14px}#dashboard.modal-open .dview-close{margin:-5px -4px 8px 8px}}
+/* Sections stay inside the main workspace; no modal overlay or forced centering. */
 </style></head><body>
 <canvas id="c"></canvas><div id="dashboard">
 <header class="dtop"><div class="dbrand"><div class="demblem"><b>V</b></div><div><strong>VORTERRA</strong><small>WORLD OF INDUSTRY &amp; TRADE</small></div></div>
@@ -653,7 +644,7 @@ function openDashboardPanel(view){
  const root=document.getElementById('dashboard');
  root.querySelectorAll('.dview').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===view));
  root.querySelectorAll('[data-view]').forEach(item=>item.classList.toggle('active',item.dataset.view===view));
- root.classList.toggle('modal-open',view!=='overview');
+
  const panel=root.querySelector('.dview.active');
  if(panel)panel.scrollTop=0;
 }
@@ -841,8 +832,6 @@ const opsLabels={
 
  // Close controls return users to the main overview.
  const root=$("dashboard");root.querySelectorAll(".dview:not([data-panel=overview])").forEach(panel=>{const x=document.createElement("button");x.type="button";x.className="dview-close";x.textContent="×";x.setAttribute("aria-label","Close and return to overview");x.title="Close";x.addEventListener("click",()=>{root.querySelectorAll(".dview").forEach(v=>v.classList.toggle("active",v.dataset.panel==="overview"));root.querySelectorAll("[data-view]").forEach(v=>v.classList.toggle("active",v.dataset.view==="overview"));root.classList.remove("modal-open");const m=root.querySelector(".dmain");if(m)m.scrollTo({top:0,behavior:"smooth"});});panel.appendChild(x);});
- root.addEventListener("click",e=>{if(root.classList.contains("modal-open")&&e.target===root){root.querySelectorAll(".dview").forEach(v=>v.classList.toggle("active",v.dataset.panel==="overview"));root.querySelectorAll("[data-view]").forEach(v=>v.classList.toggle("active",v.dataset.view==="overview"));root.classList.remove("modal-open");}});
- document.addEventListener("keydown",e=>{if(e.key==="Escape"&&root.classList.contains("modal-open")){root.querySelectorAll(".dview").forEach(v=>v.classList.toggle("active",v.dataset.panel==="overview"));root.querySelectorAll("[data-view]").forEach(v=>v.classList.toggle("active",v.dataset.view==="overview"));root.classList.remove("modal-open");}});
  document.querySelectorAll("#dashboard [data-lang]").forEach(b=>b.addEventListener("click",()=>applyLanguage(b.dataset.lang)));
  try{const saved=localStorage.getItem("vorterra-language");if(saved&&dict[saved])lang=saved}catch(e){}
  loadDemoState();
