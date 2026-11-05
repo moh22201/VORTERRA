@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>VORTERRA — World Interface Preview</title>
+<style>
+:root{--bg:#070604;--panel:rgba(20,15,9,.82);--gold:#d9b36e;--gold2:#f5e2b4;--copper:#a86c38;--ivory:#eee3ce;--muted:#a99a7e;--line:rgba(218,178,105,.32);--glow:rgba(218,178,105,.16)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ivory);font-family:Inter,"Segoe UI",Arial,sans-serif}body{overflow:hidden;background:radial-gradient(ellipse at 50% 44%,#302216 0%,#171109 39%,#090705 76%,#040302 100%)}
+#dust{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;opacity:.8}.grain{position:fixed;inset:0;pointer-events:none;opacity:.12;background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(235,196,125,.035) 4px);z-index:1}
+.shell{position:relative;z-index:2;height:100svh;min-height:560px;padding:20px 26px 18px;display:flex;flex-direction:column;gap:14px}
+.header{height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-shrink:0}
+.account{display:flex;align-items:center;gap:13px;min-width:250px;padding:8px 13px 8px 8px;border:1px solid rgba(221,185,119,.42);border-radius:13px;background:linear-gradient(125deg,rgba(255,239,203,.10),rgba(15,11,7,.8) 45%,rgba(164,104,48,.13));box-shadow:0 10px 35px #0008,inset 0 1px 0 #fff2;backdrop-filter:blur(14px)}
+.mini-card{width:76px;height:48px;flex-shrink:0;position:relative;overflow:hidden;border-radius:7px;border:1px solid #c9a465;background:linear-gradient(135deg,#43321b,#17120b 55%,#5b3c1d);box-shadow:inset 0 0 18px #f4d79b18,0 0 15px #d9b36e22}
+.mini-card:before{content:"";position:absolute;inset:4px;border:1px solid #d8b87555;border-radius:4px}
+.mini-card:after{content:"";position:absolute;width:90px;height:20px;left:-12px;top:14px;transform:rotate(-28deg);background:linear-gradient(90deg,transparent,#fff3,transparent);animation:shine 6s ease-in-out infinite}
+.mini-chip{position:absolute;left:9px;top:9px;width:13px;height:10px;border-radius:2px;background:linear-gradient(135deg,#fff0bd,#a87832);box-shadow:0 0 6px #f5d58a66}
+.mini-v{position:absolute;right:8px;top:5px;font:700 20px Georgia;color:#f0d69c;text-shadow:0 0 10px #d9b36e99}
+.mini-id{position:absolute;left:9px;bottom:6px;font:7px monospace;letter-spacing:1px;color:#f4dfb5}
+.account-copy{min-width:0}.account-label{font:9px Georgia,serif;letter-spacing:2px;color:var(--gold)}.account-name{font-size:12px;font-weight:700;letter-spacing:1px;margin-top:4px;white-space:nowrap}.account-place{font-size:10px;color:var(--muted);margin-top:3px}
+.brand{text-align:right;min-width:250px}.brand-name{font:600 clamp(23px,3vw,34px) Georgia,serif;letter-spacing:.23em;padding-left:.23em;color:transparent;background:linear-gradient(110deg,#93642d,#f8e6b7 30%,#bb8740 55%,#f5e1ad 72%,#8c5c27);background-clip:text;-webkit-background-clip:text;filter:drop-shadow(0 0 16px #d9b36e44)}.brand-sub{font:8px Georgia,serif;letter-spacing:4px;color:#b99b69;margin-top:4px}
+.header-tools{display:flex;align-items:center;gap:8px}.tool{width:34px;height:34px;border:1px solid var(--line);border-radius:9px;background:#110d08aa;color:#d9bd87;display:grid;place-items:center;font-size:14px;box-shadow:inset 0 1px 0 #fff1}
+.hero{display:flex;align-items:flex-end;justify-content:space-between;padding:2px 4px 0;flex-shrink:0}.eyebrow{font:9px Georgia,serif;letter-spacing:3px;color:#b8955c}.hero h1{margin:7px 0 0;font:500 clamp(19px,2.4vw,29px) Georgia,serif;letter-spacing:.13em;color:#f1e3c7}.hero-note{font-size:10px;color:#a99a7e;letter-spacing:.08em}
+.workspace{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:205px minmax(0,1fr) 190px;gap:13px}
+.glass{border:1px solid var(--line);background:linear-gradient(145deg,rgba(44,31,17,.68),rgba(9,7,5,.82));box-shadow:0 16px 45px #0006,inset 0 1px 0 #fff1;backdrop-filter:blur(12px);border-radius:13px}
+.city-panel,.region-panel{padding:15px;display:flex;flex-direction:column;min-height:0}
+.panel-kicker{font:8px Georgia,serif;letter-spacing:2.3px;color:#b9955c}.panel-title{font:16px Georgia,serif;color:#f0dfbd;margin:9px 0 12px}.panel-line{height:1px;background:linear-gradient(90deg,var(--gold),transparent);opacity:.5;margin:0 0 12px}
+.empty-state{font-size:11px;line-height:1.8;color:#a99a7e}.empty-mark{width:45px;height:45px;border:1px solid #c49a5c66;transform:rotate(45deg);margin:14px 0 22px 8px;display:grid;place-items:center;color:#e2c184;font-size:18px;box-shadow:0 0 20px #d9b36e12}.empty-mark span{transform:rotate(-45deg)}
+.city-info{display:none}.city-info.active{display:block}.city-name{font:21px Georgia,serif;color:#f5e6c7;margin:8px 0}.city-meta{font-size:10px;color:#c2a879;line-height:1.8}.type-pill{display:inline-block;border:1px solid #d9b36e66;border-radius:30px;padding:5px 9px;margin:8px 0;color:#e7cf9f;font-size:9px;letter-spacing:1px}.city-description{font-size:10px;line-height:1.8;color:#b9ac94;margin:8px 0 16px}.gold-button{border:1px solid #d6b16c;background:linear-gradient(110deg,#a97736aa,#3a2815aa);color:#f5e4c1;padding:10px 8px;border-radius:6px;font:9px Georgia,serif;letter-spacing:1.4px;cursor:pointer;box-shadow:0 0 18px #d9b36e16}.gold-button:hover{box-shadow:0 0 24px #d9b36e44}
+.map-stage{position:relative;min-width:0;overflow:hidden;border:1px solid rgba(215,177,106,.23);border-radius:15px;background:radial-gradient(ellipse at 50% 50%,rgba(91,63,30,.26),rgba(9,8,6,.35) 65%),linear-gradient(145deg,#21180eaa,#080705dd);box-shadow:inset 0 0 80px #0009,0 18px 55px #0008}
+.map-stage:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(214,176,105,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(214,176,105,.035) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(ellipse at center,#000 20%,transparent 83%)}
+.map-glow{position:absolute;width:70%;height:55%;left:15%;top:22%;background:#a46f3030;filter:blur(65px);border-radius:50%}
+.world-map{position:absolute;inset:4% 3%;width:94%;height:92%;filter:drop-shadow(0 10px 20px #000b)}
+.land{fill:url(#landGold);stroke:#c99e5c;stroke-opacity:.54;stroke-width:1.2}.land-detail{fill:none;stroke:#f2d7a1;stroke-opacity:.11;stroke-width:1}
+.map-label{font:10px Georgia,serif;letter-spacing:3px;fill:#d6bd8e;opacity:.56}
+.city-marker{position:absolute;width:13px;height:13px;padding:0;border:1px solid #f4dda7;background:#a87939;box-shadow:0 0 0 4px #d9b36e18,0 0 16px #e7bd6b99;border-radius:2px;transform:translate(-50%,-50%) rotate(45deg);cursor:pointer;transition:.25s;z-index:3}
+.city-marker:after{content:"";position:absolute;inset:3px;background:#fff0c5;border-radius:1px}.city-marker:hover,.city-marker.selected{transform:translate(-50%,-50%) rotate(45deg) scale(1.55);background:#f1d69c;box-shadow:0 0 0 7px #d9b36e22,0 0 25px #f5d58a}
+.marker-caption{position:absolute;transform:translate(-50%,0);font:8px Georgia,serif;letter-spacing:1px;color:#e6d2aa;text-shadow:0 2px 5px #000;white-space:nowrap;pointer-events:none;z-index:2}
+.map-compass{position:absolute;right:17px;top:16px;width:34px;height:34px;border:1px solid #d9b36e55;border-radius:50%;display:grid;place-items:center;color:#e2c58b;font:12px Georgia;box-shadow:0 0 14px #d9b36e1c}.map-scale{position:absolute;left:18px;bottom:15px;font:8px Georgia,serif;letter-spacing:2px;color:#b89b69}.map-coordinates{position:absolute;right:17px;bottom:15px;font:8px monospace;color:#927b55}
+.region-list{display:flex;flex-direction:column;gap:7px;margin-top:3px}.region{display:flex;align-items:center;justify-content:space-between;padding:9px 8px;border:1px solid transparent;border-radius:7px;color:#b9a889;font-size:10px;cursor:pointer;background:#08070555}.region:hover,.region.active{border-color:#c79d5a55;background:#c69a4a12;color:#f1d8a6}.region small{color:#96784d;font:8px monospace}.world-status{margin-top:auto;padding-top:14px;border-top:1px solid #d9b36e22;color:#9d8a68;font-size:9px;line-height:1.8}
+.footer{height:60px;display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0}.nav-item{min-width:115px;height:46px;display:flex;align-items:center;justify-content:center;gap:9px;padding:0 14px;border:1px solid #d9b36e38;border-radius:9px;background:linear-gradient(120deg,#24190eaa,#090705cc);color:#c8b28b;font:9px Georgia,serif;letter-spacing:1.3px;cursor:pointer;box-shadow:0 8px 22px #0005}.nav-item b{font-size:15px;color:#e0bf80;font-weight:400}.nav-item.active,.nav-item:hover{border-color:#e0bd7a;color:#f5e4c2;box-shadow:0 0 20px #d9b36e1c}
+@keyframes shine{0%,60%{transform:translateX(-80%) rotate(-28deg)}100%{transform:translateX(180%) rotate(-28deg)}}
+@keyframes float{50%{transform:translateY(-5px)}}.map-stage{animation:map-in 1.2s ease both}@keyframes map-in{from{opacity:0;transform:scale(.985);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
+@media(max-width:900px){.shell{padding:12px;gap:10px}.workspace{grid-template-columns:160px minmax(0,1fr)}.region-panel{display:none}.account{min-width:220px}.brand{min-width:170px}.city-panel{padding:12px}.nav-item{min-width:90px}}
+@media(max-width:620px){body{overflow:auto}.shell{height:auto;min-height:100svh;padding:10px;gap:9px}.header{height:62px;gap:7px}.account{min-width:0;padding:5px 7px 5px 5px;gap:7px}.mini-card{width:55px;height:37px}.account-label{font-size:7px}.account-name{font-size:10px}.account-place{font-size:8px}.brand{min-width:0}.brand-name{font-size:19px;letter-spacing:.13em}.brand-sub{font-size:6px;letter-spacing:2px}.header-tools{display:none}.hero{align-items:flex-start;flex-direction:column;gap:4px}.hero h1{font-size:18px}.hero-note{font-size:9px}.workspace{display:flex;flex-direction:column;gap:8px}.map-stage{height:48vh;min-height:290px;order:1}.city-panel{order:2;min-height:130px}.region-panel{display:flex;order:3;min-height:auto}.region-list{display:grid;grid-template-columns:repeat(2,1fr)}.world-map{inset:8% 1%;width:98%;height:84%}.city-marker{width:11px;height:11px}.footer{height:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:4px 0 12px}.nav-item{min-width:0;height:42px;padding:0 5px;font-size:8px;gap:5px}.nav-item b{font-size:13px}.map-compass{right:10px;top:10px}.map-scale{left:10px;bottom:9px}.map-coordinates{right:10px;bottom:9px}}
+</style>
+</head>
+<body>
+<canvas id="dust"></canvas><div class="grain"></div>
+<div class="shell">
+<header class="header">
+  <div class="account">
+    <div class="mini-card"><span class="mini-chip"></span><span class="mini-v">V</span><span class="mini-id">VOR • MEMBER</span></div>
+    <div class="account-copy"><div class="account-label">PLAYER ACCOUNT</div><div class="account-name">YOUR NAME</div><div class="account-place">YOUR CITY · YOUR COUNTRY</div></div>
+  </div>
+  <div class="header-tools"><div class="tool">◈</div><div class="tool">♙</div><div class="tool">⚙</div></div>
+  <div class="brand"><div class="brand-name">VORTERRA</div><div class="brand-sub">WORLD OF INDUSTRY &amp; TRADE</div></div>
+</header>
+<section class="hero"><div><div class="eyebrow">THE WORLD IS YOURS TO BUILD</div><h1>DISCOVER YOUR WORLD</h1></div><div class="hero-note">SELECT A CITY TO VIEW ITS PROFILE</div></section>
+<main class="workspace">
+  <aside class="city-panel glass">
+    <div class="panel-kicker">CITY INTELLIGENCE</div><div class="panel-title">Selected location</div><div class="panel-line"></div>
+    <div id="emptyState"><div class="empty-mark"><span>✦</span></div><p class="empty-state">Choose one of the golden city markers on the world map to discover its environment and city profile.</p></div>
+    <div class="city-info" id="cityInfo"><div class="panel-kicker">CITY PROFILE</div><div class="city-name" id="cityName">—</div><div class="city-meta" id="cityCountry">—</div><span class="type-pill" id="cityType">—</span><p class="city-description" id="cityDescription">—</p><button class="gold-button" id="exploreButton">VIEW CITY DETAILS ↗</button></div>
+  </aside>
+  <section class="map-stage" aria-label="VORTERRA world map">
+    <div class="map-glow"></div>
+    <svg class="world-map" viewBox="0 0 1000 520" role="img" aria-label="Stylized world map with city locations">
+      <defs><linearGradient id="landGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8d6738"/><stop offset=".48" stop-color="#49341e"/><stop offset="1" stop-color="#241a10"/></linearGradient></defs>
+      <g class="land">
+       <path d="M75 112l32-28 48-7 25-23 44 9 25 28 43 4 26 25-11 26-37 8-18 24-35 8-12 30-33 8-21-20-31-4-20-31-32-10-12-25z"/>
+       <path d="M250 225l34 5 28 24-4 40-22 36-9 55-22 50-22-18-8-46-18-38 8-42 14-30z"/>
+       <path d="M440 107l35-24 45 3 23 20 44-9 28 17 38-5 37 22 35-7 31 20 40-3 36 27-8 23-37 5-20 24-41-3-19 21-39-8-28 15-39-7-22 18-31-12-18-30-34-7-19-30-31-7-13-32-31-12z"/>
+       <path d="M475 224l42-12 45 13 23 30-6 45-22 30-13 46-32 38-27-19-8-47-21-33 1-49z"/>
+       <path d="M655 286l28-15 41 8 24 25-6 40-32 18-35-9-26-27z"/>
+       <path d="M792 375l41-19 47 11 30 32-17 32-54 8-39-18-24-25z"/>
+       <path d="M870 182l16-10 19 9-3 24-18 7-17-13z"/>
+       <path d="M365 82l14-10 18 7-4 16-20 4z"/>
+      </g>
+      <g class="land-detail"><path d="M98 122l75 13 48-18 58 13M470 125l90 17 74-12 80 30 96-8M480 253l52 18 34-7M263 251l22 53-9 69M810 389l65 24"/></g>
+      <g class="map-label"><text x="145" y="188">NORTH AMERICA</text><text x="262" y="365">SOUTH AMERICA</text><text x="550" y="190">EUROPE</text><text x="520" y="330">AFRICA</text><text x="750" y="275">ASIA</text><text x="820" y="455">OCEANIA</text></g>
+    </svg>
+    <div class="map-compass">N</div><div class="map-scale">WORLD ATLAS · VOR 01</div><div class="map-coordinates" id="coordinates">LAT 00.00 · LNG 00.00</div>
+    <button class="city-marker" style="left:19%;top:27%" data-city="New York" data-country="United States" data-type="COASTAL CITY" data-desc="A major coastal trade gateway with access to sea routes and international markets." data-coord="40.71 · -74.00" aria-label="New York"></button>
+    <span class="marker-caption" style="left:19%;top:30%">NEW YORK</span>
+    <button class="city-marker" style="left:24%;top:36%" data-city="Mexico City" data-country="Mexico" data-type="INLAND CITY" data-desc="An inland industrial center connected to regional roads and a large workforce." data-coord="19.43 · -99.13" aria-label="Mexico City"></button>
+    <button class="city-marker" style="left:31%;top:66%" data-city="São Paulo" data-country="Brazil" data-type="INLAND CITY" data-desc="A large inland business and manufacturing hub with room for industrial expansion." data-coord="-23.55 · -46.63" aria-label="São Paulo"></button>
+    <span class="marker-caption" style="left:31%;top:69%">SÃO PAULO</span>
+    <button class="city-marker" style="left:52%;top:25%" data-city="London" data-country="United Kingdom" data-type="COASTAL CITY" data-desc="A coastal international trade center with access to shipping and financial networks." data-coord="51.50 · -0.12" aria-label="London"></button>
+    <button class="city-marker" style="left:57%;top:30%" data-city="Algiers" data-country="Algeria" data-type="COASTAL CITY" data-desc="A Mediterranean coastal city with port potential and access to regional trade routes." data-coord="36.75 · 3.05" aria-label="Algiers"></button>
+    <span class="marker-caption" style="left:57%;top:33%">ALGIERS</span>
+    <button class="city-marker" style="left:55%;top:42%" data-city="Tamanrasset" data-country="Algeria" data-type="DESERT CITY" data-desc="A desert settlement with strategic access to mineral resources and long-distance land transport." data-coord="22.78 · 5.52" aria-label="Tamanrasset"></button>
+    <button class="city-marker" style="left:62%;top:35%" data-city="Cairo" data-country="Egypt" data-type="INLAND CITY" data-desc="A strategic inland metropolis connecting African, Mediterranean and Middle Eastern trade." data-coord="30.04 · 31.23" aria-label="Cairo"></button>
+    <button class="city-marker" style="left:72%;top:30%" data-city="Dubai" data-country="United Arab Emirates" data-type="COASTAL CITY" data-desc="A coastal logistics gateway with port, shipping and international business opportunities." data-coord="25.20 · 55.27" aria-label="Dubai"></button>
+    <span class="marker-caption" style="left:72%;top:33%">DUBAI</span>
+    <button class="city-marker" style="left:80%;top:27%" data-city="Shanghai" data-country="China" data-type="COASTAL CITY" data-desc="A major port city connected to global manufacturing, logistics and maritime trade." data-coord="31.23 · 121.47" aria-label="Shanghai"></button>
+    <button class="city-marker" style="left:84%;top:42%" data-city="Singapore" data-country="Singapore" data-type="COASTAL CITY" data-desc="A strategic maritime hub linking major Asian and international shipping lanes." data-coord="1.35 · 103.81" aria-label="Singapore"></button>
+    <button class="city-marker" style="left:87%;top:70%" data-city="Sydney" data-country="Australia" data-type="COASTAL CITY" data-desc="A coastal city with access to ocean transport and regional development opportunities." data-coord="-33.86 · 151.20" aria-label="Sydney"></button>
+  </section>
+  <aside class="region-panel glass">
+    <div class="panel-kicker">WORLD ATLAS</div><div class="panel-title">Explore regions</div><div class="panel-line"></div>
+    <div class="region-list">
+      <button class="region active" data-region="ALL">All regions <small>06</small></button>
+      <button class="region" data-region="AMERICA">Americas <small>02</small></button>
+      <button class="region" data-region="EUROPE">Europe <small>01</small></button>
+      <button class="region" data-region="AFRICA">Africa <small>03</small></button>
+      <button class="region" data-region="ASIA">Asia <small>03</small></button>
+      <button class="region" data-region="OCEANIA">Oceania <small>01</small></button>
+    </div>
+    <div class="world-status">WORLD NETWORK<br><strong style="color:#e4c78e;font-weight:500">CITY DISCOVERY</strong><br>Choose a location to begin.</div>
+  </aside>
+</main>
+<footer class="footer">
+  <button class="nav-item active"><b>⌖</b> WORLD MAP</button><button class="nav-item"><b>▣</b> MY ASSETS</button><button class="nav-item"><b>◈</b> WALLET</button><button class="nav-item"><b>▤</b> LIBRARY</button><button class="nav-item"><b>⚙</b> SETTINGS</button>
+</footer>
+</div>
+<script>
+const canvas=document.getElementById('dust'),ctx=canvas.getContext('2d');let w,h,dots=[];
+function resize(){w=canvas.width=innerWidth*devicePixelRatio;h=canvas.height=innerHeight*devicePixelRatio;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px'}
+resize();addEventListener('resize',resize);
+for(let i=0;i<75;i++)dots.push({x:Math.random(),y:Math.random(),r:Math.random()*1.5+.3,s:Math.random()*.00015+.00004,a:Math.random()*6.28});
+(function draw(){ctx.clearRect(0,0,w,h);for(const p of dots){p.y-=p.s;if(p.y<0)p.y=1;ctx.beginPath();ctx.fillStyle='rgba(224,185,112,'+(.16+.35*Math.abs(Math.sin(p.a+=.008)))+')';ctx.arc(p.x*w,p.y*h,p.r*devicePixelRatio,0,Math.PI*2);ctx.fill()}requestAnimationFrame(draw)})();
+const markers=[...document.querySelectorAll('.city-marker')];
+const info=document.getElementById('cityInfo'),empty=document.getElementById('emptyState');
+markers.forEach(marker=>marker.addEventListener('click',()=>{
+ markers.forEach(m=>m.classList.remove('selected'));marker.classList.add('selected');
+ document.getElementById('cityName').textContent=marker.dataset.city;
+ document.getElementById('cityCountry').textContent=marker.dataset.country+' · '+marker.dataset.coord;
+ document.getElementById('cityType').textContent=marker.dataset.type;
+ document.getElementById('cityDescription').textContent=marker.dataset.desc;
+ document.getElementById('coordinates').textContent='LAT/LNG '+marker.dataset.coord;
+ empty.style.display='none';info.classList.add('active');
+}));
+document.querySelectorAll('.region').forEach(btn=>btn.addEventListener('click',()=>{
+ document.querySelectorAll('.region').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+ const r=btn.dataset.region;
+ markers.forEach(m=>{const x=parseFloat(m.style.left);let show=r==='ALL'||(r==='AMERICA'&&x<40)||(r==='EUROPE'&&x>=45&&x<56)||(r==='AFRICA'&&x>=54&&x<67)||(r==='ASIA'&&x>=67&&x<86)||(r==='OCEANIA'&&x>=86);m.style.display=show?'block':'none';});
+ document.querySelectorAll('.marker-caption').forEach(label=>{const x=parseFloat(label.style.left);label.style.display=r==='ALL'||(r==='AMERICA'&&x<40)||(r==='EUROPE'&&x>=45&&x<56)||(r==='AFRICA'&&x>=54&&x<67)||(r==='ASIA'&&x>=67&&x<86)||(r==='OCEANIA'&&x>=86)?'block':'none';});
+}));
+document.getElementById('exploreButton').addEventListener('click',()=>alert('City entry and account registration will be connected in the next development stage.'));
+</script>
+</body></html>
