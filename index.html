@@ -668,9 +668,16 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
    <div class="reg-divider">OR CONTINUE WITH</div>
    <button class="google-register" id="googleRegister" type="button"><span>G</span> Continue with Google · التسجيل عبر Google</button>
    <p class="reg-message" id="registrationMessage" role="status" aria-live="polite"></p>
-   <p class="reg-note">Account creation and Google sign-in will be activated when VORTERRA is connected to Supabase. This is currently a visual preview; passwords are not saved or sent.</p>
+   <button class="google-register" id="showLogin" type="button" style="margin-top:10px">Already have an account? Sign in</button>
+   <form class="registration-form" id="loginForm" hidden style="margin-top:14px">
+    <div><label for="loginEmail">EMAIL ADDRESS</label><input id="loginEmail" type="email" autocomplete="username" placeholder="name@example.com" required></div>
+    <div><label for="loginPassword">PASSWORD</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
+    <button class="register-submit" type="submit">SIGN IN · دخول</button>
+   </form>
+   <p class="reg-note">Your account is secured by Supabase Authentication. Passwords are sent directly to Supabase over HTTPS and are never stored in VORTERRA code.</p>
   </section>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0"></script>
 <script>
 const cv=document.getElementById('c'),x=cv.getContext('2d');let W,H,P=[];
 function rs(){W=cv.width=innerWidth*devicePixelRatio;H=cv.height=innerHeight*devicePixelRatio}
@@ -714,23 +721,77 @@ identityForm.addEventListener('submit',event=>{
  identityForm.hidden=true;
  document.getElementById('registrationPanel').scrollIntoView({behavior:'smooth',block:'center'});
 });
+const SUPABASE_URL='https://qnfjtpwtwvlvbzyliwmh.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_tWieCfaR6RN2S01dFwH7vg_7ZkSXbDv';
+const vortERRAAuth=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 const registrationForm=document.getElementById('registrationForm');
-registrationForm.addEventListener('submit',event=>{
- event.preventDefault();
- const password=document.getElementById('regPassword');
- const confirm=document.getElementById('regConfirm');
- const message=document.getElementById('registrationMessage');
- if(password.value!==confirm.value){confirm.setCustomValidity('Passwords do not match');confirm.reportValidity();confirm.setCustomValidity('');return;}
- password.value='';confirm.value='';
- /* Preview navigation only: real account creation starts after Supabase auth is connected. */
+const registrationMessage=document.getElementById('registrationMessage');
+function showAuthMessage(message,isError=false){registrationMessage.textContent=message;registrationMessage.style.color=isError?'#ffaaa0':'#e5cf98';}
+function enterAuthenticatedDashboard(user){
  document.getElementById('cardScene').style.display='none';
  document.getElementById('intro').style.display='none';
  document.getElementById('skip').style.display='none';
- document.getElementById('dashboard').classList.add('active');
+ const dashboard=document.getElementById('dashboard');
+ dashboard.classList.add('active');
+ const member=dashboard.querySelector('.dmember');
+ if(member){member.textContent=user.email||'VORTERRA MEMBER';}
+ vortERRAAuth.from('wallets').select('total_balance,available_balance,reserved_balance').eq('user_id',user.id).maybeSingle().then(({data,error})=>{
+  if(error){console.warn('Wallet read:',error);return;}
+  if(!data)return;
+  const balance=dashboard.querySelector('.dbalance b');
+  if(balance)balance.textContent=Number(data.available_balance).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' VOR';
+ });
+}
+registrationForm.addEventListener('submit',async event=>{
+ event.preventDefault();
+ const password=document.getElementById('regPassword');
+ const confirm=document.getElementById('regConfirm');
+ if(password.value!==confirm.value){confirm.setCustomValidity('Passwords do not match');confirm.reportValidity();confirm.setCustomValidity('');return;}
+ const email=document.getElementById('regEmail').value.trim();
+ const firstName=document.getElementById('iN')?.value.trim()||'';
+ const lastName=document.getElementById('iL')?.value.trim()||'';
+ const country=document.getElementById('iC')?.value||'';
+ const city=document.getElementById('iY')?.value||'';
+ const submit=registrationForm.querySelector('button[type="submit"]');
+ submit.disabled=true;showAuthMessage('Creating your secure VORTERRA account…');
+ try{
+  const {data,error}=await vortERRAAuth.auth.signUp({
+   email,password:password.value,
+   options:{emailRedirectTo:window.location.origin+window.location.pathname,data:{full_name:[firstName,lastName].filter(Boolean).join(' '),first_name:firstName,last_name:lastName,country,city}}
+  });
+  if(error)throw error;
+  password.value='';confirm.value='';
+  if(data.session&&data.user){showAuthMessage('Account created successfully. Welcome to VORTERRA.');enterAuthenticatedDashboard(data.user);}
+  else{showAuthMessage('Account created. Please check your email and confirm your address before signing in.');}
+ }catch(error){showAuthMessage(error.message||'Account creation failed. Please try again.',true);}
+ finally{submit.disabled=false;}
 });
-document.getElementById('googleRegister').addEventListener('click',()=>{
- document.getElementById('registrationMessage').textContent='Google sign-in will be activated after Supabase OAuth setup.';
+const loginForm=document.getElementById('loginForm');
+document.getElementById('showLogin').addEventListener('click',()=>{
+ loginForm.hidden=!loginForm.hidden;
+ document.getElementById('showLogin').textContent=loginForm.hidden?'Already have an account? Sign in':'Back to create account';
 });
+loginForm.addEventListener('submit',async event=>{
+ event.preventDefault();
+ const submit=loginForm.querySelector('button[type="submit"]');submit.disabled=true;
+ showAuthMessage('Signing in securely…');
+ try{
+  const {data,error}=await vortERRAAuth.auth.signInWithPassword({email:document.getElementById('loginEmail').value.trim(),password:document.getElementById('loginPassword').value});
+  if(error)throw error;
+  if(data.user){document.getElementById('loginPassword').value='';showAuthMessage('Signed in successfully.');enterAuthenticatedDashboard(data.user);}
+ }catch(error){showAuthMessage(error.message||'Sign-in failed. Please try again.',true);}
+ finally{submit.disabled=false;}
+});
+document.getElementById('googleRegister').addEventListener('click',async()=>{
+ showAuthMessage('Connecting to Google…');
+ const {error}=await vortERRAAuth.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+window.location.pathname}});
+ if(error)showAuthMessage(error.message||'Google sign-in is not configured yet in Supabase.',true);
+});
+vortERRAAuth.auth.getSession().then(({data,error})=>{
+ if(error){console.warn('Auth session:',error);return;}
+ if(data.session?.user)enterAuthenticatedDashboard(data.session.user);
+});
+
 function openDashboardPanel(view){
  const root=document.getElementById('dashboard');
  root.querySelectorAll('.dview').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===view));
