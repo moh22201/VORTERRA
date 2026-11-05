@@ -158,3 +158,85 @@
   .member-card-foot{font-size:6px;letter-spacing:.1em}
   .member-card-foot strong{font-size:8px;letter-spacing:.12em}
 }
+
+
+/* VORTERRA black-crystal intro and premium entrance */
+.intro-screen{
+ background:
+  radial-gradient(ellipse at 50% 42%,rgba(205,157,65,.13),transparent 27%),
+  radial-gradient(ellipse at 50% 50%,#11100d 0%,#070707 48%,#020202 100%);
+}
+.intro-screen:before{
+ opacity:.42;
+ background:
+  linear-gradient(128deg,transparent 0 38%,rgba(255,222,151,.035) 48%,transparent 59%),
+  repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.012) 4px),
+  radial-gradient(ellipse at center,transparent 8%,rgba(0,0,0,.88) 100%);
+}
+.intro-screen:after{
+ inset:18px;
+ border:1px solid rgba(255,218,133,.28);
+ box-shadow:inset 0 0 34px rgba(225,177,76,.035),0 0 24px rgba(225,177,76,.05);
+}
+.ambient-gold{background:#c18b31;opacity:.18;filter:blur(110px)}
+.ambient-blue{background:#a97827;opacity:.12;filter:blur(120px)}
+.grid-glow{
+ background:
+  linear-gradient(135deg,transparent 35%,rgba(255,218,145,.025) 50%,transparent 65%),
+  radial-gradient(ellipse at center,transparent 18%,rgba(0,0,0,.78) 100%);
+}
+.emblem{
+ filter:drop-shadow(0 0 18px rgba(255,211,116,.25)) drop-shadow(0 0 42px rgba(198,143,45,.14));
+}
+.emblem:before{
+ inset:10px;border:1px solid rgba(255,225,159,.95);border-radius:19px;
+ box-shadow:inset 0 0 28px rgba(255,213,126,.13),0 0 26px rgba(255,209,110,.16);
+}
+.emblem:after{border-color:rgba(255,218,133,.68);box-shadow:0 0 30px rgba(255,211,116,.22)}
+.emblem-core{
+ color:#fff0bd;
+ background:linear-gradient(135deg,#fff8dc 5%,#d8ad55 36%,#fff0b8 58%,#9b6d25 88%);
+ background-clip:text;-webkit-background-clip:text;
+ -webkit-text-fill-color:transparent;
+ text-shadow:0 0 26px rgba(255,215,132,.24);
+}
+.emblem-orbit{border-color:rgba(255,221,151,.52)}
+.eyebrow{color:#e4c47d;text-shadow:0 0 16px rgba(255,210,116,.25)}
+.wordmark{
+ background:linear-gradient(108deg,#8b6328 0%,#fff1c4 17%,#c69743 34%,#fff8dc 49%,#b98432 67%,#ffe9ad 83%,#8d6228 100%);
+ background-clip:text;-webkit-background-clip:text;
+ filter:drop-shadow(0 5px 0 rgba(0,0,0,.72)) drop-shadow(0 0 28px rgba(235,190,99,.28));
+}
+.wordmark-line{background:linear-gradient(90deg,transparent,#9c712f,#fff0bd,#9c712f,transparent)}
+.wordmark-line:after{background:#090908;color:#ffe4a0}
+.tagline{color:#e9dfc7;text-shadow:0 0 14px rgba(255,222,160,.12)}
+.enter-button{
+ position:relative;overflow:hidden;
+ border:1px solid rgba(255,222,151,.86);border-radius:3px;
+ background:linear-gradient(110deg,rgba(199,151,61,.22),rgba(8,8,7,.92) 52%,rgba(199,151,61,.14));
+ color:#fff0c7;
+ box-shadow:0 0 32px rgba(223,176,79,.14),inset 0 0 20px rgba(255,219,142,.07);
+}
+.enter-button:before{
+ content:"";position:absolute;top:-20%;bottom:-20%;left:-65%;width:42%;
+ transform:skewX(-22deg);
+ background:linear-gradient(90deg,transparent,rgba(255,244,207,.28),transparent);
+ animation:button-glint 5s ease-in-out infinite;
+}
+.enter-button span,.enter-button b{position:relative;z-index:1}
+.enter-button b{color:#ffe3a0}
+.enter-button:hover{border-color:#fff0bd;box-shadow:0 9px 38px rgba(225,177,76,.22),inset 0 0 22px rgba(255,225,153,.12)}
+.intro-footer{color:#c3a56c}
+.skip-hint{color:#ddbd7a}
+.coin{
+ border-color:rgba(255,237,187,.95);
+ background:radial-gradient(circle at 30% 25%,#fff9d9,#e2b44e 48%,#684513 82%);
+ box-shadow:0 0 18px rgba(255,209,105,.38),inset 0 0 4px #fff4c9;
+}
+.coin:after{color:#57380e}
+@media(max-width:520px){
+ .intro-screen:after{inset:9px}
+ .emblem{transform:scale(.86)}
+ .intro-footer{left:18px;right:18px;font-size:7px;letter-spacing:.15em}
+ .skip-hint{font-size:7px;letter-spacing:.2em}
+}
