@@ -57,8 +57,10 @@ canvas{position:fixed;inset:0;width:100%;height:100%}
 .f span{display:block;font-size:clamp(12px,3.6vw,16px);font-weight:600;letter-spacing:.05em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:1.3em}
 /* FORM */
 .form{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(88vw,460px)}
-.form input{width:100%;padding:11px 12px;border-radius:12px;border:1px solid rgba(216,178,90,.4);background:rgba(8,14,30,.55);color:#fff;font:inherit;outline:none}
-.form input:focus{border-color:var(--cy);box-shadow:0 0 14px rgba(46,200,255,.4)}
+.form input,.form select{width:100%;min-width:0;padding:11px 12px;border-radius:12px;border:1px solid rgba(216,178,90,.4);background:rgba(8,14,30,.88);color:#fff;font:inherit;outline:none}
+.form input:focus,.form select:focus{border-color:var(--gold);box-shadow:0 0 14px rgba(216,178,90,.24)}
+.form select:disabled{opacity:.55;cursor:not-allowed}
+.form select option{background:#101522;color:#fff}
 .continue{width:min(88vw,460px);margin-top:4px;padding:12px;border:1px solid rgba(216,178,90,.65);border-radius:12px;background:linear-gradient(90deg,rgba(216,178,90,.18),rgba(46,200,255,.10));color:var(--gold2);font-weight:700;cursor:pointer}
 .replay-button{background:transparent;color:var(--gold);border:1px solid rgba(216,178,90,.5);font-weight:600}
 .next-stage{width:min(88vw,460px);padding:26px;text-align:center;border:1px solid rgba(216,178,90,.4);border-radius:16px;background:rgba(5,8,16,.78);box-shadow:0 20px 60px rgba(0,0,0,.5)}
@@ -87,11 +89,14 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
   </div></div></div>
  <form class="form" id="identityForm">
   <input id="iN" placeholder="الاسم / First name" autocomplete="given-name" maxlength="28" required><input id="iL" placeholder="اللقب / Last name" autocomplete="family-name" maxlength="28" required>
-  <input id="iC" placeholder="البلد / Country" autocomplete="country-name" maxlength="40" required><input id="iY" placeholder="المدينة / City" maxlength="40" required>
+  <select id="iC" aria-label="اختر البلد / Select country" required>
+   <option value="" selected disabled>اختر البلد / Select country</option>
+   <option>Algeria</option><option>France</option><option>United States</option><option>United Kingdom</option><option>Canada</option><option>Germany</option><option>Spain</option><option>Italy</option><option>Turkey</option><option>United Arab Emirates</option><option>Saudi Arabia</option><option>Egypt</option><option>Morocco</option><option>Tunisia</option><option>China</option><option>Japan</option><option>India</option><option>Brazil</option><option>Australia</option><option>Netherlands</option>
+  </select>
+  <select id="iY" aria-label="اختر المدينة / Select city" required disabled><option value="" selected disabled>اختر البلد أولاً / Select country first</option></select>
   <button id="issueCard" type="submit">إصدار البطاقة ✦</button>
-  <button id="replay" type="button" class="replay-button">↻ إعادة الانترو</button>
  </form>
- <button id="continueRegistration" class="continue" type="button" hidden>متابعة إلى التسجيل →</button>
+ <button id="continueRegistration" class="continue" type="button" hidden>سجل الآن →</button>
 </div>
 <script>
 const cv=document.getElementById('c'),x=cv.getContext('2d');let W,H,P=[];
@@ -102,8 +107,39 @@ for(let i=0;i<90;i++)P.push({x:Math.random(),y:Math.random(),r:Math.random()*2+.
 const b=document.body;
 function play(){b.classList.remove('play');void b.offsetWidth;b.classList.add('play')}
 play();
-document.getElementById('replay').onclick=play;
 const identityForm=document.getElementById('identityForm');
+const countrySelect=document.getElementById('iC');
+const citySelect=document.getElementById('iY');
+const cityOptions={
+ 'Algeria':['Algiers','Oran','Constantine','Annaba','Mostaganem','Tlemcen','Sétif','Bejaia','Blida','Batna','Tizi Ouzou','Skikda','Ghardaia','Ouargla','Tamanrasset'],
+ 'France':['Paris','Marseille','Lyon','Toulouse','Nice','Bordeaux','Lille','Nantes','Strasbourg','Montpellier'],
+ 'United States':['New York','Los Angeles','Chicago','Houston','Miami','San Francisco','Seattle','Boston','Washington, D.C.','Atlanta'],
+ 'United Kingdom':['London','Manchester','Birmingham','Liverpool','Leeds','Glasgow','Edinburgh','Bristol'],
+ 'Canada':['Toronto','Montreal','Vancouver','Calgary','Ottawa','Edmonton','Quebec City'],
+ 'Germany':['Berlin','Hamburg','Munich','Cologne','Frankfurt','Stuttgart','Düsseldorf'],
+ 'Spain':['Madrid','Barcelona','Valencia','Seville','Málaga','Bilbao'],
+ 'Italy':['Rome','Milan','Naples','Turin','Florence','Venice','Bologna'],
+ 'Turkey':['Istanbul','Ankara','Izmir','Antalya','Bursa','Adana'],
+ 'United Arab Emirates':['Dubai','Abu Dhabi','Sharjah','Ajman','Ras Al Khaimah'],
+ 'Saudi Arabia':['Riyadh','Jeddah','Mecca','Medina','Dammam','Khobar'],
+ 'Egypt':['Cairo','Alexandria','Giza','Luxor','Aswan','Port Said'],
+ 'Morocco':['Casablanca','Rabat','Marrakesh','Tangier','Fes','Agadir'],
+ 'Tunisia':['Tunis','Sfax','Sousse','Kairouan','Bizerte','Gabès'],
+ 'China':['Shanghai','Beijing','Shenzhen','Guangzhou','Chengdu','Hangzhou'],
+ 'Japan':['Tokyo','Osaka','Kyoto','Yokohama','Nagoya','Fukuoka'],
+ 'India':['Mumbai','Delhi','Bengaluru','Chennai','Hyderabad','Kolkata'],
+ 'Brazil':['São Paulo','Rio de Janeiro','Brasília','Salvador','Curitiba'],
+ 'Australia':['Sydney','Melbourne','Brisbane','Perth','Adelaide','Canberra'],
+ 'Netherlands':['Amsterdam','Rotterdam','The Hague','Utrecht','Eindhoven']
+};
+countrySelect.addEventListener('change',()=>{
+ const cities=cityOptions[countrySelect.value]||[];
+ citySelect.innerHTML='<option value="" selected disabled>اختر المدينة / Select city</option>'+cities.map(city=>'<option>'+city+'</option>').join('');
+ citySelect.disabled=cities.length===0;
+ document.getElementById('oC').textContent=countrySelect.value||'—';
+ document.getElementById('oY').textContent='—';
+});
+citySelect.addEventListener('change',()=>{document.getElementById('oY').textContent=citySelect.value||'—'});
 identityForm.addEventListener('submit',event=>{
  event.preventDefault();
  if(!identityForm.reportValidity())return;
@@ -114,7 +150,7 @@ document.getElementById('continueRegistration').onclick=()=>{
  document.getElementById('cardScene').innerHTML='<div class="next-stage"><h2>VORTERRA</h2><p>تم تجهيز معاينة بطاقة العضوية. مرحلة التسجيل ستكون الخطوة التالية بعد اعتماد هذه الشاشة.</p></div>';
 };
 document.getElementById('skip').onclick=()=>{b.classList.remove('play');document.getElementById('skip').style.display='none';document.getElementById('cardScene').style.cssText='opacity:1;pointer-events:auto';document.getElementById('intro').style.display='none'};
-[['iN','oN'],['iL','oL'],['iC','oC'],['iY','oY']].forEach(([i,o])=>{const a=document.getElementById(i);a.oninput=()=>document.getElementById(o).textContent=a.value||'—'});
+[['iN','oN'],['iL','oL']].forEach(([i,o])=>{const a=document.getElementById(i);a.oninput=()=>document.getElementById(o).textContent=a.value||'—'});
 const card=document.getElementById('card');
 document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect(),dx=(e.clientX-r.left-r.width/2)/innerWidth,dy=(e.clientY-r.top-r.height/2)/innerHeight;card.style.transform=`rotateY(${dx*28}deg) rotateX(${-dy*28}deg)`});
 </script></body></html>
