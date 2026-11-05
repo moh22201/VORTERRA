@@ -254,6 +254,9 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 #dashboard .dproject-image-note{margin-top:9px;color:#8f897c;font-size:9px}
 #dashboard .dproject-empty{grid-column:1/-1;padding:20px;border:1px solid #f6d88933;border-radius:10px;color:#c9c4b7}
 @media(max-width:680px){#dashboard .dproject-art{height:115px}#dashboard .dproject-info{padding:11px}}
+
+/* Close button for secondary dashboard views */
+#dashboard .dview{position:relative}#dashboard .dview-close{position:absolute;top:0;right:0;z-index:9;width:34px;height:34px;display:grid;place-items:center;padding:0;border:1px solid #f6d88988;border-radius:8px;background:#111315;color:#ffe3a0;font:25px Arial;cursor:pointer;box-shadow:0 3px 14px #0008}#dashboard .dview-close:hover{background:#f6d88922;border-color:#ffe3a0}#dashboard[dir=rtl] .dview-close{right:auto;left:0}#dashboard .dview:not([data-panel=overview]) .dtoolbar{padding-right:44px}#dashboard[dir=rtl] .dview:not([data-panel=overview]) .dtoolbar{padding-right:0;padding-left:44px}
 </style></head><body>
 <canvas id="c"></canvas><div id="dashboard">
 <header class="dtop"><div class="dbrand"><div class="demblem"><b>V</b></div><div><strong>VORTERRA</strong><small>WORLD OF INDUSTRY &amp; TRADE</small></div></div>
@@ -534,6 +537,9 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
   try{const r=await fetch("data/projects.json",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const d=await r.json();if(!Array.isArray(d.projects)||d.projects.length!==12)throw Error("Invalid project catalogue");projects=d.projects.sort((a,b)=>a.number-b.number);renderProjects()}
   catch(e){console.error("VORTERRA projects:",e);const g=$("projectGrid");if(g)g.innerHTML='<div class="dproject-empty">Could not load the approved projects file. The data remains saved in GitHub.</div>'}
  }
+
+ // Close controls return users to the main overview.
+ const root=$("dashboard");root.querySelectorAll(".dview:not([data-panel=overview])").forEach(panel=>{const x=document.createElement("button");x.type="button";x.className="dview-close";x.textContent="×";x.setAttribute("aria-label","Close and return to overview");x.title="Close";x.addEventListener("click",()=>{root.querySelectorAll(".dview").forEach(v=>v.classList.toggle("active",v.dataset.panel==="overview"));root.querySelectorAll("[data-view]").forEach(v=>v.classList.toggle("active",v.dataset.view==="overview"));const m=root.querySelector(".dmain");if(m)m.scrollTo({top:0,behavior:"smooth"});});panel.appendChild(x);});
  document.querySelectorAll("#dashboard [data-lang]").forEach(b=>b.addEventListener("click",()=>applyLanguage(b.dataset.lang)));
  try{const saved=localStorage.getItem("vorterra-language");if(saved&&dict[saved])lang=saved}catch(e){}
  applyLanguage(lang);
