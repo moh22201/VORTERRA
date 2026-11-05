@@ -257,6 +257,17 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 
 /* Close button for secondary dashboard views */
 #dashboard .dview{position:relative}#dashboard .dview-close{position:absolute;top:0;right:0;z-index:9;width:34px;height:34px;display:grid;place-items:center;padding:0;border:1px solid #f6d88988;border-radius:8px;background:#111315;color:#ffe3a0;font:25px Arial;cursor:pointer;box-shadow:0 3px 14px #0008}#dashboard .dview-close:hover{background:#f6d88922;border-color:#ffe3a0}#dashboard[dir=rtl] .dview-close{right:auto;left:0}#dashboard .dview:not([data-panel=overview]) .dtoolbar{padding-right:44px}#dashboard[dir=rtl] .dview:not([data-panel=overview]) .dtoolbar{padding-right:0;padding-left:44px}
+
+/* Local demo ownership controls */
+.dproject-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.dproject-actions button{flex:1;min-width:110px;padding:10px 12px;border:1px solid #f6d88970;border-radius:7px;background:#f6d88912;color:#ffe3a0;font-size:10px;cursor:pointer}
+.dproject-actions button:hover{background:#f6d88925;border-color:#ffe3a0}
+.dproject-actions button:disabled{opacity:.45;cursor:not-allowed}
+.downed-card{border:1px solid #f6d88955;border-radius:11px;background:linear-gradient(145deg,#202225,#090a0b);padding:15px;box-shadow:0 12px 28px #0007}
+.downed-card h3{color:#ffe3a0;font:17px Georgia;margin-bottom:8px}
+.downed-card p{color:#c9c4b8;font-size:10px;line-height:1.8}
+.downed-card .dproject-actions{margin-top:10px}
+
 </style></head><body>
 <canvas id="c"></canvas><div id="dashboard">
 <header class="dtop"><div class="dbrand"><div class="demblem"><b>V</b></div><div><strong>VORTERRA</strong><small>WORLD OF INDUSTRY &amp; TRADE</small></div></div>
@@ -306,7 +317,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 
 <section class="dview" data-panel="city">
  <div class="dtoolbar"><div><h2 data-i18n="myCity">My City</h2><p data-i18n="cityIntro">Your city, sectors and owned or leased assets.</p></div></div>
- <div class="dplaceholder"><i>⌂</i><h3 data-i18n="cityEmptyTitle">Your city workspace</h3><p data-i18n="cityEmptyText">Assets acquired from the library will be listed here with their ownership status, location, age, condition and operating state. City placement and ownership data will be connected in a later stage.</p></div>
+ <div id="ownedProjects" class="dasset-grid" aria-live="polite"></div><div id="cityEmpty" class="dplaceholder"><i>⌂</i><h3 data-i18n="cityEmptyTitle">Your city workspace</h3><p data-i18n="cityEmptyText">Acquire a project from the library and it will appear here.</p></div><div class="dnote" id="demoStorageNote"></div>
 </section>
 
 <section class="dview" data-panel="operations">
@@ -530,9 +541,54 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
    if(p.service_pricing)rows.push(lang==="ar"?"سعر ومدة الصيانة بالاتفاق بين اللاعبين":lang==="fr"?"Prix et durée convenus entre joueurs":"Service price and duration agreed between players");
    rows.push("<b>"+L[lang].cost+":</b> "+costText);
    card.querySelector(".dproject-detail").innerHTML=rows.map(x=>"<div>"+x+"</div>").join("");
+   const actions=document.createElement("div");actions.className="dproject-actions";
+   const existing=demoState.owned.find(x=>x.project_id===p.id);
+   if(existing){const status=document.createElement("button");status.type="button";status.disabled=true;status.textContent=demoText("owned")+" · "+demoText(existing.mode==="buy"?"purchased":"leased");actions.appendChild(status)}
+   else{
+    const buy=document.createElement("button");buy.type="button";buy.textContent=demoText("buy")+" · "+number(p.purchase_price)+" VOR";buy.addEventListener("click",()=>acquireProject(p.id,"buy"));
+    const rent=document.createElement("button");rent.type="button";rent.textContent=demoText("rent")+" · "+number(p.monthly_rent)+" VOR";rent.addEventListener("click",()=>acquireProject(p.id,"rent"));
+    actions.append(buy,rent);
+   }
+   card.querySelector(".dproject-info").appendChild(actions);
    grid.appendChild(card);
   });
  }
+
+ const DEMO_KEY="vorterra-demo-v1";
+ const demoLabels={
+  en:{buy:"Buy project",rent:"Rent monthly",owned:"Already in your city",purchased:"Purchased",leased:"Monthly lease",empty:"No projects acquired yet. Open the Project Library to choose your first project.",remove:"Remove from demo city",confirmBuy:"Add this project to your demo city as an owned project?",confirmRent:"Add this project to your demo city as a monthly lease?",note:"Demo mode: changes are saved only in this browser. No VOR is charged and no real payment or ownership is created.",buyPrice:"Purchase price",rentPrice:"Monthly rent"},
+  fr:{buy:"Acheter le projet",rent:"Louer par mois",owned:"Déjà dans votre ville",purchased:"Acheté",leased:"Location mensuelle",empty:"Aucun projet acquis. Ouvrez la bibliothèque pour choisir votre premier projet.",remove:"Retirer de la ville de démonstration",confirmBuy:"Ajouter ce projet à votre ville de démonstration comme propriété ?",confirmRent:"Ajouter ce projet à votre ville de démonstration en location mensuelle ?",note:"Mode démo : les changements sont enregistrés uniquement dans ce navigateur. Aucun VOR ni paiement réel n'est débité.",buyPrice:"Prix d'achat",rentPrice:"Loyer mensuel"},
+  ar:{buy:"شراء المشروع",rent:"استئجار شهري",owned:"موجود بالفعل في مدينتك",purchased:"شراء تجريبي",leased:"إيجار شهري",empty:"لم تحصل على أي مشروع بعد. افتح مكتبة المشاريع لاختيار مشروعك الأول.",remove:"إزالة من المدينة التجريبية",confirmBuy:"هل تريد إضافة هذا المشروع إلى مدينتك التجريبية كملكية؟",confirmRent:"هل تريد إضافة هذا المشروع إلى مدينتك التجريبية بنظام الإيجار الشهري؟",note:"وضع تجريبي: تُحفظ التغييرات في هذا المتصفح فقط. لا يتم خصم VOR ولا تنشأ ملكية أو دفعة حقيقية.",buyPrice:"سعر الشراء",rentPrice:"الإيجار الشهري"}
+ };
+ let demoState={owned:[]};
+ function loadDemoState(){try{const v=JSON.parse(localStorage.getItem(DEMO_KEY)||"{}");if(Array.isArray(v.owned))demoState.owned=v.owned}catch(e){demoState={owned:[]}}}
+ function saveDemoState(){try{localStorage.setItem(DEMO_KEY,JSON.stringify(demoState))}catch(e){console.warn("Demo state could not be saved",e)}}
+ function demoText(k){return demoLabels[lang][k]||demoLabels.en[k]||k}
+ function acquireProject(id,mode){
+  const p=projects.find(x=>x.id===id);if(!p||demoState.owned.some(x=>x.project_id===id)){renderProjects();return}
+  const question=mode==="buy"?"confirmBuy":"confirmRent";
+  if(!confirm(demoText(question)))return;
+  demoState.owned.push({project_id:id,mode,acquired_at:new Date().toISOString(),demo_id:"demo-"+Date.now()});
+  saveDemoState();renderProjects();renderOwnedProjects();
+ }
+ function renderOwnedProjects(){
+  const grid=$("ownedProjects"),empty=$("cityEmpty");if(!grid)return;
+  grid.innerHTML="";
+  if(empty)empty.hidden=demoState.owned.length>0;
+  demoState.owned.forEach(entry=>{
+   const p=projects.find(x=>x.id===entry.project_id);if(!p)return;
+   const title=(p.name&&p.name[lang])||(p.name&&p.name.en)||p.id;
+   const card=document.createElement("article");card.className="downed-card";
+   const h=document.createElement("h3");h.textContent=(icons[p.id]||"◇")+" "+title;
+   const detail=document.createElement("p");detail.textContent=demoText(entry.mode==="buy"?"purchased":"leased")+" · "+(entry.mode==="buy"?demoText("buyPrice")+": "+number(p.purchase_price)+" VOR":demoText("rentPrice")+": "+number(p.monthly_rent)+" VOR");
+   const actions=document.createElement("div");actions.className="dproject-actions";
+   const remove=document.createElement("button");remove.type="button";remove.textContent=demoText("remove");
+   remove.addEventListener("click",()=>{demoState.owned=demoState.owned.filter(x=>x.demo_id!==entry.demo_id);saveDemoState();renderOwnedProjects();renderProjects()});
+   actions.appendChild(remove);card.append(h,detail,actions);grid.appendChild(card);
+  });
+  const note=$("demoStorageNote");if(note)note.textContent=demoText("note");
+ }
+
  async function loadProjects(){
   try{const r=await fetch("data/projects.json",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const d=await r.json();if(!Array.isArray(d.projects)||d.projects.length!==12)throw Error("Invalid project catalogue");projects=d.projects.sort((a,b)=>a.number-b.number);renderProjects()}
   catch(e){console.error("VORTERRA projects:",e);const g=$("projectGrid");if(g)g.innerHTML='<div class="dproject-empty">Could not load the approved projects file. The data remains saved in GitHub.</div>'}
@@ -542,8 +598,10 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
  const root=$("dashboard");root.querySelectorAll(".dview:not([data-panel=overview])").forEach(panel=>{const x=document.createElement("button");x.type="button";x.className="dview-close";x.textContent="×";x.setAttribute("aria-label","Close and return to overview");x.title="Close";x.addEventListener("click",()=>{root.querySelectorAll(".dview").forEach(v=>v.classList.toggle("active",v.dataset.panel==="overview"));root.querySelectorAll("[data-view]").forEach(v=>v.classList.toggle("active",v.dataset.view==="overview"));const m=root.querySelector(".dmain");if(m)m.scrollTo({top:0,behavior:"smooth"});});panel.appendChild(x);});
  document.querySelectorAll("#dashboard [data-lang]").forEach(b=>b.addEventListener("click",()=>applyLanguage(b.dataset.lang)));
  try{const saved=localStorage.getItem("vorterra-language");if(saved&&dict[saved])lang=saved}catch(e){}
+ loadDemoState();
  applyLanguage(lang);
  loadProjects();
+ renderOwnedProjects();
 })();
 </script>
 </body></html>
