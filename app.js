@@ -14,6 +14,8 @@ if(particleLayer){
   }
 }
 
+function escapeCardText(value){return String(value).replace(/[&<>"\']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","\'":"&#39;"}[char]));}
+
 function renderMemberCard(first,last,country,city,reference){
   return `
     <div class="card-preview-result">
@@ -25,8 +27,8 @@ function renderMemberCard(first,last,country,city,reference){
               <span class="member-chip" aria-hidden="true"></span>
               <span class="member-contactless" aria-hidden="true">)))</span>
             </div>
-            <div class="member-card-name">${first} ${last}</div>
-            <div class="member-card-foot"><span>MEMBER REFERENCE<strong>${reference}</strong></span><span>${city.toUpperCase()}<br>${country.toUpperCase()}</span></div>
+            <div class="member-card-name">${escapeCardText(first)} ${escapeCardText(last)}</div>
+            <div class="member-card-foot"><span>MEMBER REFERENCE<strong>${escapeCardText(reference)}</strong></span><span>${escapeCardText(city.toUpperCase())}<br>${escapeCardText(country.toUpperCase())}</span></div>
           </div>
           <span class="member-card-monogram" aria-hidden="true">V</span>
         </article>
