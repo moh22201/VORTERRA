@@ -579,7 +579,6 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
   <input id="iN" placeholder="الاسم / First name" autocomplete="given-name" maxlength="28" required><input id="iL" placeholder="اللقب / Last name" autocomplete="family-name" maxlength="28" required>
   <select id="iC" aria-label="اختر البلد / Select country" required>
    <option value="" selected disabled>اختر البلد / Select country</option>
-   <option>Algeria</option><option>France</option><option>United States</option><option>United Kingdom</option><option>Canada</option><option>Germany</option><option>Spain</option><option>Italy</option><option>Turkey</option><option>United Arab Emirates</option><option>Saudi Arabia</option><option>Egypt</option><option>Morocco</option><option>Tunisia</option><option>China</option><option>Japan</option><option>India</option><option>Brazil</option><option>Australia</option><option>Netherlands</option>
   </select>
   <select id="iY" aria-label="اختر المدينة / Select city" required disabled><option value="" selected disabled>اختر البلد أولاً / Select country first</option></select>
   <button id="issueCard" type="submit">إصدار البطاقة ✦</button>
@@ -598,34 +597,29 @@ play();
 const identityForm=document.getElementById('identityForm');
 const countrySelect=document.getElementById('iC');
 const citySelect=document.getElementById('iY');
-const cityOptions={
- 'Algeria':['Algiers','Oran','Constantine','Annaba','Mostaganem','Tlemcen','Sétif','Bejaia','Blida','Batna','Tizi Ouzou','Skikda','Ghardaia','Ouargla','Tamanrasset'],
- 'France':['Paris','Marseille','Lyon','Toulouse','Nice','Bordeaux','Lille','Nantes','Strasbourg','Montpellier'],
- 'United States':['New York','Los Angeles','Chicago','Houston','Miami','San Francisco','Seattle','Boston','Washington, D.C.','Atlanta'],
- 'United Kingdom':['London','Manchester','Birmingham','Liverpool','Leeds','Glasgow','Edinburgh','Bristol'],
- 'Canada':['Toronto','Montreal','Vancouver','Calgary','Ottawa','Edmonton','Quebec City'],
- 'Germany':['Berlin','Hamburg','Munich','Cologne','Frankfurt','Stuttgart','Düsseldorf'],
- 'Spain':['Madrid','Barcelona','Valencia','Seville','Málaga','Bilbao'],
- 'Italy':['Rome','Milan','Naples','Turin','Florence','Venice','Bologna'],
- 'Turkey':['Istanbul','Ankara','Izmir','Antalya','Bursa','Adana'],
- 'United Arab Emirates':['Dubai','Abu Dhabi','Sharjah','Ajman','Ras Al Khaimah'],
- 'Saudi Arabia':['Riyadh','Jeddah','Mecca','Medina','Dammam','Khobar'],
- 'Egypt':['Cairo','Alexandria','Giza','Luxor','Aswan','Port Said'],
- 'Morocco':['Casablanca','Rabat','Marrakesh','Tangier','Fes','Agadir'],
- 'Tunisia':['Tunis','Sfax','Sousse','Kairouan','Bizerte','Gabès'],
- 'China':['Shanghai','Beijing','Shenzhen','Guangzhou','Chengdu','Hangzhou'],
- 'Japan':['Tokyo','Osaka','Kyoto','Yokohama','Nagoya','Fukuoka'],
- 'India':['Mumbai','Delhi','Bengaluru','Chennai','Hyderabad','Kolkata'],
- 'Brazil':['São Paulo','Rio de Janeiro','Brasília','Salvador','Curitiba'],
- 'Australia':['Sydney','Melbourne','Brisbane','Perth','Adelaide','Canberra'],
- 'Netherlands':['Amsterdam','Rotterdam','The Hague','Utrecht','Eindhoven']
-};
-countrySelect.addEventListener('change',()=>{
- const cities=cityOptions[countrySelect.value]||[];
- citySelect.innerHTML='<option value="" selected disabled>اختر المدينة / Select city</option>'+cities.map(city=>'<option>'+city+'</option>').join('');
- citySelect.disabled=cities.length===0;
- document.getElementById('oC').textContent=countrySelect.value||'—';
+const countryNames=["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Democratic Republic of the Congo","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
+countryNames.forEach(name=>{const option=document.createElement('option');option.value=name;option.textContent=name;countrySelect.appendChild(option)});
+countrySelect.addEventListener('change',async()=>{
+ const country=countrySelect.value;
+ citySelect.disabled=true;
+ citySelect.innerHTML='<option value="" selected disabled>جارٍ تحميل المدن… / Loading cities…</option>';
+ document.getElementById('oC').textContent=country||'—';
  document.getElementById('oY').textContent='—';
+ try{
+  const response=await fetch('https://countriesnow.space/api/v0.1/countries/cities',{
+   method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({country})
+  });
+  if(!response.ok)throw new Error('City service unavailable');
+  const result=await response.json();
+  const cities=Array.isArray(result.data)?[...new Set(result.data.filter(city=>typeof city==='string'&&city.trim()).map(city=>city.trim()))].sort((a,b)=>a.localeCompare(b)): [];
+  citySelect.innerHTML='<option value="" selected disabled>اختر المدينة / Select city</option>'+cities.map(city=>'<option value="'+city.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')+'">'+city.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</option>').join('');
+  citySelect.disabled=cities.length===0;
+  if(!cities.length)citySelect.innerHTML='<option value="" selected disabled>لا توجد مدن متاحة لهذا البلد</option>';
+ }catch(error){
+  citySelect.innerHTML='<option value="" selected disabled>تعذر تحميل المدن — حاول مجددًا</option>';
+  citySelect.disabled=true;
+  console.error('VORTERRA city list:',error);
+ }
 });
 citySelect.addEventListener('change',()=>{document.getElementById('oY').textContent=citySelect.value||'—'});
 identityForm.addEventListener('submit',event=>{
