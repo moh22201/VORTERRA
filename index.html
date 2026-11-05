@@ -239,6 +239,21 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
  #dashboard .dcols{grid-template-columns:minmax(0,1fr)}
  #dashboard .dstats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+#dashboard .dproject-card{overflow:hidden;border:1px solid #f6d88955;border-radius:14px;background:linear-gradient(145deg,#202225f2,#090a0c);box-shadow:0 14px 34px #0008,inset 0 1px #ffffff1c}
+#dashboard .dproject-art{height:126px;display:flex;align-items:center;justify-content:center;position:relative;background:radial-gradient(ellipse at 50% 40%,#b18a3c35,#17191b 68%,#090a0b);border-bottom:1px solid #f6d88930}
+#dashboard .dproject-art strong{font-size:48px;filter:drop-shadow(0 5px 12px #000)}
+#dashboard .dproject-art small{position:absolute;bottom:9px;right:11px;color:#dfc987;font-size:8px;letter-spacing:1.2px}
+#dashboard .dproject-info{padding:13px}
+#dashboard .dproject-info h3{margin:0 0 10px;color:#ffe3a0;font:18px Georgia}
+#dashboard .dproject-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+#dashboard .dproject-stats span{padding:8px;border-radius:7px;background:#ffffff08;color:#d7d1c3;font-size:10px;line-height:1.5}
+#dashboard .dproject-stats b{display:block;color:#e8c36f;font-size:9px;margin-bottom:3px}
+#dashboard .dproject-detail{margin-top:9px;padding-top:9px;border-top:1px solid #f6d88925;color:#c7c1b4;font-size:10px;line-height:1.7}
+#dashboard .dproject-detail b{color:#e8c36f}
+#dashboard .dproject-image-note{margin-top:9px;color:#8f897c;font-size:9px}
+#dashboard .dproject-empty{grid-column:1/-1;padding:20px;border:1px solid #f6d88933;border-radius:10px;color:#c9c4b7}
+@media(max-width:680px){#dashboard .dproject-art{height:115px}#dashboard .dproject-info{padding:11px}}
 </style></head><body>
 <canvas id="c"></canvas><div id="dashboard">
 <header class="dtop"><div class="dbrand"><div class="demblem"><b>V</b></div><div><strong>VORTERRA</strong><small>WORLD OF INDUSTRY &amp; TRADE</small></div></div>
@@ -281,25 +296,9 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 </section>
 
 <section class="dview" data-panel="library">
- <div class="dtoolbar"><div><h2 data-i18n="library">Asset Library</h2><p data-i18n="libraryIntro">Choose one of the 11 sectors to view its approved asset catalogue.</p></div><span class="dtag">11 <span data-i18n="sectors">SECTORS</span></span></div>
- <div class="dsector-grid" id="sectorGrid">
-  <button class="dsector" data-sector="1"><b>01</b><strong data-i18n="s1">Raw Materials Extraction</strong><small data-i18n="s1d">Quarries, mines, forests and timber</small></button>
-  <button class="dsector" data-sector="2"><b>02</b><strong data-i18n="s2">Manufacturing Industry</strong><small data-i18n="s2d">Processing raw materials into products</small></button>
-  <button class="dsector" data-sector="3"><b>03</b><strong data-i18n="s3">Waste Recycling</strong><small data-i18n="s3d">Sorting and recycling waste materials</small></button>
-  <button class="dsector" data-sector="4"><b>04</b><strong data-i18n="s4">Energy & Water</strong><small data-i18n="s4d">Electricity and water supply</small></button>
-  <button class="dsector" data-sector="5"><b>05</b><strong data-i18n="s5">Petrochemicals</strong><small data-i18n="s5d">Fuel and rubber production</small></button>
-  <button class="dsector" data-sector="6"><b>06</b><strong data-i18n="s6">Warehousing & Logistics</strong><small data-i18n="s6d">Storage and inventory facilities</small></button>
-  <button class="dsector" data-sector="7"><b>07</b><strong data-i18n="s7">Trade & Commercial Center</strong><small data-i18n="s7d">Player listings and trade contracts</small></button>
-  <button class="dsector" data-sector="8"><b>08</b><strong data-i18n="s8">Employment</strong><small data-i18n="s8d">Recruitment and workforce services</small></button>
-  <button class="dsector" data-sector="9"><b>09</b><strong data-i18n="s9">Transport & Shipping</strong><small data-i18n="s9d">Road, sea and air freight</small></button>
-  <button class="dsector" data-sector="10"><b>10</b><strong data-i18n="s10">Business Management & Accounting</strong><small data-i18n="s10d">Business administration and accounts</small></button>
-  <button class="dsector" data-sector="11"><b>11</b><strong data-i18n="s11">Construction & Fabrication</strong><small data-i18n="s11d">Construction, workshops and equipment</small></button>
- </div>
- <section class="dasset-browser" id="assetBrowser" hidden>
-  <div class="dtoolbar"><div><h3 id="sectorTitle"></h3><p id="sectorDescription"></p></div><button type="button" class="dback" id="backToSectors" data-i18n="backSectors">← All sectors</button></div>
-  <div class="dasset-grid" id="assetGrid"></div>
- </section>
- <div class="dnote" data-i18n="libraryNote">The library is for discovering and selecting assets. Purchased or leased assets appear in My City. Asset images and exact specifications are added from the approved VORTERRA asset collection.</div>
+ <div class="dtoolbar"><div><h2 data-i18n="library">Project Library</h2><p data-i18n="libraryIntro">Browse the 12 approved integrated projects.</p></div><span class="dtag"><span id="projectCount">12</span> <span>PROJECTS</span></span></div>
+ <div class="dasset-grid" id="projectGrid" aria-live="polite"></div>
+ <div class="dnote" data-i18n="libraryNote">Each card represents one complete integrated project. Unified project images will be added in the next stage. Marketplace and employment remain separate features.</div>
 </section>
 
 <section class="dview" data-panel="city">
@@ -470,19 +469,6 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
  workspace:"مساحة العمل الرئيسية",overview:"الرئيسية",library:"مكتبة الأصول",myCity:"مدينتي",operations:"التشغيل والإنتاج",market:"السوق",contracts:"العقود والنقل",finance:"الاقتصاد والمالية",account:"الحساب",settings:"الإعدادات",memberCenter:"مركز تحكم اللاعب",welcome:"مرحبًا بك في VORTERRA",welcomeText:"ملخص عالمك التجاري في مكان واحد.",balance:"رصيد الحساب",available:"الرصيد المتاح",ownedAssets:"الأصول المملوكة",assetsInCity:"الأصول في مدينتك",activeContracts:"العقود النشطة",contractsStatus:"قيد التنفيذ",workers:"العمال",workersStatus:"المكلفون بالتشغيل",recentActivity:"آخر النشاطات",accountOverview:"ملخص الحساب",libraryShortcut:"مكتبة الأصول",libraryShortcutText:"اختر قطاعًا واستعرض أصوله.",productionShortcut:"جاهزية الإنتاج",productionShortcutText:"تحقق من الأصول والعمال قبل دورة العمل ذات 8 ساعات.",financeShortcut:"السجل المالي",financeShortcutText:"تابع المحفظة والتكاليف والالتزامات.",quickAccess:"الوصول السريع",shortcuts:"اختصارات",browseSectors:"استعراض القطاعات الـ11",manageOwned:"إدارة الأصول المملوكة",eightHourShift:"دورة عمل 8 ساعات",libraryIntro:"اختر واحدًا من القطاعات الـ11 لعرض مكتبة أصوله.",sectors:"قطاعًا",backSectors:"العودة إلى القطاعات",libraryNote:"المكتبة لاختيار الأصول واستكشافها. الأصول المشتراة أو المستأجرة تظهر في مدينتي. تُضاف الصور والمواصفات الدقيقة من مجموعة أصول VORTERRA المعتمدة.",cityIntro:"مدينتك وقطاعاتها والأصول التي تملكها أو تستأجرها.",cityEmptyTitle:"مساحة مدينتك",cityEmptyText:"ستظهر هنا الأصول التي تحصل عليها من المكتبة مع حالة الملكية والموقع والعمر والحالة التشغيلية. سيتم ربط وضع الأصول وبيانات الملكية في مرحلة لاحقة.",operationsIntro:"جهّز القطاع بالكامل قبل بدء دورة الإنتاج.",hours:"ساعات",readiness:"جاهزية القطاع",beforeStart:"قبل بدء العمل",coreAssets:"اكتمال الأصول الأساسية المطلوبة",workerCount:"توفر العدد المطلوب من العمال",inputsReady:"توفر المدخلات والخدمات اللازمة",notChecked:"لم يتم التحقق",startShift:"بدء دورة عمل 8 ساعات",demoOnly:"هذه أدوات معاينة إلى حين ربط الملكية والعمال والمخزون بالنظام.",shiftRules:"قواعد دورة العمل",eightHours:"وردية إنتاج مدتها ثماني ساعات",eightHoursText:"تستمر كل دورة إنتاج لمدة 8 ساعات.",staffing:"شرط عدد العمال",staffingText:"يجب توفير عدد العمال المطلوب للقطاع.",completeAssets:"اكتمال مجموعة الأصول",completeAssetsText:"يجب امتلاك أو استئجار جميع الأصول الأساسية للعملية المختارة وأن تكون جاهزة.",settlement:"تسوية نهاية الوردية",settlementText:"يُحسب الإنتاج والأجور وتكاليف التشغيل والاستهلاك عند انتهاء الدورة.",marketIntro:"سوق موحد لجميع مدن اللاعبين.",buyAssets:"شراء الأصول",buyAssetsText:"شراء الأصول المعروضة من المنصة أو اللاعبين.",sellAssets:"بيع الأصول",sellAssetsText:"عرض الأصول المملوكة للبيع للاعبين الآخرين.",rentAssets:"استئجار الأصول",rentAssetsText:"استئجار المعدات أو المنشآت من اللاعبين.",materialsProducts:"المواد والمنتجات",materialsProductsText:"تبادل المواد الخام والمنتجات النهائية.",marketNote:"سيتم ربط العروض والأسعار والمدفوعات ونقل الملكية بعد اعتماد قواعد السوق.",contractsIntro:"إدارة اتفاقيات التوريد والتسليم والشحن.",supplyContracts:"عقود التوريد",supplyContractsText:"شراء أو بيع كميات وفق اتفاق.",roadTransport:"النقل البري",roadTransportText:"تنظيم توصيل البضائع بين المدن.",seaAir:"الشحن البحري والجوي",seaAirText:"تنسيق الشحن عبر الموانئ والمطارات.",deliveryTracking:"متابعة التسليم",deliveryTrackingText:"متابعة حالة العقود والشحنات.",financeIntro:"محفظتك وحركة الأموال والالتزامات المالية.",wallet:"المحفظة",walletText:"رصيد VOR المتاح والرصيد المحجوز.",deposits:"الإيداعات",depositsText:"سجل الإيداعات وحالة الدفع.",withdrawals:"السحوبات",withdrawalsText:"طلبات السحب وحالتها.",transactions:"المعاملات والسجلات",transactionsText:"الإيرادات والمصروفات والأجور والتحويلات.",loans:"القروض والسداد",loansText:"الدين المتبقي ومواعيد الاستحقاق.",financialSummary:"الملخص المالي",financialSummaryText:"الإيرادات والتكاليف ونتائج التشغيل.",financeNote:"العمليات المالية غير مفعلة بعد. هذه واجهة معاينة ولا تنفذ إيداعات أو سحوبات أو تحويلات حقيقية.",settingsIntro:"اللغة والملف الشخصي والتنبيهات وتفضيلات الحساب.",chooseLanguage:"اختر لغة العرض",s1:"استخراج المواد الخام",s1d:"المحاجر والمناجم والغابات والأخشاب",s2:"الصناعة التحويلية",s2d:"تحويل المواد الخام إلى منتجات",s3:"إعادة تدوير النفايات",s3d:"فرز النفايات ومعالجتها وإعادة تدويرها",s4:"الكهرباء والمياه",s4d:"إنتاج الكهرباء والمياه وتوفيرهما",s5:"البتروكيماويات",s5d:"إنتاج الوقود والمطاط",s6:"التخزين والخدمات اللوجستية",s6d:"المستودعات وإدارة المخزون",s7:"التجارة والمركز التجاري",s7d:"عروض اللاعبين والعقود التجارية",s8:"التوظيف",s8d:"التوظيف وخدمات العمال",s9:"النقل والشحن",s9d:"الشحن البري والبحري والجوي",s10:"إدارة الأعمال والحسابات",s10d:"إدارة الأعمال والحسابات",s11:"البناء والتصنيع",s11d:"البناء والورش والمعدات",assetDetails:"تفاصيل الأصل",ownership:"الملكية",debt:"الدين",age:"العمر",consumption:"الاستهلاك",production:"الإنتاج",capacity:"السعة",workersRequired:"العمال المطلوبون",notSet:"يُحدد لاحقًا",preview:"معاينة فقط",quarry:"المحجرة وكسارة الحجر",forest:"الغابة واستغلال الأخشاب",recycling:"منشأة إعادة التدوير",assetPhotoPending:"الصورة الأصلية المعتمدة لهذا الأصل غير مرتبطة بالمكتبة بعد.",buyRentLater:"سيتم تفعيل الشراء والاستئجار بعد ربط الحسابات والمدفوعات."
  }};
  let lang="en";
- const sectors={
-  1:{title:{en:dict.en.s1,fr:dict.fr.s1,ar:dict.ar.s1},desc:{en:dict.en.s1d,fr:dict.fr.s1d,ar:dict.ar.s1d},assets:[{key:"quarry",icon:"⛏️",props:["quarry","ownership","debt","age","consumption","production","capacity","workersRequired"]},{key:"forest",icon:"🌲",props:["forest","ownership","debt","age","consumption","production","capacity","workersRequired"]}]},
-  2:{title:{en:dict.en.s2,fr:dict.fr.s2,ar:dict.ar.s2},desc:{en:dict.en.s2d,fr:dict.fr.s2d,ar:dict.ar.s2d},assets:[]},
-  3:{title:{en:dict.en.s3,fr:dict.fr.s3,ar:dict.ar.s3},desc:{en:dict.en.s3d,fr:dict.fr.s3d,ar:dict.ar.s3d},assets:[{key:"recycling",icon:"♻️",props:["recycling","ownership","debt","age","consumption","production","capacity","workersRequired"]}]},
-  4:{title:{en:dict.en.s4,fr:dict.fr.s4,ar:dict.ar.s4},desc:{en:dict.en.s4d,fr:dict.fr.s4d,ar:dict.ar.s4d},assets:[]},
-  5:{title:{en:dict.en.s5,fr:dict.fr.s5,ar:dict.ar.s5},desc:{en:dict.en.s5d,fr:dict.fr.s5d,ar:dict.ar.s5d},assets:[]},
-  6:{title:{en:dict.en.s6,fr:dict.fr.s6,ar:dict.ar.s6},desc:{en:dict.en.s6d,fr:dict.fr.s6d,ar:dict.ar.s6d},assets:[]},
-  7:{title:{en:dict.en.s7,fr:dict.fr.s7,ar:dict.ar.s7},desc:{en:dict.en.s7d,fr:dict.fr.s7d,ar:dict.ar.s7d},assets:[]},
-  8:{title:{en:dict.en.s8,fr:dict.fr.s8,ar:dict.ar.s8},desc:{en:dict.en.s8d,fr:dict.fr.s8d,ar:dict.ar.s8d},assets:[]},
-  9:{title:{en:dict.en.s9,fr:dict.fr.s9,ar:dict.ar.s9},desc:{en:dict.en.s9d,fr:dict.fr.s9d,ar:dict.ar.s9d},assets:[]},
-  10:{title:{en:dict.en.s10,fr:dict.fr.s10,ar:dict.ar.s10},desc:{en:dict.en.s10d,fr:dict.fr.s10d,ar:dict.ar.s10d},assets:[]},
-  11:{title:{en:dict.en.s11,fr:dict.fr.s11,ar:dict.ar.s11},desc:{en:dict.en.s11d,fr:dict.fr.s11d,ar:dict.ar.s11d},assets:[]}
- };
  const $=(id)=>document.getElementById(id);
  function tr(key){return (dict[lang]&&dict[lang][key])||dict.en[key]||key}
  function applyLanguage(next){
@@ -493,35 +479,65 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
   dash.dir=rtl?"rtl":"ltr";
   dash.querySelectorAll("[data-i18n]").forEach(el=>{const key=el.getAttribute("data-i18n");if(dict[lang][key])el.textContent=tr(key)});
   dash.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("active",b.dataset.lang===lang));
-  const selected=document.querySelector(".dsector.selected");
-  if(selected)openSector(selected.dataset.sector);
+  renderProjects();
   try{localStorage.setItem("vorterra-language",lang)}catch(e){}
  }
- document.querySelectorAll("#dashboard [data-lang]").forEach(b=>b.addEventListener("click",()=>applyLanguage(b.dataset.lang)));
- document.querySelectorAll("#dashboard [data-sector]").forEach(b=>b.addEventListener("click",()=>openSector(b.dataset.sector)));
- $("backToSectors").addEventListener("click",()=>{
-  $("assetBrowser").hidden=true;$("sectorGrid").hidden=false;
-  document.querySelectorAll(".dsector").forEach(b=>b.classList.remove("selected"));
- });
- function openSector(id){
-  const sec=sectors[id];if(!sec)return;
-  $("sectorGrid").hidden=true;$("assetBrowser").hidden=false;
-  $("sectorTitle").textContent=sec.title[lang];
-  $("sectorDescription").textContent=sec.desc[lang];
-  document.querySelectorAll(".dsector").forEach(b=>b.classList.toggle("selected",b.dataset.sector===String(id)));
-  const grid=$("assetGrid");grid.innerHTML="";
-  if(!sec.assets.length){
-   grid.innerHTML='<div class="dnote">'+tr("assetPhotoPending")+'</div>';
-   return;
-  }
-  sec.assets.forEach(a=>{
-   const card=document.createElement("article");card.className="dasset-card";
-   card.innerHTML='<div class="dasset-visual">'+a.icon+'</div><div class="dasset-info"><h4>'+tr(a.key)+'</h4><p>'+tr("assetPhotoPending")+'</p><div class="dasset-meta">'+a.props.slice(1).map(k=>'<span>'+tr(k)+': '+tr("notSet")+'</span>').join("")+'</div><button type="button" disabled>'+tr("buyRentLater")+'</button></div>';
+
+ const icons={quarry:"⛏️",forest:"🌲",mine:"⚒️",electricity:"⚡",water:"💧",oil:"🛢️",recycling:"♻️",city_storage:"🏬",road_transport:"🚚",sea_transport:"🚢",air_transport:"✈️",maintenance:"🛠️"};
+ const L={
+ en:{buy:"Purchase",rent:"Monthly rent",life:"Service life",workers:"Workers",prod:"Production / shift",store:"Storage capacity",cost:"Resource costs / shift",electricity:"Electricity",fuel:"Fuel",water:"Water",payload:"Payload / trip",fleet:"Fleet",teams:"Maintenance teams",image:"UNIFIED PROJECT IMAGE · COMING NEXT",shift:"8-hour shift",input:"Input",tariff:"Electricity tariff"},
+ fr:{buy:"Achat",rent:"Loyer mensuel",life:"Durée de vie",workers:"Employés",prod:"Production / poste",store:"Capacité de stockage",cost:"Coûts des ressources / poste",electricity:"Électricité",fuel:"Carburant",water:"Eau",payload:"Charge / trajet",fleet:"Flotte",teams:"Équipes de maintenance",image:"IMAGE UNIQUE DU PROJET · À VENIR",shift:"Poste de 8 heures",input:"Entrée",tariff:"Tarif de l’électricité"},
+ ar:{buy:"سعر الشراء",rent:"الإيجار الشهري",life:"العمر الاستهلاكي",workers:"عدد العمال",prod:"الإنتاج / الوردية",store:"سعة التخزين",cost:"تكاليف الموارد / الوردية",electricity:"الكهرباء",fuel:"الوقود",water:"المياه",payload:"الحمولة / الرحلة",fleet:"الأسطول",teams:"فرق الصيانة",image:"صورة موحدة للمشروع · تضاف لاحقاً",shift:"وردية 8 ساعات",input:"المدخلات",tariff:"تعريفة الكهرباء"}
+ };
+ const names={
+ en:{raw_rock:"Raw rock",crushed_gravel:"Crushed gravel",manufactured_building_materials:"Building materials",raw_wood:"Raw wood",wood_panels:"Wood panels",raw_minerals:"Raw minerals",processed_minerals:"Processed minerals",concentrated_minerals:"Concentrated minerals",electricity:"Electricity",treated_water:"Treated water",crude_oil:"Crude oil",refined_fuel:"Refined fuel",petroleum_byproducts:"Petroleum by-products",waste:"Waste",recycled_materials:"Recycled materials",plastic_materials:"Plastic materials",recovered_metals:"Recovered metals"},
+ fr:{raw_rock:"Roche brute",crushed_gravel:"Gravier concassé",manufactured_building_materials:"Matériaux de construction",raw_wood:"Bois brut",wood_panels:"Panneaux de bois",raw_minerals:"Minéraux bruts",processed_minerals:"Minéraux traités",concentrated_minerals:"Minéraux concentrés",electricity:"Électricité",treated_water:"Eau traitée",crude_oil:"Pétrole brut",refined_fuel:"Carburant raffiné",petroleum_byproducts:"Dérivés pétroliers",waste:"Déchets",recycled_materials:"Matériaux recyclés",plastic_materials:"Matières plastiques",recovered_metals:"Métaux récupérés"},
+ ar:{raw_rock:"الصخور الخام",crushed_gravel:"الحصى المكسر",manufactured_building_materials:"مواد البناء المصنعة",raw_wood:"الأخشاب الخام",wood_panels:"الألواح الخشبية",raw_minerals:"المعادن الخام",processed_minerals:"المعادن المعالجة",concentrated_minerals:"المعادن المركزة",electricity:"الكهرباء",treated_water:"المياه المعالجة",crude_oil:"النفط الخام",refined_fuel:"الوقود المكرر",petroleum_byproducts:"المشتقات النفطية",waste:"النفايات",recycled_materials:"المواد المعاد تدويرها",plastic_materials:"المواد البلاستيكية",recovered_metals:"المعادن المسترجعة"}
+ };
+ let projects=[];
+ const number=n=>Number(n).toLocaleString(lang==="ar"?"ar-DZ":"en-US",{maximumFractionDigits:2});
+ const unit=u=>({ton:lang==="ar"?"طن":lang==="fr"?"tonnes":"tons",m3:"m³",kWh:"kWh",barrel:lang==="ar"?"برميل":lang==="fr"?"barils":"barrels"}[u]||u);
+ function renderProjects(){
+  const grid=$("projectGrid");if(!grid)return;grid.innerHTML="";
+  $("projectCount").textContent=String(projects.length||12);
+  if(!projects.length){grid.innerHTML='<div class="dproject-empty">Project catalogue unavailable. Refresh to retry.</div>';return;}
+  projects.forEach(p=>{
+   const card=document.createElement("article");card.className="dproject-card";
+   const title=(p.name&&p.name[lang])||(p.name&&p.name.en)||p.id;
+   const stats=[[L[lang].buy,number(p.purchase_price)+" VOR"],[L[lang].rent,number(p.monthly_rent)+" VOR"],[L[lang].life,number(p.lifespan_days)+(lang==="ar"?" يوماً":lang==="fr"?" jours":" days")],[L[lang].workers,number(p.workers)]];
+   const production=(p.production_per_shift||[]).map(x=>(names[lang][x.item]||x.item)+": "+number(x.quantity)+" "+unit(x.unit)).join(" · ");
+   const costs=p.resource_cost_per_shift||{};
+   const costText=[L[lang].electricity+": "+number(costs.electricity_vor??0),L[lang].fuel+": "+number(costs.fuel_vor??0),L[lang].water+": "+number(costs.water_vor??0)].map(x=>x+" VOR").join(" · ");
+   const cap=p.storage_capacity?number(p.storage_capacity.quantity)+" "+unit(p.storage_capacity.unit):"";
+   const payload=p.total_payload_per_trip?number(p.total_payload_per_trip.quantity)+" "+unit(p.total_payload_per_trip.unit):"";
+   const fleet=p.fleet?number(p.fleet.vehicles)+" "+(p.fleet.type==="truck"?(lang==="ar"?"شاحنة":lang==="fr"?"camions":"trucks"):p.fleet.type==="cargo_ship"?(lang==="ar"?"سفينة":lang==="fr"?"navires":"ships"):(lang==="ar"?"طائرة شحن":lang==="fr"?"avions cargo":"cargo aircraft")):"";
+   card.innerHTML='<div class="dproject-art"><strong>'+icons[p.id]+'</strong><small>'+L[lang].image+'</small></div><div class="dproject-info"><h3></h3><div class="dproject-stats"></div><div class="dproject-detail"></div><div class="dproject-image-note">'+L[lang].shift+'</div></div>';
+   card.querySelector("h3").textContent=String(p.number).padStart(2,"0")+" · "+title;
+   const sg=card.querySelector(".dproject-stats");
+   stats.forEach(([k,v])=>{const e=document.createElement("span"),b=document.createElement("b");b.textContent=k;e.append(b,document.createTextNode(v));sg.appendChild(e)});
+   const rows=[];
+   if(production)rows.push("<b>"+L[lang].prod+":</b> "+production);
+   if(cap)rows.push("<b>"+L[lang].store+":</b> "+cap);
+   if(fleet)rows.push("<b>"+L[lang].fleet+":</b> "+fleet+(payload?" · "+payload:""));
+   if(p.maintenance_teams)rows.push("<b>"+L[lang].teams+":</b> "+p.maintenance_teams);
+   if(p.inputs_per_shift)rows.push("<b>"+L[lang].input+":</b> "+p.inputs_per_shift.map(x=>(names[lang][x.item]||x.item)+" "+number(x.quantity)+" "+unit(x.unit)).join(", "));
+   if(p.capacity_breakdown)rows.push((lang==="ar"?"تفصيل السعة":lang==="fr"?"Détail de capacité":"Capacity breakdown")+": "+Object.values(p.capacity_breakdown).map(v=>number(v.quantity)+" "+unit(v.unit)).join(" + "));
+   if(p.travel_duration)rows.push(lang==="ar"?"مدة النقل حسب المسافة على خريطة اللعبة":lang==="fr"?"Durée selon la distance sur la carte":"Travel duration based on game-map distance");
+   if(p.sale_tariff_vor_per_kwh)rows.push("<b>"+L[lang].tariff+":</b> "+number(p.sale_tariff_vor_per_kwh)+" VOR/kWh");
+   if(p.service_pricing)rows.push(lang==="ar"?"سعر ومدة الصيانة بالاتفاق بين اللاعبين":lang==="fr"?"Prix et durée convenus entre joueurs":"Service price and duration agreed between players");
+   rows.push("<b>"+L[lang].cost+":</b> "+costText);
+   card.querySelector(".dproject-detail").innerHTML=rows.map(x=>"<div>"+x+"</div>").join("");
    grid.appendChild(card);
   });
  }
+ async function loadProjects(){
+  try{const r=await fetch("data/projects.json",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const d=await r.json();if(!Array.isArray(d.projects)||d.projects.length!==12)throw Error("Invalid project catalogue");projects=d.projects.sort((a,b)=>a.number-b.number);renderProjects()}
+  catch(e){console.error("VORTERRA projects:",e);const g=$("projectGrid");if(g)g.innerHTML='<div class="dproject-empty">Could not load the approved projects file. The data remains saved in GitHub.</div>'}
+ }
+ document.querySelectorAll("#dashboard [data-lang]").forEach(b=>b.addEventListener("click",()=>applyLanguage(b.dataset.lang)));
  try{const saved=localStorage.getItem("vorterra-language");if(saved&&dict[saved])lang=saved}catch(e){}
  applyLanguage(lang);
+ loadProjects();
 })();
 </script>
 </body></html>
