@@ -268,6 +268,13 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 .downed-card p{color:#c9c4b8;font-size:10px;line-height:1.8}
 .downed-card .dproject-actions{margin-top:10px}
 
+
+.dproject-select{width:100%;margin:8px 0 12px;padding:11px 12px;border:1px solid #d7ad5866;border-radius:7px;background:#101216;color:#f3e9d5;font:inherit}
+.dproject-select:focus{outline:2px solid #d7ad58;outline-offset:2px}
+.dcheck b[data-state="ok"]{color:#75d49b}
+.dcheck b[data-state="missing"]{color:#f0bd67}
+.dcheck b[data-state="idle"]{color:#a9a9a9}
+
 </style></head><body>
 <canvas id="c"></canvas><div id="dashboard">
 <header class="dtop"><div class="dbrand"><div class="demblem"><b>V</b></div><div><strong>VORTERRA</strong><small>WORLD OF INDUSTRY &amp; TRADE</small></div></div>
@@ -324,11 +331,13 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
  <div class="dtoolbar"><div><h2 data-i18n="operations">Operations & Production</h2><p data-i18n="operationsIntro">Prepare a complete sector before starting its production cycle.</p></div><span class="dtag">8 <span data-i18n="hours">HOURS</span></span></div>
  <div class="dcols">
   <section class="dpanel"><div class="dpanelhead"><b data-i18n="readiness">Sector readiness</b><small data-i18n="beforeStart">BEFORE START</small></div><div class="dpanelbody">
-   <div class="dcheck"><span data-i18n="coreAssets">Required core assets are complete</span><b data-i18n="notChecked">Not checked</b></div>
-   <div class="dcheck"><span data-i18n="workerCount">Required worker count is available</span><b data-i18n="notChecked">Not checked</b></div>
-   <div class="dcheck"><span data-i18n="inputsReady">Required inputs and utilities are available</span><b data-i18n="notChecked">Not checked</b></div>
-   <button class="dprimary" type="button" disabled data-i18n="startShift">Start 8-hour work cycle</button>
-   <small class="dmuted" data-i18n="demoOnly">Readiness and production controls are a preview until ownership, workers and inventory are connected.</small>
+   <label class="dmuted" id="operationSelectLabel" for="operationProjectSelect">Choose an acquired project</label>
+   <select id="operationProjectSelect" class="dproject-select"><option value="">No acquired projects</option></select>
+   <div class="dcheck"><span id="opAssetsLabel">Project ownership</span><b id="opAssetsStatus">Not met</b></div>
+   <div class="dcheck"><span id="opWorkersLabel">Required workers</span><b id="opWorkersStatus">Not met</b></div>
+   <div class="dcheck"><span id="opInputsLabel">Inputs and utilities</span><b id="opInputsStatus">Not checked</b></div>
+   <button class="dprimary" id="startShiftButton" type="button" disabled>Start 8-hour work cycle</button>
+   <small class="dmuted" id="operationMessage">Acquire a project from the library first.</small>
   </div></section>
   <section class="dpanel"><div class="dpanelhead"><b data-i18n="shiftRules">Work cycle rules</b><small>8H</small></div><div class="dpanelbody">
    <div class="dactivity"><i>◷</i><div><b data-i18n="eightHours">Eight-hour production shift</b><small data-i18n="eightHoursText">Each production cycle runs for 8 hours.</small></div></div>
@@ -494,6 +503,8 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
   dash.querySelectorAll("[data-i18n]").forEach(el=>{const key=el.getAttribute("data-i18n");if(dict[lang][key])el.textContent=tr(key)});
   dash.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("active",b.dataset.lang===lang));
   renderProjects();
+  renderOwnedProjects();
+  renderOperations();
   try{localStorage.setItem("vorterra-language",lang)}catch(e){}
  }
 
@@ -554,7 +565,13 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
   });
  }
 
- const DEMO_KEY="vorterra-demo-v1";
+const opsLabels={
+ en:{choose:"Choose an acquired project",none:"No acquired projects",ownership:"Project ownership",workers:"Required workers",inputs:"Inputs and utilities",ready:"Met",missing:"Missing",demoMet:"Assumed available in demo",noProject:"Acquire a project from the library first.",hireNeeded:"Hire {n} workers to meet this project's requirement.",allReady:"All readiness checks are met. Shift controls will be enabled in the next production step.",start:"Start 8-hour work cycle"},
+ fr:{choose:"Choisir un projet acquis",none:"Aucun projet acquis",ownership:"Propriété du projet",workers:"Employés requis",inputs:"Intrants et services",ready:"Validé",missing:"Manquants",demoMet:"Disponibles (hypothèse de démonstration)",noProject:"Acquérez d'abord un projet dans la bibliothèque.",hireNeeded:"Recrutez {n} employés pour satisfaire les besoins du projet.",allReady:"Toutes les conditions sont remplies. Le contrôle de production sera activé dans l'étape suivante.",start:"Démarrer un poste de 8 heures"},
+ ar:{choose:"اختر مشروعاً تم الحصول عليه",none:"لا توجد مشاريع مقتناة",ownership:"ملكية المشروع",workers:"عدد العمال المطلوب",inputs:"المدخلات والخدمات",ready:"متحقق",missing:"ناقص",demoMet:"متاح افتراضياً في التجربة",noProject:"اقتَنِ مشروعاً من المكتبة أولاً.",hireNeeded:"ينقصك توظيف {n} عاملاً لاستكمال العدد المطلوب لهذا المشروع.",allReady:"اكتملت متطلبات الجاهزية. سيتم تفعيل التحكم بالإنتاج في المرحلة التالية.",start:"بدء وردية 8 ساعات"}
+};
+
+  const DEMO_KEY="vorterra-demo-v1";
  const demoLabels={
   en:{buy:"Buy project",rent:"Rent monthly",owned:"Already in your city",purchased:"Purchased",leased:"Monthly lease",empty:"No projects acquired yet. Open the Project Library to choose your first project.",remove:"Remove from demo city",confirmBuy:"Add this project to your demo city as an owned project?",confirmRent:"Add this project to your demo city as a monthly lease?",note:"Demo mode: changes are saved only in this browser. No VOR is charged and no real payment or ownership is created.",buyPrice:"Purchase price",rentPrice:"Monthly rent"},
   fr:{buy:"Acheter le projet",rent:"Louer par mois",owned:"Déjà dans votre ville",purchased:"Acheté",leased:"Location mensuelle",empty:"Aucun projet acquis. Ouvrez la bibliothèque pour choisir votre premier projet.",remove:"Retirer de la ville de démonstration",confirmBuy:"Ajouter ce projet à votre ville de démonstration comme propriété ?",confirmRent:"Ajouter ce projet à votre ville de démonstration en location mensuelle ?",note:"Mode démo : les changements sont enregistrés uniquement dans ce navigateur. Aucun VOR ni paiement réel n'est débité.",buyPrice:"Prix d'achat",rentPrice:"Loyer mensuel"},
@@ -569,8 +586,39 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
   const question=mode==="buy"?"confirmBuy":"confirmRent";
   if(!confirm(demoText(question)))return;
   demoState.owned.push({project_id:id,mode,acquired_at:new Date().toISOString(),demo_id:"demo-"+Date.now()});
-  saveDemoState();renderProjects();renderOwnedProjects();
+  saveDemoState();renderProjects();renderOwnedProjects();renderOperations();
  }
+
+ function renderOperations(){
+  const select=$("operationProjectSelect");if(!select)return;
+  const labels=opsLabels[lang]||opsLabels.en;
+  const owned=demoState.owned.map(x=>({entry:x,project:projects.find(p=>p.id===x.project_id)})).filter(x=>x.project);
+  const previous=select.value||demoState.selectedProjectId||"";
+  select.innerHTML="";
+  const placeholder=document.createElement("option");placeholder.value="";placeholder.textContent=owned.length?labels.choose:labels.none;select.appendChild(placeholder);
+  owned.forEach(({project})=>{const o=document.createElement("option");o.value=project.id;o.textContent=project.name?.[lang]||project.name?.en||project.id;select.appendChild(o)});
+  const selected=owned.some(x=>x.project.id===previous)?previous:(owned[0]?.project.id||"");
+  select.value=selected;demoState.selectedProjectId=selected;
+  const project=owned.find(x=>x.project.id===selected)?.project||null;
+  const set=(id,value,state)=>{const el=$(id);if(el){el.textContent=value;el.dataset.state=state}};
+  $("operationSelectLabel").textContent=labels.choose;
+  $("opAssetsLabel").textContent=labels.ownership;
+  $("opWorkersLabel").textContent=labels.workers;
+  $("opInputsLabel").textContent=labels.inputs;
+  $("startShiftButton").textContent=labels.start;
+  if(!project){
+   set("opAssetsStatus",labels.missing,"idle");set("opWorkersStatus",labels.missing,"idle");set("opInputsStatus",labels.missing,"idle");
+   $("operationMessage").textContent=labels.noProject;$("startShiftButton").disabled=true;return;
+  }
+  const hired=Number((demoState.workerAssignments||{})[project.id]||0);
+  const required=Number(project.workers||0),remaining=Math.max(0,required-hired);
+  set("opAssetsStatus",labels.ready,"ok");
+  set("opWorkersStatus",remaining?labels.missing+" · "+remaining+"/"+required:labels.ready+" · "+hired+"/"+required,remaining?"missing":"ok");
+  set("opInputsStatus",labels.demoMet,"ok");
+  $("operationMessage").textContent=remaining?labels.hireNeeded.replace("{n}",remaining):labels.allReady;
+  $("startShiftButton").disabled=remaining>0;
+ }
+
  function renderOwnedProjects(){
   const grid=$("ownedProjects"),empty=$("cityEmpty");if(!grid)return;
   grid.innerHTML="";
@@ -583,14 +631,14 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
    const detail=document.createElement("p");detail.textContent=demoText(entry.mode==="buy"?"purchased":"leased")+" · "+(entry.mode==="buy"?demoText("buyPrice")+": "+number(p.purchase_price)+" VOR":demoText("rentPrice")+": "+number(p.monthly_rent)+" VOR");
    const actions=document.createElement("div");actions.className="dproject-actions";
    const remove=document.createElement("button");remove.type="button";remove.textContent=demoText("remove");
-   remove.addEventListener("click",()=>{demoState.owned=demoState.owned.filter(x=>x.demo_id!==entry.demo_id);saveDemoState();renderOwnedProjects();renderProjects()});
+   remove.addEventListener("click",()=>{demoState.owned=demoState.owned.filter(x=>x.demo_id!==entry.demo_id);saveDemoState();renderOwnedProjects();renderProjects();renderOperations()});
    actions.appendChild(remove);card.append(h,detail,actions);grid.appendChild(card);
   });
   const note=$("demoStorageNote");if(note)note.textContent=demoText("note");
  }
 
  async function loadProjects(){
-  try{const r=await fetch("data/projects.json",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const d=await r.json();if(!Array.isArray(d.projects)||d.projects.length!==12)throw Error("Invalid project catalogue");projects=d.projects.sort((a,b)=>a.number-b.number);renderProjects()}
+  try{const r=await fetch("data/projects.json",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const d=await r.json();if(!Array.isArray(d.projects)||d.projects.length!==12)throw Error("Invalid project catalogue");projects=d.projects.sort((a,b)=>a.number-b.number);renderProjects();renderOwnedProjects();renderOperations()}
   catch(e){console.error("VORTERRA projects:",e);const g=$("projectGrid");if(g)g.innerHTML='<div class="dproject-empty">Could not load the approved projects file. The data remains saved in GitHub.</div>'}
  }
 
@@ -602,6 +650,8 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
  applyLanguage(lang);
  loadProjects();
  renderOwnedProjects();
+ renderOperations();
+ $("operationProjectSelect").addEventListener("change",e=>{demoState.selectedProjectId=e.target.value;saveDemoState();renderOperations()});
 })();
 </script>
 </body></html>
