@@ -1,0 +1,402 @@
+{
+  "schema_version": 1,
+  "currency": "VOR",
+  "operating_rules": {
+    "production_shift_hours": 8,
+    "production_stops_after_shift": true,
+    "next_shift_requires_project_yard_to_be_empty": true,
+    "wages_and_resource_costs_settle_at_shift_end": true,
+    "no_wages_or_resource_consumption_while_stopped": true,
+    "project_image_mode": "single_integrated_project_image",
+    "images_pending": true
+  },
+  "projects": [
+    {
+      "id": "quarry",
+      "number": 1,
+      "name": {
+        "en": "Quarry",
+        "fr": "Carrière",
+        "ar": "المحجرة"
+      },
+      "purchase_price": 350,
+      "monthly_rent": 48,
+      "lifespan_days": 240,
+      "workers": 12,
+      "production_per_shift": [
+        {
+          "item": "raw_rock",
+          "quantity": 120,
+          "unit": "ton"
+        },
+        {
+          "item": "crushed_gravel",
+          "quantity": 70,
+          "unit": "ton"
+        },
+        {
+          "item": "manufactured_building_materials",
+          "quantity": 40,
+          "unit": "ton"
+        }
+      ],
+      "resource_cost_per_shift": {
+        "electricity_vor": 6,
+        "fuel_vor": 5,
+        "water_vor": 2
+      }
+    },
+    {
+      "id": "forest",
+      "number": 2,
+      "name": {
+        "en": "Forest",
+        "fr": "Forêt",
+        "ar": "الغابة"
+      },
+      "purchase_price": 300,
+      "monthly_rent": 42,
+      "lifespan_days": 220,
+      "workers": 10,
+      "production_per_shift": [
+        {
+          "item": "raw_wood",
+          "quantity": 100,
+          "unit": "ton"
+        },
+        {
+          "item": "wood_panels",
+          "quantity": 55,
+          "unit": "ton"
+        }
+      ],
+      "resource_cost_per_shift": {
+        "electricity_vor": 5,
+        "fuel_vor": 5,
+        "water_vor": 2
+      }
+    },
+    {
+      "id": "mine",
+      "number": 3,
+      "name": {
+        "en": "Mine",
+        "fr": "Mine",
+        "ar": "المنجم"
+      },
+      "purchase_price": 420,
+      "monthly_rent": 58,
+      "lifespan_days": 260,
+      "workers": 15,
+      "production_per_shift": [
+        {
+          "item": "raw_minerals",
+          "quantity": 100,
+          "unit": "ton"
+        },
+        {
+          "item": "processed_minerals",
+          "quantity": 60,
+          "unit": "ton"
+        },
+        {
+          "item": "concentrated_minerals",
+          "quantity": 35,
+          "unit": "ton"
+        }
+      ],
+      "resource_cost_per_shift": {
+        "electricity_vor": 7,
+        "fuel_vor": 6,
+        "water_vor": 3
+      }
+    },
+    {
+      "id": "electricity",
+      "number": 4,
+      "name": {
+        "en": "Electricity",
+        "fr": "Électricité",
+        "ar": "الكهرباء"
+      },
+      "purchase_price": 500,
+      "monthly_rent": 70,
+      "lifespan_days": 280,
+      "workers": 12,
+      "production_per_shift": [
+        {
+          "item": "electricity",
+          "quantity": 1200,
+          "unit": "kWh"
+        }
+      ],
+      "storage_capacity": {
+        "quantity": 400,
+        "unit": "kWh"
+      },
+      "resource_cost_per_shift": {
+        "electricity_vor": 0,
+        "fuel_vor": 6,
+        "water_vor": 2
+      },
+      "sale_tariff_vor_per_kwh": 0.15
+    },
+    {
+      "id": "water",
+      "number": 5,
+      "name": {
+        "en": "Water",
+        "fr": "Eau",
+        "ar": "المياه"
+      },
+      "purchase_price": 450,
+      "monthly_rent": 63,
+      "lifespan_days": 260,
+      "workers": 12,
+      "production_per_shift": [
+        {
+          "item": "treated_water",
+          "quantity": 600,
+          "unit": "m3"
+        }
+      ],
+      "storage_capacity": {
+        "quantity": 300,
+        "unit": "m3"
+      },
+      "resource_cost_per_shift": {
+        "electricity_vor": 6,
+        "fuel_vor": 4,
+        "water_vor": 1
+      }
+    },
+    {
+      "id": "oil",
+      "number": 6,
+      "name": {
+        "en": "Oil",
+        "fr": "Pétrole",
+        "ar": "النفط"
+      },
+      "purchase_price": 550,
+      "monthly_rent": 77,
+      "lifespan_days": 300,
+      "workers": 16,
+      "production_per_shift": [
+        {
+          "item": "crude_oil",
+          "quantity": 100,
+          "unit": "barrel"
+        },
+        {
+          "item": "refined_fuel",
+          "quantity": 60,
+          "unit": "barrel"
+        },
+        {
+          "item": "petroleum_byproducts",
+          "quantity": 30,
+          "unit": "barrel"
+        }
+      ],
+      "storage_capacity": {
+        "quantity": 150,
+        "unit": "barrel"
+      },
+      "resource_cost_per_shift": {
+        "electricity_vor": 7,
+        "fuel_vor": 5,
+        "water_vor": 3
+      }
+    },
+    {
+      "id": "recycling",
+      "number": 7,
+      "name": {
+        "en": "Recycling",
+        "fr": "Recyclage",
+        "ar": "إعادة التدوير"
+      },
+      "purchase_price": 380,
+      "monthly_rent": 53,
+      "lifespan_days": 240,
+      "workers": 12,
+      "inputs_per_shift": [
+        {
+          "item": "waste",
+          "quantity": 120,
+          "unit": "ton"
+        }
+      ],
+      "production_per_shift": [
+        {
+          "item": "recycled_materials",
+          "quantity": 75,
+          "unit": "ton"
+        },
+        {
+          "item": "plastic_materials",
+          "quantity": 25,
+          "unit": "ton"
+        },
+        {
+          "item": "recovered_metals",
+          "quantity": 20,
+          "unit": "ton"
+        }
+      ],
+      "storage_capacity": {
+        "quantity": 150,
+        "unit": "ton"
+      },
+      "resource_cost_per_shift": {
+        "electricity_vor": 6,
+        "fuel_vor": 5,
+        "water_vor": 2
+      }
+    },
+    {
+      "id": "city_storage",
+      "number": 8,
+      "name": {
+        "en": "City General Storage",
+        "fr": "Entrepôt général de la ville",
+        "ar": "التخزين العام للمدينة"
+      },
+      "purchase_price": 130,
+      "monthly_rent": 45,
+      "lifespan_days": 300,
+      "workers": 8,
+      "storage_capacity": {
+        "quantity": 2000,
+        "unit": "ton"
+      },
+      "capacity_breakdown": {
+        "goods": {
+          "quantity": 1500,
+          "unit": "ton"
+        },
+        "raw_materials": {
+          "quantity": 500,
+          "unit": "ton"
+        }
+      },
+      "resource_cost_per_shift": {
+        "electricity_vor": 6,
+        "fuel_vor": 4,
+        "water_vor": 1
+      }
+    },
+    {
+      "id": "road_transport",
+      "number": 9,
+      "name": {
+        "en": "Road Transport",
+        "fr": "Transport routier",
+        "ar": "النقل البري"
+      },
+      "purchase_price": 600,
+      "monthly_rent": 39,
+      "lifespan_days": 240,
+      "workers": 10,
+      "fleet": {
+        "vehicles": 10,
+        "type": "truck"
+      },
+      "total_payload_per_trip": {
+        "quantity": 220,
+        "unit": "ton"
+      },
+      "travel_duration": "calculated_from_route_distance_on_game_map",
+      "resource_cost_per_shift": {
+        "electricity_vor": 5,
+        "fuel_vor": 6,
+        "water_vor": 1
+      }
+    },
+    {
+      "id": "sea_transport",
+      "number": 10,
+      "name": {
+        "en": "Sea Transport",
+        "fr": "Transport maritime",
+        "ar": "النقل البحري"
+      },
+      "purchase_price": 900,
+      "monthly_rent": 126,
+      "lifespan_days": 320,
+      "workers": 18,
+      "fleet": {
+        "vehicles": 2,
+        "type": "cargo_ship",
+        "payload_each": {
+          "quantity": 1000,
+          "unit": "ton"
+        }
+      },
+      "total_payload_per_trip": {
+        "quantity": 2000,
+        "unit": "ton"
+      },
+      "travel_duration": "calculated_from_sea_route_distance_between_ports",
+      "resource_cost_per_shift": {
+        "electricity_vor": 5,
+        "fuel_vor": 6,
+        "water_vor": 2
+      }
+    },
+    {
+      "id": "air_transport",
+      "number": 11,
+      "name": {
+        "en": "Air Transport",
+        "fr": "Transport aérien",
+        "ar": "النقل الجوي"
+      },
+      "purchase_price": 1200,
+      "monthly_rent": 168,
+      "lifespan_days": 350,
+      "workers": 20,
+      "fleet": {
+        "vehicles": 2,
+        "type": "cargo_aircraft",
+        "payload_each": {
+          "quantity": 100,
+          "unit": "ton"
+        }
+      },
+      "total_payload_per_trip": {
+        "quantity": 200,
+        "unit": "ton"
+      },
+      "travel_duration": "calculated_from_air_route_distance_between_airports",
+      "resource_cost_per_shift": {
+        "electricity_vor": 6,
+        "fuel_vor": 6,
+        "water_vor": 2
+      }
+    },
+    {
+      "id": "maintenance",
+      "number": 12,
+      "name": {
+        "en": "Maintenance Company",
+        "fr": "Entreprise de maintenance",
+        "ar": "شركة الصيانة"
+      },
+      "purchase_price": 500,
+      "monthly_rent": 35,
+      "lifespan_days": 240,
+      "workers": 10,
+      "maintenance_teams": 3,
+      "service_pricing": "agreed_between_players",
+      "service_duration": "agreed_between_players",
+      "serviced_project_stops_production_during_maintenance": true,
+      "resource_cost_per_shift": {
+        "electricity_vor": 5,
+        "fuel_vor": 4,
+        "water_vor": 1
+      }
+    }
+  ]
+}
