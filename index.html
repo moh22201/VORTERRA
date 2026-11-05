@@ -31,6 +31,27 @@ canvas{position:fixed;inset:0;width:100%;height:100%}
 .tag{position:absolute;bottom:-8%;width:100%;text-align:center;letter-spacing:.7em;font-size:clamp(10px,1.6vw,16px);color:var(--gold);opacity:0;direction:ltr}
 .play .tag{animation:tag 1.6s 2.8s forwards}
 @keyframes tag{to{opacity:.85;letter-spacing:.45em}}
+
+/* Registration beneath the member card */
+#cardScene{justify-content:flex-start;padding-top:clamp(20px,5vh,55px);padding-bottom:35px;gap:18px}
+.registration-panel{width:min(92vw,460px);padding:22px;border:1px solid rgba(246,216,137,.58);border-radius:18px;background:linear-gradient(145deg,rgba(32,34,36,.96),rgba(7,8,10,.97));box-shadow:0 22px 65px #000b,inset 0 1px #ffffff22,0 0 28px #f6d88912;direction:ltr}
+.registration-heading{text-align:center;margin-bottom:17px}
+.registration-heading .reg-mark{width:42px;height:42px;margin:0 auto 10px;border:1px solid #f6d889;border-radius:13px;display:grid;place-items:center;color:#ffe3a0;font:23px Georgia;box-shadow:0 0 18px #f6d88925,inset 0 1px #ffffff20}
+.registration-heading h2{font:22px Georgia;color:#ffe3a0;letter-spacing:1px}
+.registration-heading p{margin-top:7px;color:#bdb8ad;font-size:11px;line-height:1.6}
+.registration-form{display:grid;gap:10px}
+.registration-form label{display:block;color:#d9c89e;font-size:10px;letter-spacing:.5px;margin:2px 2px 5px}
+.registration-form input{width:100%;padding:12px 13px;border:1px solid #f6d88955;border-radius:10px;background:linear-gradient(145deg,#151719,#090a0c);color:#fff;font:13px "Segoe UI",Arial;outline:none}
+.registration-form input:focus{border-color:#ffe3a0;box-shadow:0 0 14px #f6d88920}
+.registration-form .register-submit{width:100%;margin-top:4px;padding:13px;border:1px solid #ffe3a0;border-radius:10px;background:linear-gradient(110deg,#a77a31,#f6d889 48%,#b68a42);color:#15110a;font-weight:800;letter-spacing:.4px;box-shadow:0 7px 22px #f6d88922}
+.google-register{width:100%;padding:12px;border:1px solid #ffffff38;border-radius:10px;background:linear-gradient(145deg,#ffffff12,#ffffff05);color:#f1eee6;font-weight:600}
+.google-register span{display:inline-grid;place-items:center;width:22px;height:22px;margin-right:8px;border-radius:50%;background:#fff;color:#4285f4;font:bold 15px Arial}
+.reg-divider{display:flex;align-items:center;gap:10px;color:#898579;font-size:9px;letter-spacing:1px;margin:12px 0}
+.reg-divider:before,.reg-divider:after{content:"";height:1px;flex:1;background:#f6d88930}
+.reg-message{min-height:17px;color:#e5cf98;font-size:10px;line-height:1.6;text-align:center;margin-top:10px}
+.reg-note{margin-top:12px;padding-top:11px;border-top:1px solid #ffffff18;color:#99958b;font-size:9px;line-height:1.7;text-align:center}
+@media(max-width:520px){.registration-panel{padding:18px}.registration-heading h2{font-size:20px}}
+
 /* CARD */
 #cardScene{opacity:0;pointer-events:none;flex-direction:column;gap:22px;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
 .play #cardScene{animation:cardShow 1.8s 5.6s ease forwards}
@@ -635,7 +656,20 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
   <select id="iY" aria-label="اختر المدينة / Select city" required disabled><option value="" selected disabled>اختر البلد أولاً / Select country first</option></select>
   <button id="issueCard" type="submit">إصدار البطاقة ✦</button>
  </form>
- <button id="continueRegistration" class="continue" type="button" hidden>سجل الآن →</button>
+ 
+  <section class="registration-panel" id="registrationPanel" aria-labelledby="registrationTitle">
+   <div class="registration-heading"><div class="reg-mark">V</div><h2 id="registrationTitle">CREATE YOUR ACCOUNT</h2><p>Join VORTERRA and enter your business world.</p></div>
+   <form class="registration-form" id="registrationForm">
+    <div><label for="regEmail">EMAIL ADDRESS · البريد الإلكتروني</label><input id="regEmail" type="email" name="email" autocomplete="email" placeholder="name@example.com" required></div>
+    <div><label for="regPassword">PASSWORD · كلمة المرور</label><input id="regPassword" type="password" name="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required></div>
+    <div><label for="regConfirm">CONFIRM PASSWORD · تأكيد كلمة المرور</label><input id="regConfirm" type="password" name="confirmPassword" autocomplete="new-password" minlength="8" placeholder="Repeat your password" required></div>
+    <button class="register-submit" id="registerNow" type="submit">سجّل الآن · REGISTER NOW</button>
+   </form>
+   <div class="reg-divider">OR CONTINUE WITH</div>
+   <button class="google-register" id="googleRegister" type="button"><span>G</span> Continue with Google · التسجيل عبر Google</button>
+   <p class="reg-message" id="registrationMessage" role="status" aria-live="polite"></p>
+   <p class="reg-note">Account creation and Google sign-in will be activated when VORTERRA is connected to Supabase. This is currently a visual preview; passwords are not saved or sent.</p>
+  </section>
 </div>
 <script>
 const cv=document.getElementById('c'),x=cv.getContext('2d');let W,H,P=[];
@@ -678,14 +712,21 @@ identityForm.addEventListener('submit',event=>{
  event.preventDefault();
  if(!identityForm.reportValidity())return;
  identityForm.hidden=true;
- document.getElementById('continueRegistration').hidden=false;
+ document.getElementById('registrationPanel').scrollIntoView({behavior:'smooth',block:'center'});
 });
-document.getElementById('continueRegistration').onclick=()=>{
-  document.getElementById('cardScene').style.display='none';
-  document.getElementById('intro').style.display='none';
-  document.getElementById('skip').style.display='none';
-  document.getElementById('dashboard').classList.add('active');
-};
+const registrationForm=document.getElementById('registrationForm');
+registrationForm.addEventListener('submit',event=>{
+ event.preventDefault();
+ const password=document.getElementById('regPassword');
+ const confirm=document.getElementById('regConfirm');
+ const message=document.getElementById('registrationMessage');
+ if(password.value!==confirm.value){confirm.setCustomValidity('Passwords do not match');confirm.reportValidity();confirm.setCustomValidity('');return;}
+ message.textContent='Preview only: no account has been created yet. Supabase authentication will be enabled next.';
+ password.value='';confirm.value='';
+});
+document.getElementById('googleRegister').addEventListener('click',()=>{
+ document.getElementById('registrationMessage').textContent='Google sign-in will be activated after Supabase OAuth setup.';
+});
 function openDashboardPanel(view){
  const root=document.getElementById('dashboard');
  root.querySelectorAll('.dview').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===view));
