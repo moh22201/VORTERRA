@@ -721,8 +721,12 @@ registrationForm.addEventListener('submit',event=>{
  const confirm=document.getElementById('regConfirm');
  const message=document.getElementById('registrationMessage');
  if(password.value!==confirm.value){confirm.setCustomValidity('Passwords do not match');confirm.reportValidity();confirm.setCustomValidity('');return;}
- message.textContent='Preview only: no account has been created yet. Supabase authentication will be enabled next.';
  password.value='';confirm.value='';
+ /* Preview navigation only: real account creation starts after Supabase auth is connected. */
+ document.getElementById('cardScene').style.display='none';
+ document.getElementById('intro').style.display='none';
+ document.getElementById('skip').style.display='none';
+ document.getElementById('dashboard').classList.add('active');
 });
 document.getElementById('googleRegister').addEventListener('click',()=>{
  document.getElementById('registrationMessage').textContent='Google sign-in will be activated after Supabase OAuth setup.';
