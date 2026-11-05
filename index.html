@@ -127,20 +127,172 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 #dashboard .dplaceholder{background:linear-gradient(145deg,#1a1c1ff2,#08090afa)!important}
 @media(max-width:680px){#dashboard .dside{background:#070809f5!important;border-top-color:#f6d88944!important}}
 
+
+/* VORTERRA system structure */
+#dashboard .dlang-switch{display:flex;align-items:center;gap:5px;padding:5px;border:1px solid #f6d88940;border-radius:12px;background:#08090bd9}
+#dashboard .dlang-switch button{padding:8px 11px;border:1px solid transparent;border-radius:8px;background:transparent;color:#c9c4b7;font-size:11px;font-weight:800;cursor:pointer}
+#dashboard .dlang-switch button.active{color:#ffe3a0;border-color:#f6d88980;background:linear-gradient(135deg,#f6d88922,#fff1)}
+#dashboard .dside button span+span{font-size:13px}
+#dashboard .dside button{display:flex;align-items:center;gap:12px}
+#dashboard .dsector-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0}
+#dashboard .dsector{display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;min-height:104px;padding:16px;border:1px solid #f6d88935;border-radius:14px;background:linear-gradient(145deg,#191b1e,#070809);color:#eee9dc;cursor:pointer;transition:.2s}
+#dashboard .dsector:hover{border-color:#ffe3a0;box-shadow:0 0 18px #f6d88920;transform:translateY(-2px)}
+#dashboard .dsector b{color:#e8c36f;font-size:12px;letter-spacing:1px}
+#dashboard .dsector strong{font-size:14px;line-height:1.35}
+#dashboard .dsector small,#dashboard .dmuted{color:#aaa69c;font-size:11px;line-height:1.5}
+#dashboard .dasset-browser{margin-top:22px;padding:16px;border:1px solid #f6d88945;border-radius:16px;background:linear-gradient(145deg,#121416,#050607)}
+#dashboard .dasset-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#dashboard .dasset-card{overflow:hidden;border:1px solid #f6d88935;border-radius:13px;background:#0a0c0e}
+#dashboard .dasset-visual{height:120px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 35%,#59451f66,#151719 60%,#08090a);font-size:44px}
+#dashboard .dasset-info{padding:12px}
+#dashboard .dasset-info h4{margin:0 0 6px;color:#f3d58c;font-size:14px}
+#dashboard .dasset-info p{margin:0;color:#aaa69c;font-size:11px;line-height:1.5}
+#dashboard .dasset-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+#dashboard .dasset-meta span{padding:7px;border-radius:7px;background:#ffffff08;color:#c9c4b7;font-size:10px}
+#dashboard .dasset-card button{width:100%;margin-top:10px;padding:9px;border:1px solid #f6d88965;border-radius:8px;background:#f6d88912;color:#ffe3a0;font-weight:700}
+#dashboard .dback{padding:9px 12px;border:1px solid #f6d88950;border-radius:9px;background:#f6d88910;color:#ffe3a0;cursor:pointer}
+#dashboard .dtag{padding:8px 11px;border:1px solid #f6d88955;border-radius:20px;color:#f6d889;font-size:11px}
+#dashboard .dnote{margin-top:16px;padding:13px 15px;border:1px solid #f6d8892b;border-radius:11px;background:#ffffff06;color:#bdb8ab;font-size:12px;line-height:1.7}
+#dashboard .dcheck{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #ffffff12;color:#ded9cd;font-size:12px}
+#dashboard .dcheck b{color:#d8b96f;font-size:10px;white-space:nowrap}
+#dashboard .dprimary{width:100%;margin:15px 0 8px;padding:12px;border:1px solid #f6d88955;border-radius:9px;background:#f6d88918;color:#ffe3a0;font-weight:800}
+#dashboard .dprimary:disabled{opacity:.48;cursor:not-allowed}
+#dashboard .dquick-large{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+#dashboard .dquick-large button{min-height:116px;padding:15px;text-align:left;display:flex;flex-direction:column;gap:7px}
+#dashboard .dquick-large button span{font-size:22px;color:#e8c36f}
+#dashboard .dquick-large button b{font-size:13px}
+#dashboard .dquick-large button small{font-size:11px;line-height:1.5;color:#aaa69c}
+#dashboard .dlang-large{margin-top:12px;width:max-content}
+#dashboard [dir="rtl"] .dsector,#dashboard [dir="rtl"] .dquick-large button{text-align:right;align-items:flex-start}
+#dashboard [dir="rtl"] .dcheck{flex-direction:row-reverse}
+@media(max-width:680px){#dashboard .dsector-grid,#dashboard .dasset-grid,#dashboard .dquick-large{grid-template-columns:1fr}#dashboard .dlang-switch button{padding:7px 8px}#dashboard .dasset-visual{height:145px}}
+
 </style></head><body>
 <canvas id="c"></canvas><div id="dashboard">
 <header class="dtop"><div class="dbrand"><div class="demblem"><b>V</b></div><div><strong>VORTERRA</strong><small>WORLD OF INDUSTRY &amp; TRADE</small></div></div>
-<nav class="dtopnav"><button class="active" data-view="overview">Overview</button><button data-view="economy">Economy</button><button data-view="market">Marketplace</button><button data-view="industry">Industry</button><button data-view="logistics">Logistics</button></nav>
+<div class="dlang-switch" aria-label="Language"><button type="button" data-lang="en" class="active">ENG</button><button type="button" data-lang="fr">FRA</button><button type="button" data-lang="ar">ARB</button></div>
 <div class="daccount"><div class="dbalance"><small>AVAILABLE BALANCE</small><b>0.00 VOR</b></div><div class="davatar">V</div><div class="dmember">Member Account<small>VOR · MEMBER</small></div></div></header>
-<div class="dlayout"><aside class="dside"><div class="dlabel">MAIN WORKSPACE</div>
-<button class="active" data-view="overview"><span>⌂</span>Dashboard</button><button data-view="economy"><span>◈</span>Economy &amp; Finance</button><button data-view="market"><span>▤</span>Marketplace</button><button data-view="industry"><span>⚙</span>Industries &amp; Assets</button><button data-view="workforce"><span>♙</span>Workforce</button><button data-view="logistics"><span>⇄</span>Logistics &amp; Transport</button><button data-view="contracts"><span>▧</span>Contracts</button><div class="dsep"></div><div class="dlabel">ACCOUNT</div><button data-view="assets"><span>◇</span>My Properties</button><button data-view="reports"><span>▥</span>Reports &amp; Records</button><button data-view="settings"><span>⚙</span>Settings</button><footer>VORTERRA NETWORK<br>GLOBAL ECONOMIC PLATFORM<br>✦ PREVIEW INTERFACE</footer></aside>
-<main class="dmain">
-<section class="dview active" data-panel="overview"><div class="dwelcome"><div><div class="deyebrow">MEMBER CONTROL CENTER</div><h1>Welcome to VORTERRA</h1><p>Your global business workspace. Choose a section to get started.</p></div><div class="dcrumb">MEMBER PORTAL / OVERVIEW</div></div>
-<div class="dstats"><article class="dstat"><small>ACCOUNT BALANCE</small><strong>0.00 <small>VOR</small></strong><em>Your available funds</em><i>◈</i></article><article class="dstat"><small>ACTIVE ASSETS</small><strong>00</strong><em>Owned &amp; leased assets</em><i>◇</i></article><article class="dstat"><small>ACTIVE CONTRACTS</small><strong>00</strong><em>Ongoing business deals</em><i>▧</i></article><article class="dstat"><small>WORKFORCE</small><strong>00</strong><em>Registered workers</em><i>♙</i></article></div>
-<div class="dcols"><section class="dpanel"><div class="dpanelhead"><b>Recent Activity</b><small>ACCOUNT OVERVIEW</small></div><div class="dpanelbody"><div class="dactivity"><i>◈</i><div><b>Welcome to your member workspace</b><small>Your account activity will appear here.</small></div><em>—</em></div><div class="dactivity"><i>▤</i><div><b>Marketplace access</b><small>Explore listings, services and opportunities.</small></div><em>READY</em></div><div class="dactivity"><i>⚙</i><div><b>Business operations</b><small>Manage industries, assets and workforce.</small></div><em>READY</em></div></div></section>
-<section class="dpanel"><div class="dpanelhead"><b>Quick Access</b><small>SHORTCUTS</small></div><div class="dpanelbody"><div class="dquick"><button data-view="market">▤<b>Marketplace</b><small>Buy, sell or rent</small></button><button data-view="industry">⚙<b>Industries</b><small>Assets &amp; production</small></button><button data-view="workforce">♙<b>Workforce</b><small>Find workers</small></button><button data-view="contracts">▧<b>Contracts</b><small>Business offers</small></button></div></div></section></div></section>
-<section class="dview" data-panel="economy"><div class="dtoolbar"><div><h2>Economy & Finance</h2><p>Wallet, deposits, withdrawals and financial records.</p></div><div><button>Overview</button><button>Manage</button></div></div><div class="dplaceholder"><i>◈</i><h3>Financial workspace</h3><p>VOR wallet, account balances, deposits, withdrawals, payroll and transaction history. Live financial operations will be connected in a later stage. This is a visual interface preview; connected operations will be implemented in their own development stages.</p></div></section><section class="dview" data-panel="market"><div class="dtoolbar"><div><h2>Global Marketplace</h2><p>Trade assets, materials, products and services.</p></div><div><button>Overview</button><button>Manage</button></div></div><div class="dplaceholder"><i>▤</i><h3>Marketplace window</h3><p>A unified marketplace for player listings, equipment, raw materials, finished products, services and rental offers. This is a visual interface preview; connected operations will be implemented in their own development stages.</p></div></section><section class="dview" data-panel="industry"><div class="dtoolbar"><div><h2>Industries & Assets</h2><p>Explore industrial sectors and manage productive assets.</p></div><div><button>Overview</button><button>Manage</button></div></div><div class="dplaceholder"><i>⚙</i><h3>Industrial operations</h3><p>Manage extraction, manufacturing, recycling, energy, water, petrochemicals, storage and construction assets. This is a visual interface preview; connected operations will be implemented in their own development stages.</p></div></section><section class="dview" data-panel="workforce"><div class="dtoolbar"><div><h2>Workforce</h2><p>Recruitment, worker profiles, shifts and payroll.</p></div><div><button>Overview</button><button>Manage</button></div></div><div class="dplaceholder"><i>♙</i><h3>Employment center</h3><p>Find workers, publish vacancies, manage production shifts, wages, bonuses and experience records. This is a visual interface preview; connected operations will be implemented in their own development stages.</p></div></section><section class="dview" data-panel="logistics"><div class="dtoolbar"><div><h2>Logistics & Transport</h2><p>Storage, shipping and delivery services.</p></div><div><button>Overview</button><button>Manage</button></div></div><div class="dplaceholder"><i>⇄</i><h3>Logistics control</h3><p>Coordinate warehouses, transport providers, shipping contracts and delivery services between businesses. This is a visual interface preview; connected operations will be implemented in their own development stages.</p></div></section><section class="dview" data-panel="contracts"><div class="dtoolbar"><div><h2>Contracts</h2><p>Business offers, tenders and agreements.</p></div><div><button>Overview</button><button>Manage</button></div></div><div class="dplaceholder"><i>▧</i><h3>Contract center</h3><p>Discover construction, production, procurement, transport and service contracts from the VORTERRA network. This is a visual interface preview; connected operations will be implemented in their own development stages.</p></div></section><section class="dview" data-panel="assets"><div class="dtoolbar"><div><h2>My Properties</h2><p>Your owned, leased and listed assets.</p></div><div><button>Overview</button><button>Manage</button></div></div><div class="dplaceholder"><i>◇</i><h3>Asset portfolio</h3><p>Your property and equipment portfolio will appear here when asset ownership is connected. This is a visual interface preview; connected operations will be implemented in their own development stages.</p></div></section><section class="dview" data-panel="reports"><div class="dtoolbar"><div><h2>Reports & Records</h2><p>Business performance and account history.</p></div><div><button>Overview</button><button>Manage</button></div></div><div class="dplaceholder"><i>▥</i><h3>Business intelligence</h3><p>Review operational records, production results, financial movements and business performance. This is a visual interface preview; connected operations will be implemented in their own development stages.</p></div></section><section class="dview" data-panel="settings"><div class="dtoolbar"><div><h2>Settings</h2><p>Personal profile, language and security preferences.</p></div><div><button>Overview</button><button>Manage</button></div></div><div class="dplaceholder"><i>⚙</i><h3>Account preferences</h3><p>Manage your member profile, preferred language, notifications and account security. This is a visual interface preview; connected operations will be implemented in their own development stages.</p></div></section>
-</main></div></div><div class="bgglow"></div>
+<div class="dlayout"><aside class="dside">
+<div class="dlabel" data-i18n="workspace">MAIN WORKSPACE</div>
+<button class="active" data-view="overview"><span>⌂</span><span data-i18n="overview">Overview</span></button>
+<button data-view="library"><span>▦</span><span data-i18n="library">Asset Library</span></button>
+<button data-view="city"><span>⌂</span><span data-i18n="myCity">My City</span></button>
+<button data-view="operations"><span>⚙</span><span data-i18n="operations">Operations & Production</span></button>
+<button data-view="market"><span>▤</span><span data-i18n="market">Marketplace</span></button>
+<button data-view="contracts"><span>⇄</span><span data-i18n="contracts">Contracts & Logistics</span></button>
+<button data-view="economy"><span>◈</span><span data-i18n="finance">Economy & Finance</span></button>
+<div class="dsep"></div><div class="dlabel" data-i18n="account">ACCOUNT</div>
+<button data-view="settings"><span>⚙</span><span data-i18n="settings">Settings</span></button>
+<footer>VORTERRA NETWORK<br>GLOBAL ECONOMIC PLATFORM<br>✦ PREVIEW INTERFACE</footer>
+</aside><main class="dmain">
+<section class="dview active" data-panel="overview">
+ <div class="dwelcome"><div><div class="deyebrow" data-i18n="memberCenter">MEMBER CONTROL CENTER</div><h1 data-i18n="welcome">Welcome to VORTERRA</h1><p data-i18n="welcomeText">Your business world at a glance.</p></div><div class="dcrumb">MEMBER PORTAL / OVERVIEW</div></div>
+ <div class="dstats">
+  <article class="dstat"><small data-i18n="balance">ACCOUNT BALANCE</small><strong>0.00 <small>VOR</small></strong><em data-i18n="available">Available balance</em><i>◈</i></article>
+  <article class="dstat"><small data-i18n="ownedAssets">OWNED ASSETS</small><strong>00</strong><em data-i18n="assetsInCity">Assets in your city</em><i>◇</i></article>
+  <article class="dstat"><small data-i18n="activeContracts">ACTIVE CONTRACTS</small><strong>00</strong><em data-i18n="contractsStatus">In progress</em><i>▧</i></article>
+  <article class="dstat"><small data-i18n="workers">WORKERS</small><strong>00</strong><em data-i18n="workersStatus">Assigned to operations</em><i>♙</i></article>
+ </div>
+ <div class="dcols">
+  <section class="dpanel"><div class="dpanelhead"><b data-i18n="recentActivity">Recent Activity</b><small data-i18n="accountOverview">ACCOUNT OVERVIEW</small></div><div class="dpanelbody">
+   <div class="dactivity"><i>▦</i><div><b data-i18n="libraryShortcut">Asset Library</b><small data-i18n="libraryShortcutText">Choose a sector and explore its assets.</small></div><em>→</em></div>
+   <div class="dactivity"><i>⚙</i><div><b data-i18n="productionShortcut">Production readiness</b><small data-i18n="productionShortcutText">Check assets and worker requirements before an 8-hour shift.</small></div><em>8H</em></div>
+   <div class="dactivity"><i>◈</i><div><b data-i18n="financeShortcut">Financial records</b><small data-i18n="financeShortcutText">Track wallet activity, costs and obligations.</small></div><em>→</em></div>
+  </div></section>
+  <section class="dpanel"><div class="dpanelhead"><b data-i18n="quickAccess">Quick Access</b><small data-i18n="shortcuts">SHORTCUTS</small></div><div class="dpanelbody"><div class="dquick">
+   <button data-view="library">▦<b data-i18n="library">Asset Library</b><small data-i18n="browseSectors">Browse 11 sectors</small></button>
+   <button data-view="city">⌂<b data-i18n="myCity">My City</b><small data-i18n="manageOwned">Manage owned assets</small></button>
+   <button data-view="operations">⚙<b data-i18n="operations">Operations</b><small data-i18n="eightHourShift">8-hour work cycle</small></button>
+   <button data-view="market">▤<b data-i18n="market">Marketplace</b><small data-i18n="tradeRent">Buy, sell or rent</small></button>
+  </div></div></section>
+ </div>
+</section>
+
+<section class="dview" data-panel="library">
+ <div class="dtoolbar"><div><h2 data-i18n="library">Asset Library</h2><p data-i18n="libraryIntro">Choose one of the 11 sectors to view its approved asset catalogue.</p></div><span class="dtag">11 <span data-i18n="sectors">SECTORS</span></span></div>
+ <div class="dsector-grid" id="sectorGrid">
+  <button class="dsector" data-sector="1"><b>01</b><strong data-i18n="s1">Raw Materials Extraction</strong><small data-i18n="s1d">Quarries, mines, forests and timber</small></button>
+  <button class="dsector" data-sector="2"><b>02</b><strong data-i18n="s2">Manufacturing Industry</strong><small data-i18n="s2d">Processing raw materials into products</small></button>
+  <button class="dsector" data-sector="3"><b>03</b><strong data-i18n="s3">Waste Recycling</strong><small data-i18n="s3d">Sorting and recycling waste materials</small></button>
+  <button class="dsector" data-sector="4"><b>04</b><strong data-i18n="s4">Energy & Water</strong><small data-i18n="s4d">Electricity and water supply</small></button>
+  <button class="dsector" data-sector="5"><b>05</b><strong data-i18n="s5">Petrochemicals</strong><small data-i18n="s5d">Fuel and rubber production</small></button>
+  <button class="dsector" data-sector="6"><b>06</b><strong data-i18n="s6">Warehousing & Logistics</strong><small data-i18n="s6d">Storage and inventory facilities</small></button>
+  <button class="dsector" data-sector="7"><b>07</b><strong data-i18n="s7">Trade & Commercial Center</strong><small data-i18n="s7d">Player listings and trade contracts</small></button>
+  <button class="dsector" data-sector="8"><b>08</b><strong data-i18n="s8">Employment</strong><small data-i18n="s8d">Recruitment and workforce services</small></button>
+  <button class="dsector" data-sector="9"><b>09</b><strong data-i18n="s9">Transport & Shipping</strong><small data-i18n="s9d">Road, sea and air freight</small></button>
+  <button class="dsector" data-sector="10"><b>10</b><strong data-i18n="s10">Business Management & Accounting</strong><small data-i18n="s10d">Business administration and accounts</small></button>
+  <button class="dsector" data-sector="11"><b>11</b><strong data-i18n="s11">Construction & Fabrication</strong><small data-i18n="s11d">Construction, workshops and equipment</small></button>
+ </div>
+ <section class="dasset-browser" id="assetBrowser" hidden>
+  <div class="dtoolbar"><div><h3 id="sectorTitle"></h3><p id="sectorDescription"></p></div><button type="button" class="dback" id="backToSectors" data-i18n="backSectors">← All sectors</button></div>
+  <div class="dasset-grid" id="assetGrid"></div>
+ </section>
+ <div class="dnote" data-i18n="libraryNote">The library is for discovering and selecting assets. Purchased or leased assets appear in My City. Asset images and exact specifications are added from the approved VORTERRA asset collection.</div>
+</section>
+
+<section class="dview" data-panel="city">
+ <div class="dtoolbar"><div><h2 data-i18n="myCity">My City</h2><p data-i18n="cityIntro">Your city, sectors and owned or leased assets.</p></div></div>
+ <div class="dplaceholder"><i>⌂</i><h3 data-i18n="cityEmptyTitle">Your city workspace</h3><p data-i18n="cityEmptyText">Assets acquired from the library will be listed here with their ownership status, location, age, condition and operating state. City placement and ownership data will be connected in a later stage.</p></div>
+</section>
+
+<section class="dview" data-panel="operations">
+ <div class="dtoolbar"><div><h2 data-i18n="operations">Operations & Production</h2><p data-i18n="operationsIntro">Prepare a complete sector before starting its production cycle.</p></div><span class="dtag">8 <span data-i18n="hours">HOURS</span></span></div>
+ <div class="dcols">
+  <section class="dpanel"><div class="dpanelhead"><b data-i18n="readiness">Sector readiness</b><small data-i18n="beforeStart">BEFORE START</small></div><div class="dpanelbody">
+   <div class="dcheck"><span data-i18n="coreAssets">Required core assets are complete</span><b data-i18n="notChecked">Not checked</b></div>
+   <div class="dcheck"><span data-i18n="workerCount">Required worker count is available</span><b data-i18n="notChecked">Not checked</b></div>
+   <div class="dcheck"><span data-i18n="inputsReady">Required inputs and utilities are available</span><b data-i18n="notChecked">Not checked</b></div>
+   <button class="dprimary" type="button" disabled data-i18n="startShift">Start 8-hour work cycle</button>
+   <small class="dmuted" data-i18n="demoOnly">Readiness and production controls are a preview until ownership, workers and inventory are connected.</small>
+  </div></section>
+  <section class="dpanel"><div class="dpanelhead"><b data-i18n="shiftRules">Work cycle rules</b><small>8H</small></div><div class="dpanelbody">
+   <div class="dactivity"><i>◷</i><div><b data-i18n="eightHours">Eight-hour production shift</b><small data-i18n="eightHoursText">Each production cycle runs for 8 hours.</small></div></div>
+   <div class="dactivity"><i>♙</i><div><b data-i18n="staffing">Staffing requirement</b><small data-i18n="staffingText">The sector must have the required number of workers.</small></div></div>
+   <div class="dactivity"><i>◇</i><div><b data-i18n="completeAssets">Complete asset set</b><small data-i18n="completeAssetsText">All essential assets for the selected operation must be owned or leased and ready.</small></div></div>
+   <div class="dactivity"><i>▤</i><div><b data-i18n="settlement">End-of-shift settlement</b><small data-i18n="settlementText">Production, wages, operating costs and consumption are calculated at cycle completion.</small></div></div>
+  </div></section>
+ </div>
+</section>
+
+<section class="dview" data-panel="market">
+ <div class="dtoolbar"><div><h2 data-i18n="market">Marketplace</h2><p data-i18n="marketIntro">One shared marketplace for all player cities.</p></div></div>
+ <div class="dquick dquick-large">
+  <button><span>◇</span><b data-i18n="buyAssets">Buy assets</b><small data-i18n="buyAssetsText">Purchase assets offered by the platform or players.</small></button>
+  <button><span>⇄</span><b data-i18n="sellAssets">Sell assets</b><small data-i18n="sellAssetsText">List owned assets for other players.</small></button>
+  <button><span>⌂</span><b data-i18n="rentAssets">Rent assets</b><small data-i18n="rentAssetsText">Rent equipment or facilities from players.</small></button>
+  <button><span>▤</span><b data-i18n="materialsProducts">Materials & products</b><small data-i18n="materialsProductsText">Trade raw materials and finished products.</small></button>
+ </div>
+ <div class="dnote" data-i18n="marketNote">Listings, prices, payments and ownership transfers will be connected after the marketplace rules are finalized.</div>
+</section>
+
+<section class="dview" data-panel="contracts">
+ <div class="dtoolbar"><div><h2 data-i18n="contracts">Contracts & Logistics</h2><p data-i18n="contractsIntro">Manage supply agreements, delivery and shipping.</p></div></div>
+ <div class="dquick dquick-large">
+  <button><span>▧</span><b data-i18n="supplyContracts">Supply contracts</b><small data-i18n="supplyContractsText">Buy or sell quantities under an agreement.</small></button>
+  <button><span>🚚</span><b data-i18n="roadTransport">Road transport</b><small data-i18n="roadTransportText">Arrange deliveries between cities.</small></button>
+  <button><span>⚓</span><b data-i18n="seaAir">Sea & air shipping</b><small data-i18n="seaAirText">Coordinate port and airport shipments.</small></button>
+  <button><span>✓</span><b data-i18n="deliveryTracking">Delivery tracking</b><small data-i18n="deliveryTrackingText">Follow contract and delivery status.</small></button>
+ </div>
+</section>
+
+<section class="dview" data-panel="economy">
+ <div class="dtoolbar"><div><h2 data-i18n="finance">Economy & Finance</h2><p data-i18n="financeIntro">Your wallet, money movements and financial obligations.</p></div></div>
+ <div class="dquick dquick-large">
+  <button><span>◈</span><b data-i18n="wallet">Wallet</b><small data-i18n="walletText">Available and reserved VOR balance.</small></button>
+  <button><span>＋</span><b data-i18n="deposits">Deposits</b><small data-i18n="depositsText">Deposit history and payment status.</small></button>
+  <button><span>↗</span><b data-i18n="withdrawals">Withdrawals</b><small data-i18n="withdrawalsText">Withdrawal requests and status.</small></button>
+  <button><span>▥</span><b data-i18n="transactions">Transactions & records</b><small data-i18n="transactionsText">Income, expenses, wages and transfers.</small></button>
+  <button><span>▣</span><b data-i18n="loans">Loans & repayments</b><small data-i18n="loansText">Outstanding debt and due dates.</small></button>
+  <button><span>◷</span><b data-i18n="financialSummary">Financial summary</b><small data-i18n="financialSummaryText">Revenue, costs and operating results.</small></button>
+ </div>
+ <div class="dnote" data-i18n="financeNote">Financial actions are not live yet. The current page is an interface preview; no real deposits, withdrawals or transfers are processed.</div>
+</section>
+
+<section class="dview" data-panel="settings">
+ <div class="dtoolbar"><div><h2 data-i18n="settings">Settings</h2><p data-i18n="settingsIntro">Language, profile, notifications and account preferences.</p></div></div>
+ <div class="dpanel"><div class="dpanelbody"><b data-i18n="chooseLanguage">Choose your language</b><div class="dlang-switch dlang-large"><button type="button" data-lang="en">ENG</button><button type="button" data-lang="fr">FRA</button><button type="button" data-lang="ar">ARB</button></div></div></div>
+</section>
+</main></div></div></div><div class="bgglow"></div>
 <button class="skip" id="skip">تخطي ⏭</button>
 <div class="stage" id="intro"><div class="logo">
  <div class="ring"></div><div class="ring b"></div>
@@ -232,4 +384,72 @@ document.getElementById('skip').onclick=()=>{b.classList.remove('play');document
 [['iN','oN'],['iL','oL']].forEach(([i,o])=>{const a=document.getElementById(i);a.oninput=()=>document.getElementById(o).textContent=a.value||'—'});
 const card=document.getElementById('card');
 document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect(),dx=(e.clientX-r.left-r.width/2)/innerWidth,dy=(e.clientY-r.top-r.height/2)/innerHeight;card.style.transform=`rotateY(${dx*28}deg) rotateX(${-dy*28}deg)`});
-</script></body></html>
+</script>
+<script>
+(()=>{
+ const dict={
+ en:{
+ workspace:"MAIN WORKSPACE",overview:"Overview",library:"Asset Library",myCity:"My City",operations:"Operations & Production",market:"Marketplace",contracts:"Contracts & Logistics",finance:"Economy & Finance",account:"ACCOUNT",settings:"Settings",memberCenter:"MEMBER CONTROL CENTER",welcome:"Welcome to VORTERRA",welcomeText:"Your business world at a glance.",balance:"ACCOUNT BALANCE",available:"Available balance",ownedAssets:"OWNED ASSETS",assetsInCity:"Assets in your city",activeContracts:"ACTIVE CONTRACTS",contractsStatus:"In progress",workers:"WORKERS",workersStatus:"Assigned to operations",recentActivity:"Recent Activity",accountOverview:"ACCOUNT OVERVIEW",libraryShortcut:"Asset Library",libraryShortcutText:"Choose a sector and explore its assets.",productionShortcut:"Production readiness",productionShortcutText:"Check assets and worker requirements before an 8-hour shift.",financeShortcut:"Financial records",financeShortcutText:"Track wallet activity, costs and obligations.",quickAccess:"Quick Access",shortcuts:"SHORTCUTS",browseSectors:"Browse 11 sectors",manageOwned:"Manage owned assets",eightHourShift:"8-hour work cycle",libraryIntro:"Choose one of the 11 sectors to view its approved asset catalogue.",sectors:"SECTORS",backSectors:"← All sectors",libraryNote:"The library is for discovering and selecting assets. Purchased or leased assets appear in My City. Asset images and exact specifications are added from the approved VORTERRA asset collection.",cityIntro:"Your city, sectors and owned or leased assets.",cityEmptyTitle:"Your city workspace",cityEmptyText:"Assets acquired from the library will be listed here with their ownership status, location, age, condition and operating state. City placement and ownership data will be connected in a later stage.",operationsIntro:"Prepare a complete sector before starting its production cycle.",hours:"HOURS",readiness:"Sector readiness",beforeStart:"BEFORE START",coreAssets:"Required core assets are complete",workerCount:"Required worker count is available",inputsReady:"Required inputs and utilities are available",notChecked:"Not checked",startShift:"Start 8-hour work cycle",demoOnly:"Readiness and production controls are a preview until ownership, workers and inventory are connected.",shiftRules:"Work cycle rules",eightHours:"Eight-hour production shift",eightHoursText:"Each production cycle runs for 8 hours.",staffing:"Staffing requirement",staffingText:"The sector must have the required number of workers.",completeAssets:"Complete asset set",completeAssetsText:"All essential assets for the selected operation must be owned or leased and ready.",settlement:"End-of-shift settlement",settlementText:"Production, wages, operating costs and consumption are calculated at cycle completion.",marketIntro:"One shared marketplace for all player cities.",buyAssets:"Buy assets",buyAssetsText:"Purchase assets offered by the platform or players.",sellAssets:"Sell assets",sellAssetsText:"List owned assets for other players.",rentAssets:"Rent assets",rentAssetsText:"Rent equipment or facilities from players.",materialsProducts:"Materials & products",materialsProductsText:"Trade raw materials and finished products.",marketNote:"Listings, prices, payments and ownership transfers will be connected after the marketplace rules are finalized.",contractsIntro:"Manage supply agreements, delivery and shipping.",supplyContracts:"Supply contracts",supplyContractsText:"Buy or sell quantities under an agreement.",roadTransport:"Road transport",roadTransportText:"Arrange deliveries between cities.",seaAir:"Sea & air shipping",seaAirText:"Coordinate port and airport shipments.",deliveryTracking:"Delivery tracking",deliveryTrackingText:"Follow contract and delivery status.",financeIntro:"Your wallet, money movements and financial obligations.",wallet:"Wallet",walletText:"Available and reserved VOR balance.",deposits:"Deposits",depositsText:"Deposit history and payment status.",withdrawals:"Withdrawals",withdrawalsText:"Withdrawal requests and status.",transactions:"Transactions & records",transactionsText:"Income, expenses, wages and transfers.",loans:"Loans & repayments",loansText:"Outstanding debt and due dates.",financialSummary:"Financial summary",financialSummaryText:"Revenue, costs and operating results.",financeNote:"Financial actions are not live yet. The current page is an interface preview; no real deposits, withdrawals or transfers are processed.",settingsIntro:"Language, profile, notifications and account preferences.",chooseLanguage:"Choose your language",s1:"Raw Materials Extraction",s1d:"Quarries, mines, forests and timber",s2:"Manufacturing Industry",s2d:"Processing raw materials into products",s3:"Waste Recycling",s3d:"Sorting and recycling waste materials",s4:"Energy & Water",s4d:"Electricity and water supply",s5:"Petrochemicals",s5d:"Fuel and rubber production",s6:"Warehousing & Logistics",s6d:"Storage and inventory facilities",s7:"Trade & Commercial Center",s7d:"Player listings and trade contracts",s8:"Employment",s8d:"Recruitment and workforce services",s9:"Transport & Shipping",s9d:"Road, sea and air freight",s10:"Business Management & Accounting",s10d:"Business administration and accounts",s11:"Construction & Fabrication",s11d:"Construction, workshops and equipment",assetDetails:"Asset details",ownership:"Ownership",debt:"Debt",age:"Age",consumption:"Wear / consumption",production:"Production",capacity:"Capacity",workersRequired:"Workers required",notSet:"To be specified",preview:"Preview only",quarry:"Quarry & stone crusher",forest:"Forest & timber operation",recycling:"Recycling facility",assetPhotoPending:"Approved asset image is not yet linked to this catalogue item.",buyRentLater:"Purchase / rental will be enabled after account and payment systems are connected."
+ },
+ fr:{
+ workspace:"ESPACE PRINCIPAL",overview:"Vue d’ensemble",library:"Bibliothèque d’actifs",myCity:"Ma ville",operations:"Opérations et production",market:"Marché",contracts:"Contrats et logistique",finance:"Économie et finances",account:"COMPTE",settings:"Paramètres",memberCenter:"CENTRE DE CONTRÔLE",welcome:"Bienvenue sur VORTERRA",welcomeText:"Votre activité en un coup d’œil.",balance:"SOLDE DU COMPTE",available:"Solde disponible",ownedAssets:"ACTIFS POSSÉDÉS",assetsInCity:"Actifs dans votre ville",activeContracts:"CONTRATS ACTIFS",contractsStatus:"En cours",workers:"TRAVAILLEURS",workersStatus:"Affectés aux opérations",recentActivity:"Activité récente",accountOverview:"APERÇU DU COMPTE",libraryShortcut:"Bibliothèque d’actifs",libraryShortcutText:"Choisissez un secteur et découvrez ses actifs.",productionShortcut:"Préparation de la production",productionShortcutText:"Vérifiez les actifs et les effectifs avant un cycle de 8 heures.",financeShortcut:"Dossiers financiers",financeShortcutText:"Suivez le portefeuille, les coûts et les obligations.",quickAccess:"Accès rapide",shortcuts:"RACCOURCIS",browseSectors:"Parcourir les 11 secteurs",manageOwned:"Gérer les actifs détenus",eightHourShift:"Cycle de travail de 8 heures",libraryIntro:"Choisissez l’un des 11 secteurs pour consulter son catalogue d’actifs.",sectors:"SECTEURS",backSectors:"← Tous les secteurs",libraryNote:"La bibliothèque sert à découvrir et sélectionner des actifs. Les actifs achetés ou loués apparaissent dans Ma ville. Les images et caractéristiques exactes seront ajoutées depuis la collection approuvée de VORTERRA.",cityIntro:"Votre ville, ses secteurs et vos actifs détenus ou loués.",cityEmptyTitle:"Espace de votre ville",cityEmptyText:"Les actifs acquis depuis la bibliothèque apparaîtront ici avec leur propriété, leur emplacement, leur âge, leur état et leur statut opérationnel. Le placement et les données de propriété seront connectés ultérieurement.",operationsIntro:"Préparez un secteur complet avant de lancer son cycle de production.",hours:"HEURES",readiness:"État de préparation du secteur",beforeStart:"AVANT LE DÉMARRAGE",coreAssets:"Les actifs essentiels sont complets",workerCount:"Le nombre de travailleurs requis est disponible",inputsReady:"Les intrants et services nécessaires sont disponibles",notChecked:"Non vérifié",startShift:"Démarrer le cycle de 8 heures",demoOnly:"Les contrôles sont une prévisualisation jusqu’à la connexion des actifs, des travailleurs et des stocks.",shiftRules:"Règles du cycle de travail",eightHours:"Poste de production de huit heures",eightHoursText:"Chaque cycle de production dure 8 heures.",staffing:"Effectif requis",staffingText:"Le secteur doit disposer du nombre de travailleurs requis.",completeAssets:"Ensemble d’actifs complet",completeAssetsText:"Tous les actifs essentiels à l’opération choisie doivent être détenus ou loués et prêts.",settlement:"Clôture du poste",settlementText:"La production, les salaires, les coûts et la consommation sont calculés à la fin du cycle.",marketIntro:"Un marché commun pour toutes les villes des joueurs.",buyAssets:"Acheter des actifs",buyAssetsText:"Achetez des actifs proposés par la plateforme ou les joueurs.",sellAssets:"Vendre des actifs",sellAssetsText:"Publiez vos actifs pour les autres joueurs.",rentAssets:"Louer des actifs",rentAssetsText:"Louez des équipements ou installations aux joueurs.",materialsProducts:"Matières et produits",materialsProductsText:"Échangez des matières premières et des produits finis.",marketNote:"Les annonces, prix, paiements et transferts de propriété seront connectés après validation des règles du marché.",contractsIntro:"Gérez les contrats d’approvisionnement, la livraison et l’expédition.",supplyContracts:"Contrats d’approvisionnement",supplyContractsText:"Achetez ou vendez des quantités selon un accord.",roadTransport:"Transport routier",roadTransportText:"Organisez les livraisons entre les villes.",seaAir:"Transport maritime et aérien",seaAirText:"Coordonnez les expéditions portuaires et aéroportuaires.",deliveryTracking:"Suivi des livraisons",deliveryTrackingText:"Suivez l’état des contrats et des livraisons.",financeIntro:"Votre portefeuille, vos mouvements d’argent et vos obligations.",wallet:"Portefeuille",walletText:"Solde VOR disponible et réservé.",deposits:"Dépôts",depositsText:"Historique des dépôts et état des paiements.",withdrawals:"Retraits",withdrawalsText:"Demandes de retrait et leur état.",transactions:"Transactions et relevés",transactionsText:"Revenus, dépenses, salaires et transferts.",loans:"Prêts et remboursements",loansText:"Dette restante et échéances.",financialSummary:"Résumé financier",financialSummaryText:"Revenus, coûts et résultats d’exploitation.",financeNote:"Les opérations financières ne sont pas encore actives. Cette page est une prévisualisation; aucun dépôt, retrait ou transfert réel n’est traité.",settingsIntro:"Langue, profil, notifications et préférences du compte.",chooseLanguage:"Choisissez votre langue",s1:"Extraction des matières premières",s1d:"Carrières, mines, forêts et bois",s2:"Industrie manufacturière",s2d:"Transformation des matières premières",s3:"Recyclage des déchets",s3d:"Tri et recyclage des déchets",s4:"Énergie et eau",s4d:"Production d’électricité et d’eau",s5:"Pétrochimie",s5d:"Production de carburant et de caoutchouc",s6:"Entreposage et logistique",s6d:"Entrepôts et gestion des stocks",s7:"Commerce et centre commercial",s7d:"Annonces des joueurs et contrats commerciaux",s8:"Emploi",s8d:"Recrutement et services de main-d’œuvre",s9:"Transport et expédition",s9d:"Fret routier, maritime et aérien",s10:"Gestion d’entreprise et comptabilité",s10d:"Administration et comptabilité",s11:"Construction et fabrication",s11d:"Construction, ateliers et équipements",assetDetails:"Détails de l’actif",ownership:"Propriété",debt:"Dette",age:"Âge",consumption:"Usure / consommation",production:"Production",capacity:"Capacité",workersRequired:"Travailleurs requis",notSet:"À définir",preview:"Aperçu uniquement",quarry:"Carrière et concassage",forest:"Forêt et exploitation du bois",recycling:"Installation de recyclage",assetPhotoPending:"L’image approuvée de cet actif n’est pas encore liée au catalogue.",buyRentLater:"L’achat et la location seront activés après la connexion du compte et des paiements."
+ },
+ ar:{
+ workspace:"مساحة العمل الرئيسية",overview:"الرئيسية",library:"مكتبة الأصول",myCity:"مدينتي",operations:"التشغيل والإنتاج",market:"السوق",contracts:"العقود والنقل",finance:"الاقتصاد والمالية",account:"الحساب",settings:"الإعدادات",memberCenter:"مركز تحكم اللاعب",welcome:"مرحبًا بك في VORTERRA",welcomeText:"ملخص عالمك التجاري في مكان واحد.",balance:"رصيد الحساب",available:"الرصيد المتاح",ownedAssets:"الأصول المملوكة",assetsInCity:"الأصول في مدينتك",activeContracts:"العقود النشطة",contractsStatus:"قيد التنفيذ",workers:"العمال",workersStatus:"المكلفون بالتشغيل",recentActivity:"آخر النشاطات",accountOverview:"ملخص الحساب",libraryShortcut:"مكتبة الأصول",libraryShortcutText:"اختر قطاعًا واستعرض أصوله.",productionShortcut:"جاهزية الإنتاج",productionShortcutText:"تحقق من الأصول والعمال قبل دورة العمل ذات 8 ساعات.",financeShortcut:"السجل المالي",financeShortcutText:"تابع المحفظة والتكاليف والالتزامات.",quickAccess:"الوصول السريع",shortcuts:"اختصارات",browseSectors:"استعراض القطاعات الـ11",manageOwned:"إدارة الأصول المملوكة",eightHourShift:"دورة عمل 8 ساعات",libraryIntro:"اختر واحدًا من القطاعات الـ11 لعرض مكتبة أصوله.",sectors:"قطاعًا",backSectors:"العودة إلى القطاعات",libraryNote:"المكتبة لاختيار الأصول واستكشافها. الأصول المشتراة أو المستأجرة تظهر في مدينتي. تُضاف الصور والمواصفات الدقيقة من مجموعة أصول VORTERRA المعتمدة.",cityIntro:"مدينتك وقطاعاتها والأصول التي تملكها أو تستأجرها.",cityEmptyTitle:"مساحة مدينتك",cityEmptyText:"ستظهر هنا الأصول التي تحصل عليها من المكتبة مع حالة الملكية والموقع والعمر والحالة التشغيلية. سيتم ربط وضع الأصول وبيانات الملكية في مرحلة لاحقة.",operationsIntro:"جهّز القطاع بالكامل قبل بدء دورة الإنتاج.",hours:"ساعات",readiness:"جاهزية القطاع",beforeStart:"قبل بدء العمل",coreAssets:"اكتمال الأصول الأساسية المطلوبة",workerCount:"توفر العدد المطلوب من العمال",inputsReady:"توفر المدخلات والخدمات اللازمة",notChecked:"لم يتم التحقق",startShift:"بدء دورة عمل 8 ساعات",demoOnly:"هذه أدوات معاينة إلى حين ربط الملكية والعمال والمخزون بالنظام.",shiftRules:"قواعد دورة العمل",eightHours:"وردية إنتاج مدتها ثماني ساعات",eightHoursText:"تستمر كل دورة إنتاج لمدة 8 ساعات.",staffing:"شرط عدد العمال",staffingText:"يجب توفير عدد العمال المطلوب للقطاع.",completeAssets:"اكتمال مجموعة الأصول",completeAssetsText:"يجب امتلاك أو استئجار جميع الأصول الأساسية للعملية المختارة وأن تكون جاهزة.",settlement:"تسوية نهاية الوردية",settlementText:"يُحسب الإنتاج والأجور وتكاليف التشغيل والاستهلاك عند انتهاء الدورة.",marketIntro:"سوق موحد لجميع مدن اللاعبين.",buyAssets:"شراء الأصول",buyAssetsText:"شراء الأصول المعروضة من المنصة أو اللاعبين.",sellAssets:"بيع الأصول",sellAssetsText:"عرض الأصول المملوكة للبيع للاعبين الآخرين.",rentAssets:"استئجار الأصول",rentAssetsText:"استئجار المعدات أو المنشآت من اللاعبين.",materialsProducts:"المواد والمنتجات",materialsProductsText:"تبادل المواد الخام والمنتجات النهائية.",marketNote:"سيتم ربط العروض والأسعار والمدفوعات ونقل الملكية بعد اعتماد قواعد السوق.",contractsIntro:"إدارة اتفاقيات التوريد والتسليم والشحن.",supplyContracts:"عقود التوريد",supplyContractsText:"شراء أو بيع كميات وفق اتفاق.",roadTransport:"النقل البري",roadTransportText:"تنظيم توصيل البضائع بين المدن.",seaAir:"الشحن البحري والجوي",seaAirText:"تنسيق الشحن عبر الموانئ والمطارات.",deliveryTracking:"متابعة التسليم",deliveryTrackingText:"متابعة حالة العقود والشحنات.",financeIntro:"محفظتك وحركة الأموال والالتزامات المالية.",wallet:"المحفظة",walletText:"رصيد VOR المتاح والرصيد المحجوز.",deposits:"الإيداعات",depositsText:"سجل الإيداعات وحالة الدفع.",withdrawals:"السحوبات",withdrawalsText:"طلبات السحب وحالتها.",transactions:"المعاملات والسجلات",transactionsText:"الإيرادات والمصروفات والأجور والتحويلات.",loans:"القروض والسداد",loansText:"الدين المتبقي ومواعيد الاستحقاق.",financialSummary:"الملخص المالي",financialSummaryText:"الإيرادات والتكاليف ونتائج التشغيل.",financeNote:"العمليات المالية غير مفعلة بعد. هذه واجهة معاينة ولا تنفذ إيداعات أو سحوبات أو تحويلات حقيقية.",settingsIntro:"اللغة والملف الشخصي والتنبيهات وتفضيلات الحساب.",chooseLanguage:"اختر لغة العرض",s1:"استخراج المواد الخام",s1d:"المحاجر والمناجم والغابات والأخشاب",s2:"الصناعة التحويلية",s2d:"تحويل المواد الخام إلى منتجات",s3:"إعادة تدوير النفايات",s3d:"فرز النفايات ومعالجتها وإعادة تدويرها",s4:"الكهرباء والمياه",s4d:"إنتاج الكهرباء والمياه وتوفيرهما",s5:"البتروكيماويات",s5d:"إنتاج الوقود والمطاط",s6:"التخزين والخدمات اللوجستية",s6d:"المستودعات وإدارة المخزون",s7:"التجارة والمركز التجاري",s7d:"عروض اللاعبين والعقود التجارية",s8:"التوظيف",s8d:"التوظيف وخدمات العمال",s9:"النقل والشحن",s9d:"الشحن البري والبحري والجوي",s10:"إدارة الأعمال والحسابات",s10d:"إدارة الأعمال والحسابات",s11:"البناء والتصنيع",s11d:"البناء والورش والمعدات",assetDetails:"تفاصيل الأصل",ownership:"الملكية",debt:"الدين",age:"العمر",consumption:"الاستهلاك",production:"الإنتاج",capacity:"السعة",workersRequired:"العمال المطلوبون",notSet:"يُحدد لاحقًا",preview:"معاينة فقط",quarry:"المحجرة وكسارة الحجر",forest:"الغابة واستغلال الأخشاب",recycling:"منشأة إعادة التدوير",assetPhotoPending:"الصورة الأصلية المعتمدة لهذا الأصل غير مرتبطة بالمكتبة بعد.",buyRentLater:"سيتم تفعيل الشراء والاستئجار بعد ربط الحسابات والمدفوعات."
+ }};
+ let lang="en";
+ const sectors={
+  1:{title:{en:dict.en.s1,fr:dict.fr.s1,ar:dict.ar.s1},desc:{en:dict.en.s1d,fr:dict.fr.s1d,ar:dict.ar.s1d},assets:[{key:"quarry",icon:"⛏️",props:["quarry","ownership","debt","age","consumption","production","capacity","workersRequired"]},{key:"forest",icon:"🌲",props:["forest","ownership","debt","age","consumption","production","capacity","workersRequired"]}]},
+  2:{title:{en:dict.en.s2,fr:dict.fr.s2,ar:dict.ar.s2},desc:{en:dict.en.s2d,fr:dict.fr.s2d,ar:dict.ar.s2d},assets:[]},
+  3:{title:{en:dict.en.s3,fr:dict.fr.s3,ar:dict.ar.s3},desc:{en:dict.en.s3d,fr:dict.fr.s3d,ar:dict.ar.s3d},assets:[{key:"recycling",icon:"♻️",props:["recycling","ownership","debt","age","consumption","production","capacity","workersRequired"]}]},
+  4:{title:{en:dict.en.s4,fr:dict.fr.s4,ar:dict.ar.s4},desc:{en:dict.en.s4d,fr:dict.fr.s4d,ar:dict.ar.s4d},assets:[]},
+  5:{title:{en:dict.en.s5,fr:dict.fr.s5,ar:dict.ar.s5},desc:{en:dict.en.s5d,fr:dict.fr.s5d,ar:dict.ar.s5d},assets:[]},
+  6:{title:{en:dict.en.s6,fr:dict.fr.s6,ar:dict.ar.s6},desc:{en:dict.en.s6d,fr:dict.fr.s6d,ar:dict.ar.s6d},assets:[]},
+  7:{title:{en:dict.en.s7,fr:dict.fr.s7,ar:dict.ar.s7},desc:{en:dict.en.s7d,fr:dict.fr.s7d,ar:dict.ar.s7d},assets:[]},
+  8:{title:{en:dict.en.s8,fr:dict.fr.s8,ar:dict.ar.s8},desc:{en:dict.en.s8d,fr:dict.fr.s8d,ar:dict.ar.s8d},assets:[]},
+  9:{title:{en:dict.en.s9,fr:dict.fr.s9,ar:dict.ar.s9},desc:{en:dict.en.s9d,fr:dict.fr.s9d,ar:dict.ar.s9d},assets:[]},
+  10:{title:{en:dict.en.s10,fr:dict.fr.s10,ar:dict.ar.s10},desc:{en:dict.en.s10d,fr:dict.fr.s10d,ar:dict.ar.s10d},assets:[]},
+  11:{title:{en:dict.en.s11,fr:dict.fr.s11,ar:dict.ar.s11},desc:{en:dict.en.s11d,fr:dict.fr.s11d,ar:dict.ar.s11d},assets:[]}
+ };
+ const $=(id)=>document.getElementById(id);
+ function tr(key){return (dict[lang]&&dict[lang][key])||dict.en[key]||key}
+ function applyLanguage(next){
+  lang=next;
+  document.documentElement.lang=lang;
+  const rtl=lang==="ar";
+  const dash=$("dashboard");
+  dash.dir=rtl?"rtl":"ltr";
+  dash.querySelectorAll("[data-i18n]").forEach(el=>{const key=el.getAttribute("data-i18n");if(dict[lang][key])el.textContent=tr(key)});
+  dash.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("active",b.dataset.lang===lang));
+  const selected=document.querySelector(".dsector.selected");
+  if(selected)openSector(selected.dataset.sector);
+  try{localStorage.setItem("vorterra-language",lang)}catch(e){}
+ }
+ document.querySelectorAll("#dashboard [data-lang]").forEach(b=>b.addEventListener("click",()=>applyLanguage(b.dataset.lang)));
+ document.querySelectorAll("#dashboard [data-sector]").forEach(b=>b.addEventListener("click",()=>openSector(b.dataset.sector)));
+ $("backToSectors").addEventListener("click",()=>{
+  $("assetBrowser").hidden=true;$("sectorGrid").hidden=false;
+  document.querySelectorAll(".dsector").forEach(b=>b.classList.remove("selected"));
+ });
+ function openSector(id){
+  const sec=sectors[id];if(!sec)return;
+  $("sectorGrid").hidden=true;$("assetBrowser").hidden=false;
+  $("sectorTitle").textContent=sec.title[lang];
+  $("sectorDescription").textContent=sec.desc[lang];
+  document.querySelectorAll(".dsector").forEach(b=>b.classList.toggle("selected",b.dataset.sector===String(id)));
+  const grid=$("assetGrid");grid.innerHTML="";
+  if(!sec.assets.length){
+   grid.innerHTML='<div class="dnote">'+tr("assetPhotoPending")+'</div>';
+   return;
+  }
+  sec.assets.forEach(a=>{
+   const card=document.createElement("article");card.className="dasset-card";
+   card.innerHTML='<div class="dasset-visual">'+a.icon+'</div><div class="dasset-info"><h4>'+tr(a.key)+'</h4><p>'+tr("assetPhotoPending")+'</p><div class="dasset-meta">'+a.props.slice(1).map(k=>'<span>'+tr(k)+': '+tr("notSet")+'</span>').join("")+'</div><button type="button" disabled>'+tr("buyRentLater")+'</button></div>';
+   grid.appendChild(card);
+  });
+ }
+ try{const saved=localStorage.getItem("vorterra-language");if(saved&&dict[saved])lang=saved}catch(e){}
+ applyLanguage(lang);
+})();
+</script>
+</body></html>
