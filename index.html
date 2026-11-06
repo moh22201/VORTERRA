@@ -541,7 +541,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
   </div></section>
   <section class="dpanel"><div class="dpanelhead"><b data-i18n="productionStatus">Production status</b><small id="productionStateTag">IDLE</small></div><div class="dpanelbody">
    <div id="productionCycleStatus" class="dmuted">Select a project to view its production status.</div>
-   <div class="dproduction-actions"><button type="button" id="startProductionButton" class="dprimary" disabled>Start 8-hour shift</button><button type="button" id="completeProductionButton" class="dprimary" disabled>Complete shift</button><button type="button" id="cancelProductionButton" class="dsecondary" disabled>Cancel shift</button></div>
+   <div class="dproduction-actions"><button type="button" id="startProductionButton" class="dprimary" disabled>Start 8-hour shift</button><button type="button" id="completeProductionButton" class="dprimary" disabled>Complete shift</button><button type="button" id="transferProductionButton" class="dprimary" disabled>Transfer to warehouse</button><button type="button" id="cancelProductionButton" class="dsecondary" disabled>Cancel shift</button></div>
    <div class="dproduction-inventory"><b id="productionInventoryTitle">Stored production</b><div id="productionInventory" class="dlisting-list"><div class="dempty">No stored products yet.</div></div></div>
   </div></section>
   
@@ -1087,9 +1087,9 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
  }
 
 const opsLabels={
- en:{choose:"Choose an acquired project",none:"No acquired projects",ownership:"Project ownership",workers:"Active workers",ready:"Verified",notConnected:"Not connected",noProject:"Acquire a project from the library first.",needWorkers:"No active workers yet. Production can still start at 50% output.",readyProduction:"Ready to start. Base output is 50%, increasing with active worker-hours.",running:"Production shift is running",finished:"Shift completed",start:"Start 8-hour shift",complete:"Complete shift",cancel:"Cancel shift",inventory:"Stored production",emptyInventory:"No stored products yet.",waitUntil:"Shift completes at ",working:"Working…",startOk:"Production shift started. Wages and operating costs are reserved.",completeOk:"Production cycle completed. Products were stored; unfinished worker time is paused for the next cycle.",cancelOk:"Cycle cancelled. Operating funds were returned and worked time was preserved.",error:"Production action failed: ",required:"Required workers: ",assigned:"Active workers: ",wage:"Wages: ",cost:"Operating costs: ",reserved:"Reserved: ",noOutput:"This project has no production output."},
- fr:{choose:"Choisir un projet acquis",none:"Aucun projet acquis",ownership:"Propriété du projet",workers:"Travailleurs actifs",ready:"Vérifié",notConnected:"Non connecté",noProject:"Acquérez d'abord un projet dans la bibliothèque.",needWorkers:"Aucun travailleur actif. La production peut démarrer à 50 %.",readyProduction:"Prêt à démarrer. La production commence à 50 % et augmente avec les heures travaillées.",running:"Poste de production en cours",finished:"Poste terminé",start:"Démarrer un poste de 8 heures",complete:"Terminer le poste",cancel:"Annuler le poste",inventory:"Production stockée",emptyInventory:"Aucun produit stocké.",waitUntil:"Fin du poste : ",working:"Traitement…",startOk:"Poste démarré. Salaires et coûts d'exploitation réservés.",completeOk:"Cycle terminé. Les produits sont stockés et le temps restant des travailleurs est mis en pause.",cancelOk:"Cycle annulé. Les coûts d’exploitation sont restitués et le temps travaillé est conservé.",error:"Échec de l'opération : ",required:"Travailleurs requis : ",assigned:"Travailleurs actifs : ",wage:"Salaires : ",cost:"Coûts d'exploitation : ",reserved:"Réservé : ",noOutput:"Ce projet ne produit aucun article."},
- ar:{choose:"اختر مشروعاً تم اقتناؤه",none:"لا توجد مشاريع مقتناة",ownership:"ملكية المشروع",workers:"العمال النشطون",ready:"متحقق",notConnected:"غير مربوط",noProject:"اقتَنِ مشروعاً من المكتبة أولاً.",needWorkers:"لا يوجد عمال نشطون حالياً، ويمكن بدء الإنتاج بنسبة 50%.",readyProduction:"جاهز للتشغيل. يبدأ الإنتاج بنسبة 50% وترتفع حسب ساعات عمل العمال.",running:"وردية الإنتاج جارية",finished:"اكتملت الوردية",start:"بدء وردية 8 ساعات",complete:"إنهاء الوردية",cancel:"إلغاء الوردية",inventory:"الإنتاج المخزن",emptyInventory:"لا توجد منتجات مخزنة بعد.",waitUntil:"تنتهي الوردية في ",working:"جارٍ التنفيذ…",startOk:"بدأت الوردية. تم حجز الأجور وتكاليف التشغيل.",completeOk:"اكتملت دورة الإنتاج وأُضيفت المنتجات للمخزون، وحُفظ الوقت المتبقي للعمال للدورة التالية.",cancelOk:"أُلغيت الدورة وأُعيدت تكاليف التشغيل مع الاحتفاظ بوقت عمل العمال.",error:"فشل تنفيذ العملية: ",required:"العمال المطلوبون: ",assigned:"العمال النشطون: ",wage:"الأجور: ",cost:"تكاليف التشغيل: ",reserved:"المبلغ المحجوز: ",noOutput:"هذا المشروع لا يملك إنتاجاً محدداً."}
+ en:{choose:"Choose an acquired project",none:"No acquired projects",ownership:"Project ownership",workers:"Active workers",ready:"Verified",notConnected:"Not connected",noProject:"Acquire a project from the library first.",needWorkers:"No active workers yet. Production can still start at 50% output.",readyProduction:"Ready to start. Base output is 50%, increasing with active worker-hours.",running:"Production shift is running",finished:"Shift completed",start:"Start 8-hour shift",complete:"Complete shift",cancel:"Cancel shift",inventory:"Stored production",emptyInventory:"No stored products yet.",waitUntil:"Shift completes at ",working:"Working…",startOk:"Production shift started. Wages and operating costs are reserved.",completeOk:"Production cycle completed. Products were stored; unfinished worker time is paused for the next cycle.",cancelOk:"Cycle cancelled. Operating funds were returned and worked time was preserved.",error:"Production action failed: ",required:"Required workers: ",assigned:"Active workers: ",wage:"Wages: ",cost:"Operating costs: ",reserved:"Reserved: ",noOutput:"This project has no production output.",transfer:"Transfer to warehouse",waitingTransfer:"Cycle completed. Transfer products to the general warehouse before starting the next cycle. Output: ",transferOk:"Products transferred to the general warehouse."},
+ fr:{choose:"Choisir un projet acquis",none:"Aucun projet acquis",ownership:"Propriété du projet",workers:"Travailleurs actifs",ready:"Vérifié",notConnected:"Non connecté",noProject:"Acquérez d'abord un projet dans la bibliothèque.",needWorkers:"Aucun travailleur actif. La production peut démarrer à 50 %.",readyProduction:"Prêt à démarrer. La production commence à 50 % et augmente avec les heures travaillées.",running:"Poste de production en cours",finished:"Poste terminé",start:"Démarrer un poste de 8 heures",complete:"Terminer le poste",cancel:"Annuler le poste",inventory:"Production stockée",emptyInventory:"Aucun produit stocké.",waitUntil:"Fin du poste : ",working:"Traitement…",startOk:"Poste démarré. Salaires et coûts d'exploitation réservés.",completeOk:"Cycle terminé. Les produits sont stockés et le temps restant des travailleurs est mis en pause.",cancelOk:"Cycle annulé. Les coûts d’exploitation sont restitués et le temps travaillé est conservé.",error:"Échec de l'opération : ",required:"Travailleurs requis : ",assigned:"Travailleurs actifs : ",wage:"Salaires : ",cost:"Coûts d'exploitation : ",reserved:"Réservé : ",noOutput:"Ce projet ne produit aucun article.",transfer:"Transférer vers l’entrepôt",waitingTransfer:"Cycle terminé. Transférez les produits vers l’entrepôt général avant de démarrer le cycle suivant. Production : ",transferOk:"Produits transférés vers l’entrepôt général."},
+ ar:{choose:"اختر مشروعاً تم اقتناؤه",none:"لا توجد مشاريع مقتناة",ownership:"ملكية المشروع",workers:"العمال النشطون",ready:"متحقق",notConnected:"غير مربوط",noProject:"اقتَنِ مشروعاً من المكتبة أولاً.",needWorkers:"لا يوجد عمال نشطون حالياً، ويمكن بدء الإنتاج بنسبة 50%.",readyProduction:"جاهز للتشغيل. يبدأ الإنتاج بنسبة 50% وترتفع حسب ساعات عمل العمال.",running:"وردية الإنتاج جارية",finished:"اكتملت الوردية",start:"بدء وردية 8 ساعات",complete:"إنهاء الوردية",cancel:"إلغاء الوردية",inventory:"الإنتاج المخزن",emptyInventory:"لا توجد منتجات مخزنة بعد.",waitUntil:"تنتهي الوردية في ",working:"جارٍ التنفيذ…",startOk:"بدأت الوردية. تم حجز الأجور وتكاليف التشغيل.",completeOk:"اكتملت دورة الإنتاج وأُضيفت المنتجات للمخزون، وحُفظ الوقت المتبقي للعمال للدورة التالية.",cancelOk:"أُلغيت الدورة وأُعيدت تكاليف التشغيل مع الاحتفاظ بوقت عمل العمال.",error:"فشل تنفيذ العملية: ",required:"العمال المطلوبون: ",assigned:"العمال النشطون: ",wage:"الأجور: ",cost:"تكاليف التشغيل: ",reserved:"المبلغ المحجوز: ",noOutput:"هذا المشروع لا يملك إنتاجاً محدداً.",transfer:"نقل إلى المستودع العام",waitingTransfer:"اكتملت الدورة. انقل المنتجات إلى المستودع العام قبل بدء الدورة التالية. نسبة الإنتاج: ",transferOk:"تم نقل المنتجات إلى المستودع العام."}
  };
  let actualOwnedProjects=[];
  async function loadActualOwnedProjects(){
@@ -1119,12 +1119,12 @@ const opsLabels={
   const projectId=$("operationProjectSelect")?.value;
   const selected=actualOwnedProjects.find(x=>x.entry.id===projectId);
   const status=$("productionCycleStatus"),tag=$("productionStateTag");
-  const start=$("startProductionButton"),complete=$("completeProductionButton"),cancel=$("cancelProductionButton");
+  const start=$("startProductionButton"),complete=$("completeProductionButton"),cancel=$("cancelProductionButton"),transfer=$("transferProductionButton");
   const inventoryBox=$("productionInventory"),inventoryTitle=$("productionInventoryTitle");
   if(!selected){
    if(status)status.textContent=labels.noProject;
    if(tag)tag.textContent="IDLE";
-   [start,complete,cancel].forEach(b=>{if(b)b.disabled=true});
+   [start,complete,cancel,transfer].forEach(b=>{if(b)b.disabled=true});
    if(inventoryBox)inventoryBox.innerHTML='<div class="dempty">'+labels.emptyInventory+'</div>';
    return;
   }
@@ -1134,7 +1134,7 @@ const opsLabels={
   const user=userData.user;if(!user)throw new Error("Authentication required");
   const [{data:contracts,error:contractError},{data:cycles,error:cycleError},{data:stock,error:stockError}]=await Promise.all([
    auth.from("player_employment_contracts").select("worker_id,wage_per_shift").eq("project_id",projectId).eq("employer_id",user.id).eq("status","active"),
-   auth.from("production_cycles").select("id,status,started_at,completes_at,wage_total_vor,operating_cost_vor,reserved_total_vor").eq("project_id",projectId).eq("owner_id",user.id).eq("status","running").order("started_at",{ascending:false}).limit(1),
+   auth.from("production_cycles").select("id,status,started_at,completes_at,wage_total_vor,operating_cost_vor,reserved_total_vor,production_percent,output_transferred_at").eq("project_id",projectId).eq("owner_id",user.id).or("status.eq.running,and(status.eq.completed,output_transferred_at.is.null)").order("started_at",{ascending:false}).limit(1),
    auth.from("player_inventory").select("item_key,unit,quantity").eq("owner_id",user.id).order("item_key")
   ]);
   if(contractError)throw contractError;if(cycleError)throw cycleError;if(stockError)throw stockError;
@@ -1153,20 +1153,25 @@ const opsLabels={
    if(!stock?.length){inventoryBox.innerHTML='<div class="dempty">'+labels.emptyInventory+'</div>'}
    else stock.forEach(row=>{const item=document.createElement("article");item.className="dlisting";const title=document.createElement("strong");title.textContent=row.item_key;const detail=document.createElement("small");detail.textContent=Number(row.quantity).toLocaleString()+" "+row.unit;item.append(title,detail);inventoryBox.appendChild(item)});
   }
-  if(cycle){
+  if(cycle&&cycle.status==="running"){
    const finish=new Date(cycle.completes_at);
    const ready=Date.now()>=finish.getTime();
    if(status)status.textContent=labels.running+" · "+labels.waitUntil+finish.toLocaleString()+" · "+labels.wage+money(wages)+" · "+labels.cost+money(cycle.operating_cost_vor)+" · "+labels.reserved+money(cycle.reserved_total_vor);
    if(tag)tag.textContent=ready?"READY TO SETTLE":"RUNNING";
-   if(start)start.disabled=true;if(complete)complete.disabled=!ready;if(cancel)cancel.disabled=false;
+   if(start)start.disabled=true;if(complete)complete.disabled=!ready;if(cancel)cancel.disabled=false;if(transfer)transfer.disabled=true;
+  }else if(cycle&&cycle.status==="completed"){
+   if(status)status.textContent=labels.waitingTransfer+Number(cycle.production_percent||50).toFixed(2)+"%";
+   if(tag)tag.textContent="TRANSFER REQUIRED";
+   if(start)start.disabled=true;if(complete)complete.disabled=true;if(cancel)cancel.disabled=true;if(transfer)transfer.disabled=false;
   }else{
    const ready=supportsProduction;
    if(status)status.textContent=!supportsProduction?labels.noOutput:(ready?labels.readyProduction:labels.needWorkers)+" "+labels.required+required+" · "+labels.assigned+workers+" · "+labels.wage+money(wages);
    if(tag)tag.textContent=!supportsProduction?"N/A":ready?"READY":"WAITING";
    if(start){start.disabled=!ready;start.textContent=labels.start}
-   if(complete)complete.disabled=true;if(cancel)cancel.disabled=true;
+   if(complete)complete.disabled=true;if(cancel)cancel.disabled=true;if(transfer)transfer.disabled=true;
   }
   if(complete)complete.textContent=labels.complete;
+  if(transfer)transfer.textContent=labels.transfer;
   if(cancel)cancel.textContent=labels.cancel;
  }
  function bindProductionActions(){
@@ -1183,6 +1188,7 @@ const opsLabels={
   run($("startProductionButton"),"start_project_production",p=>({p_project_id:p.entry.id}),"startOk");
   run($("completeProductionButton"),"complete_project_production",p=>({p_cycle_id:window.currentProductionCycleId}),"completeOk");
   run($("cancelProductionButton"),"cancel_project_production",p=>({p_cycle_id:window.currentProductionCycleId}),"cancelOk");
+  run($("transferProductionButton"),"transfer_completed_production",p=>({p_cycle_id:window.currentProductionCycleId}),"transferOk");
   if(!window.vorterraProductionTimer){
    window.vorterraProductionTimer=window.setInterval(()=>{
     if(document.visibilityState==="visible"&&$("dashboard")?.classList.contains("active")){
