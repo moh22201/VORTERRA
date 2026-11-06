@@ -598,6 +598,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
   </form><div id="jobRequests" class="dlisting-list"></div></section>
   <section class="dsubpanel"><h3 data-i18n="jobOffers">عروض عمل</h3><form id="jobOfferForm" class="dform">
    <label><span data-i18n="jobTitle">المسمى الوظيفي</span><input name="role" required maxlength="80"></label>
+   <label><span>Project for this hiring offer</span><select name="project_id" id="jobOfferProject" required><option value="">Choose an owned project</option></select></label>
    <label><span data-i18n="workersCount">عدد العمال</span><input name="workers" type="number" min="1" step="1" required></label>
    <label><span data-i18n="offeredWage">الأجر لكل عامل / وردية (VOR)</span><input name="wage" type="number" min="0.01" step="0.01" required></label>
    <label><span data-i18n="jobConditions">شروط العمل</span><input name="conditions" maxlength="200"></label>
@@ -1148,8 +1149,24 @@ const opsLabels={
    if(userError)throw userError;
    if(!userData?.user)throw new Error(lang==="ar"?"سجّل الدخول لعرض إعلانات التوظيف.":"Sign in to view hiring posts.");
    const currentUser=userData.user;
+   const [{data:ownedRows,error:ownedError},{data:catalogData,error:catalogError}]=await Promise.all([
+    vortERRAAuth.from("player_projects").select("id,project_key,acquisition_type,expires_at").eq("owner_id",currentUser.id),
+    fetch("data/projects.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("Project catalogue unavailable");return r.json()})
+   ]);
+   if(ownedError)throw ownedError;
+   if(catalogError)throw catalogError;
+   const catalog=catalogData.projects||[];
+   const activeProjects=(ownedRows||[]).filter(p=>p.acquisition_type==="purchase"||(p.expires_at&&new Date(p.expires_at)>new Date()));
+   const projectName=id=>{const row=activeProjects.find(p=>p.id===id);const meta=row&&catalog.find(p=>p.id===row.project_key);return meta?(meta.name?.[lang]||meta.name?.en||meta.id):(row?.project_key||"Project")};
+   const projectSelect=$("jobOfferProject");
+   if(projectSelect){
+    projectSelect.innerHTML="";
+    const first=document.createElement("option");first.value="";first.textContent=lang==="ar"?"اختر مشروعاً تملكه":lang==="fr"?"Choisir un projet détenu":"Choose an owned project";projectSelect.appendChild(first);
+    activeProjects.forEach(p=>{const option=document.createElement("option");option.value=p.id;option.textContent=projectName(p.id);projectSelect.appendChild(option)});
+    projectSelect.disabled=activeProjects.length===0;
+   }
    const {data,error}=await vortERRAAuth.from("player_job_listings")
-    .select("id,owner_id,listing_type,role,experience,wage,workers,conditions,created_at")
+    .select("id,owner_id,listing_type,role,experience,wage,workers,conditions,project_id,created_at")
     .eq("status","active").order("created_at",{ascending:false}).limit(100);
    if(error)throw error;
    const rows=data||[];
@@ -1164,17 +1181,29 @@ const opsLabels={
      detail.textContent=type==="request"
       ? item.wage+" VOR / "+(lang==="ar"?"وردية":lang==="fr"?"poste":"shift")+(item.experience?" · "+item.experience:"")
       : item.workers+" · "+item.wage+" VOR / "+(lang==="ar"?"عامل / وردية":lang==="fr"?"travailleur / poste":"worker / shift")+(item.conditions?" · "+item.conditions:"");
-     info.append(title,detail);card.appendChild(info);
+     info.append(title,detail);
+     if(type==="offer"&&item.project_id){const projectLine=document.createElement("small");projectLine.textContent=(lang==="ar"?"المشروع: ":lang==="fr"?"Projet : ":"Project: ")+projectName(item.project_id);info.appendChild(projectLine)}
+     card.appendChild(info);
      if(item.owner_id===currentUser.id){
       const del=document.createElement("button");del.type="button";del.textContent=words.remove;
       del.addEventListener("click",async()=>{del.disabled=true;try{const {error}=await vortERRAAuth.from("player_job_listings").update({status:"cancelled",updated_at:new Date().toISOString()}).eq("id",item.id).eq("owner_id",currentUser.id);if(error)throw error;await renderLiveJobListings()}catch(err){alert(words.failed+(err.message||""));del.disabled=false}});
       card.appendChild(del);
      }else{
+      let hireProjectSelect=null;
+      if(type==="request"){
+       hireProjectSelect=document.createElement("select");hireProjectSelect.className="dproject-hire-select";
+       const placeholder=document.createElement("option");placeholder.value="";placeholder.textContent=lang==="ar"?"اختر مشروعاً لتعيين العامل":lang==="fr"?"Choisir le projet d'affectation":"Choose project for this worker";hireProjectSelect.appendChild(placeholder);
+       activeProjects.forEach(p=>{const option=document.createElement("option");option.value=p.id;option.textContent=projectName(p.id);hireProjectSelect.appendChild(option)});
+       hireProjectSelect.disabled=activeProjects.length===0;card.appendChild(hireProjectSelect);
+      }
       const action=document.createElement("button");action.type="button";action.textContent=type==="offer"?words.accept:words.hire;
+      action.disabled=type==="request"&&activeProjects.length===0;
       action.addEventListener("click",async()=>{
+       const selectedProject=type==="request"?hireProjectSelect?.value:null;
+       if(type==="request"&&!selectedProject){alert(lang==="ar"?"اختر مشروعاً تملكه أولاً.":lang==="fr"?"Choisissez d'abord un projet que vous possédez.":"Choose a project you own first.");return}
        action.disabled=true;action.textContent=words.ending;
        try{
-        const {error}=await vortERRAAuth.rpc("respond_to_job_listing",{p_listing_id:item.id});if(error)throw error;
+        const {error}=await vortERRAAuth.rpc("respond_to_job_listing",{p_listing_id:item.id,p_project_id:selectedProject});if(error)throw error;
         alert(words.accepted);await renderLiveJobListings();
        }catch(err){alert(words.actionFailed+(err.message||""));action.disabled=false;action.textContent=type==="offer"?words.accept:words.hire}
       });
@@ -1185,7 +1214,7 @@ const opsLabels={
    }
    if(contractList){
     const {data:contracts,error:contractError}=await vortERRAAuth.from("player_employment_contracts")
-     .select("id,employer_id,worker_id,role,wage_per_shift,created_at")
+     .select("id,employer_id,worker_id,role,wage_per_shift,project_id,created_at")
      .eq("status","active").order("created_at",{ascending:false}).limit(100);
     if(contractError)throw contractError;
     if(!contracts?.length){const empty=document.createElement("div");empty.className="dempty";empty.textContent=words.employmentEmpty;contractList.appendChild(empty);}
@@ -1194,7 +1223,8 @@ const opsLabels={
      const info=document.createElement("div"),title=document.createElement("strong"),detail=document.createElement("small");
      title.textContent=contract.role;
      detail.textContent=(contract.employer_id===currentUser.id?(lang==="ar"?"أنت صاحب العمل":lang==="fr"?"Vous êtes employeur":"You are the employer"):(lang==="ar"?"أنت العامل":lang==="fr"?"Vous êtes salarié":"You are the worker"))+" · "+Number(contract.wage_per_shift).toFixed(2)+" VOR / "+(lang==="ar"?"وردية":lang==="fr"?"poste":"shift");
-     info.append(title,detail);card.appendChild(info);
+     const projectLine=document.createElement("small");projectLine.textContent=(lang==="ar"?"المشروع: ":lang==="fr"?"Projet : ":"Project: ")+projectName(contract.project_id);
+     info.append(title,detail,projectLine);card.appendChild(info);
      const endButton=document.createElement("button");endButton.type="button";endButton.textContent=words.end;
      endButton.addEventListener("click",async()=>{
       endButton.disabled=true;endButton.textContent=words.ending;
@@ -1220,7 +1250,10 @@ const opsLabels={
    const values=Object.fromEntries(new FormData(form).entries());
    const wage=Number(values.wage);if(!Number.isFinite(wage)||wage<=0)throw new Error(lang==="ar"?"يجب أن يكون الأجر أكبر من صفر.":"Enter a wage greater than zero.");
    const row={owner_id:userData.user.id,listing_type:kind,role:String(values.role||"").trim(),experience:String(values.experience||"").trim()||null,wage};
-   if(kind==="offer"){row.workers=Number(values.workers);row.conditions=String(values.conditions||"").trim()||null}
+   if(kind==="offer"){
+    if(!values.project_id)throw new Error(lang==="ar"?"اختر المشروع الذي سيعمل فيه العمال.":lang==="fr"?"Choisissez le projet auquel les travailleurs seront affectés.":"Choose the project these workers will be assigned to.");
+    row.project_id=values.project_id;row.workers=Number(values.workers);row.conditions=String(values.conditions||"").trim()||null
+   }
    const {error}=await vortERRAAuth.from("player_job_listings").insert(row);if(error)throw error;
    form.reset();await renderLiveJobListings();
    alert(lang==="ar"?"تم نشر إعلان التوظيف في السوق.":lang==="fr"?"Annonce publiée sur le marché.":"Hiring post published to the marketplace.");
