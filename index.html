@@ -1137,15 +1137,17 @@ const opsLabels={
  function safeText(v){return String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
  async function renderLiveJobListings(){
   const words={
-   en:{empty:"No active hiring posts yet.",request:"Seeking work",offer:"Hiring workers",mine:" · Your post",remove:"Remove",failed:"Could not load hiring posts: "},
-   fr:{empty:"Aucune annonce active pour le moment.",request:"Recherche d'emploi",offer:"Recrutement",mine:" · Votre annonce",remove:"Supprimer",failed:"Impossible de charger les annonces : "},
-   ar:{empty:"لا توجد إعلانات توظيف نشطة حتى الآن.",request:"طلب عمل",offer:"عرض توظيف",mine:" · إعلانك",remove:"حذف",failed:"تعذر تحميل إعلانات التوظيف: "}
-  }[lang]||{empty:"No active hiring posts yet.",request:"Seeking work",offer:"Hiring workers",mine:" · Your post",remove:"Remove",failed:"Could not load hiring posts: "};
+   en:{empty:"No active hiring posts yet.",request:"Seeking work",offer:"Hiring workers",mine:" · Your post",remove:"Remove",failed:"Could not load hiring posts: ",accept:"Accept job",hire:"Hire applicant",active:"Active employment",employmentEmpty:"No active employment contracts.",end:"End contract",ending:"Ending contract…",accepted:"Employment contract created.",ended:"Employment contract ended.",actionFailed:"Action failed: "},
+   fr:{empty:"Aucune annonce active pour le moment.",request:"Recherche d'emploi",offer:"Recrutement",mine:" · Votre annonce",remove:"Supprimer",failed:"Impossible de charger les annonces : ",accept:"Accepter le poste",hire:"Embaucher",active:"Contrats actifs",employmentEmpty:"Aucun contrat actif.",end:"Terminer le contrat",ending:"Clôture du contrat…",accepted:"Contrat de travail créé.",ended:"Contrat terminé.",actionFailed:"Échec de l’action : "},
+   ar:{empty:"لا توجد إعلانات توظيف نشطة حتى الآن.",request:"طلب عمل",offer:"عرض توظيف",mine:" · إعلانك",remove:"حذف",failed:"تعذر تحميل إعلانات التوظيف: ",accept:"قبول الوظيفة",hire:"توظيف المتقدم",active:"عقود العمل النشطة",employmentEmpty:"لا توجد عقود عمل نشطة.",end:"إنهاء العقد",ending:"جارٍ إنهاء العقد…",accepted:"تم إنشاء عقد العمل.",ended:"تم إنهاء عقد العمل.",actionFailed:"تعذر تنفيذ العملية: "}
+  }[lang]||{empty:"No active hiring posts yet.",request:"Seeking work",offer:"Hiring workers",mine:" · Your post",remove:"Remove",failed:"Could not load hiring posts: ",accept:"Accept job",hire:"Hire applicant",active:"Active employment",employmentEmpty:"No active employment contracts.",end:"End contract",ending:"Ending contract…",accepted:"Employment contract created.",ended:"Employment contract ended.",actionFailed:"Action failed: "};
   const ids=["jobRequests","jobOffers"];ids.forEach(id=>{const el=$(id);if(el)el.innerHTML=""});
+  const contractList=$("myEmploymentContracts");if(contractList)contractList.innerHTML="";
   try{
    const {data:userData,error:userError}=await vortERRAAuth.auth.getUser();
    if(userError)throw userError;
    if(!userData?.user)throw new Error(lang==="ar"?"سجّل الدخول لعرض إعلانات التوظيف.":"Sign in to view hiring posts.");
+   const currentUser=userData.user;
    const {data,error}=await vortERRAAuth.from("player_job_listings")
     .select("id,owner_id,listing_type,role,experience,wage,workers,conditions,created_at")
     .eq("status","active").order("created_at",{ascending:false}).limit(100);
@@ -1163,17 +1165,52 @@ const opsLabels={
       ? item.wage+" VOR / "+(lang==="ar"?"وردية":lang==="fr"?"poste":"shift")+(item.experience?" · "+item.experience:"")
       : item.workers+" · "+item.wage+" VOR / "+(lang==="ar"?"عامل / وردية":lang==="fr"?"travailleur / poste":"worker / shift")+(item.conditions?" · "+item.conditions:"");
      info.append(title,detail);card.appendChild(info);
-     if(item.owner_id===userData.user.id){
+     if(item.owner_id===currentUser.id){
       const del=document.createElement("button");del.type="button";del.textContent=words.remove;
-      del.addEventListener("click",async()=>{del.disabled=true;try{const {error}=await vortERRAAuth.from("player_job_listings").delete().eq("id",item.id).eq("owner_id",userData.user.id);if(error)throw error;await renderLiveJobListings()}catch(err){alert(words.failed+(err.message||""));del.disabled=false}});
+      del.addEventListener("click",async()=>{del.disabled=true;try{const {error}=await vortERRAAuth.from("player_job_listings").delete().eq("id",item.id).eq("owner_id",currentUser.id);if(error)throw error;await renderLiveJobListings()}catch(err){alert(words.failed+(err.message||""));del.disabled=false}});
       card.appendChild(del);
+     }else{
+      const action=document.createElement("button");action.type="button";action.textContent=type==="offer"?words.accept:words.hire;
+      action.addEventListener("click",async()=>{
+       action.disabled=true;action.textContent=words.ending;
+       try{
+        const {error}=await vortERRAAuth.rpc("respond_to_job_listing",{p_listing_id:item.id});if(error)throw error;
+        alert(words.accepted);await renderLiveJobListings();
+       }catch(err){alert(words.actionFailed+(err.message||""));action.disabled=false;action.textContent=type==="offer"?words.accept:words.hire}
+      });
+      card.appendChild(action);
      }
      el.appendChild(card);
     });
    }
+   if(contractList){
+    const {data:contracts,error:contractError}=await vortERRAAuth.from("player_employment_contracts")
+     .select("id,employer_id,worker_id,role,wage_per_shift,created_at")
+     .eq("status","active").order("created_at",{ascending:false}).limit(100);
+    if(contractError)throw contractError;
+    if(!contracts?.length){const empty=document.createElement("div");empty.className="dempty";empty.textContent=words.employmentEmpty;contractList.appendChild(empty);}
+    else contracts.forEach(contract=>{
+     const card=document.createElement("article");card.className="dlisting";
+     const info=document.createElement("div"),title=document.createElement("strong"),detail=document.createElement("small");
+     title.textContent=contract.role;
+     detail.textContent=(contract.employer_id===currentUser.id?(lang==="ar"?"أنت صاحب العمل":lang==="fr"?"Vous êtes employeur":"You are the employer"):(lang==="ar"?"أنت العامل":lang==="fr"?"Vous êtes salarié":"You are the worker"))+" · "+Number(contract.wage_per_shift).toFixed(2)+" VOR / "+(lang==="ar"?"وردية":lang==="fr"?"poste":"shift");
+     info.append(title,detail);card.appendChild(info);
+     const endButton=document.createElement("button");endButton.type="button";endButton.textContent=words.end;
+     endButton.addEventListener("click",async()=>{
+      endButton.disabled=true;endButton.textContent=words.ending;
+      try{const {error}=await vortERRAAuth.rpc("end_my_employment_contract",{p_contract_id:contract.id});if(error)throw error;alert(words.ended);await renderLiveJobListings();}
+      catch(err){alert(words.actionFailed+(err.message||""));endButton.disabled=false;endButton.textContent=words.end}
+     });
+     card.appendChild(endButton);contractList.appendChild(card);
+    });
+   }
    const note=document.querySelector('[data-i18n="hiringStorageNote"]');
-   if(note)note.textContent=lang==="ar"?"إعلانات التوظيف محفوظة في قاعدة البيانات، لكن قبول العروض وتعيين العمال غير مفعّل بعد.":lang==="fr"?"Les annonces sont enregistrées en base, mais l’acceptation et l’affectation des travailleurs ne sont pas encore actives.":"Hiring listings are stored in the database; accepting offers and assigning workers are not active yet.";
-  }catch(err){console.error("Live hiring:",err);ids.forEach(id=>{const el=$(id);if(el)el.textContent=words.failed+(err.message||"")})}
+   if(note)note.textContent=lang==="ar"?"يمكن قبول عروض العمل وتوظيف أصحاب طلبات العمل. تُسوى الأجور عند تفعيل دورات الإنتاج.":lang==="fr"?"Vous pouvez accepter les offres et embaucher les candidats. Les salaires seront réglés lorsque les cycles de production seront activés.":"Accept job offers or hire applicants. Shift wages will be settled when production cycles are enabled.";
+  }catch(err){
+   console.error("Live hiring:",err);
+   ids.forEach(id=>{const el=$(id);if(el)el.textContent=words.failed+(err.message||"")});
+   if(contractList)contractList.textContent=words.failed+(err.message||"");
+  }
  }
  async function submitJobListing(form,kind){
   const button=form.querySelector('button[type="submit"]');if(button)button.disabled=true;
@@ -1181,13 +1218,13 @@ const opsLabels={
    const {data:userData,error:userError}=await vortERRAAuth.auth.getUser();if(userError)throw userError;
    if(!userData?.user)throw new Error(lang==="ar"?"سجّل الدخول أولاً.":"Please sign in first.");
    const values=Object.fromEntries(new FormData(form).entries());
-   const wage=Number(values.wage);if(!Number.isFinite(wage)||wage<0)throw new Error(lang==="ar"?"تحقق من قيمة الأجر.":"Enter a valid wage.");
+   const wage=Number(values.wage);if(!Number.isFinite(wage)||wage<=0)throw new Error(lang==="ar"?"يجب أن يكون الأجر أكبر من صفر.":"Enter a wage greater than zero.");
    const row={owner_id:userData.user.id,listing_type:kind,role:String(values.role||"").trim(),experience:String(values.experience||"").trim()||null,wage};
    if(kind==="offer"){row.workers=Number(values.workers);row.conditions=String(values.conditions||"").trim()||null}
    const {error}=await vortERRAAuth.from("player_job_listings").insert(row);if(error)throw error;
    form.reset();await renderLiveJobListings();
    alert(lang==="ar"?"تم نشر إعلان التوظيف في السوق.":lang==="fr"?"Annonce publiée sur le marché.":"Hiring post published to the marketplace.");
-  }catch(err){alert((lang==="ar"?"تعذر نشر الإعلان: ": "Could not publish post: ")+(err.message||""))}
+  }catch(err){alert((lang==="ar"?"تعذر نشر الإعلان: ":"Could not publish post: ")+(err.message||""))}
   finally{if(button)button.disabled=false}
  }
  [["jobRequestForm","request"],["jobOfferForm","offer"]].forEach(([id,kind])=>{const form=$(id);if(form&&!form.dataset.dbBound){form.dataset.dbBound="1";form.addEventListener("submit",e=>{e.preventDefault();if(form.reportValidity())submitJobListing(form,kind)})}});
