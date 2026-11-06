@@ -496,10 +496,10 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 <section class="dview active" data-panel="overview">
  <div class="dwelcome"><div><div class="deyebrow" data-i18n="memberCenter">MEMBER CONTROL CENTER</div><h1 data-i18n="welcome">Welcome to VORTERRA</h1><p data-i18n="welcomeText">Your business world at a glance.</p></div><div class="dcrumb">MEMBER PORTAL / OVERVIEW</div></div>
  <div class="dstats">
-  <article class="dstat"><small data-i18n="balance">ACCOUNT BALANCE</small><strong>0.00 <small>VOR</small></strong><em data-i18n="available">Available balance</em><i>◈</i></article>
-  <article class="dstat"><small data-i18n="ownedAssets">OWNED ASSETS</small><strong>00</strong><em data-i18n="assetsInCity">Assets in your city</em><i>◇</i></article>
-  <article class="dstat"><small data-i18n="activeContracts">ACTIVE CONTRACTS</small><strong>00</strong><em data-i18n="contractsStatus">In progress</em><i>▧</i></article>
-  <article class="dstat"><small data-i18n="workers">WORKERS</small><strong>00</strong><em data-i18n="workersStatus">Assigned to operations</em><i>♙</i></article>
+  <article class="dstat"><small data-i18n="balance">ACCOUNT BALANCE</small><strong id="playerOverviewBalance">0.00 <small>VOR</small></strong><em data-i18n="available">Available balance</em><i>◈</i></article>
+  <article class="dstat"><small data-i18n="ownedAssets">OWNED ASSETS</small><strong id="playerOverviewAssets">00</strong><em data-i18n="assetsInCity">Assets in your city</em><i>◇</i></article>
+  <article class="dstat"><small data-i18n="activeContracts">ACTIVE CONTRACTS</small><strong id="playerOverviewContracts">00</strong><em data-i18n="contractsStatus">In progress</em><i>▧</i></article>
+  <article class="dstat"><small data-i18n="workers">WORKERS</small><strong id="playerOverviewWorkers">00</strong><em data-i18n="workersStatus">Assigned to operations</em><i>♙</i></article>
  </div>
  <div class="dcols">
   <section class="dpanel"><div class="dpanelhead"><b data-i18n="recentActivity">Recent Activity</b><small data-i18n="accountOverview">ACCOUNT OVERVIEW</small></div><div class="dpanelbody">
@@ -564,7 +564,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
    <label><span data-i18n="rentDuration">مدة الإيجار</span><input name="duration" required maxlength="60"></label>
    <button class="dprimary" type="submit" data-i18n="publishRent">نشر عرض الإيجار</button>
   </form><div id="rentListings" class="dlisting-list"></div></section>
- </div></div><div class="dnote" data-i18n="demoPersistenceNote">تُحفظ بيانات التجربة في هذا المتصفح فقط ولا تتم مزامنتها مع لاعبين آخرين بعد.</div>
+ </div></div><div class="dnote" id="marketLiveNote">بيانات السوق المعروضة تُحمّل مباشرة من قاعدة البيانات.</div>
 </section>
 <section class="dview" data-panel="employment">
  <div class="dtoolbar"><div><h2 data-i18n="employment">التوظيف</h2><p data-i18n="employmentIntro">طلبات العمل وعروض الوظائف فقط بين اللاعبين.</p></div></div>
@@ -1149,11 +1149,11 @@ const opsLabels={
 
  function safeText(v){return String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
  function renderDemoListings(){
-  const specs=[["mySaleListings",demoState.saleListings.filter(x=>x.owner==="local"),"sale"],["saleListings",demoState.saleListings.filter(x=>x.owner!=="local"),"sale"],["rentListings",demoState.rentListings,"rent"],["jobRequests",demoState.jobRequests,"request"],["jobOffers",demoState.jobOffers,"offer"]];
+  const specs=[["jobRequests",demoState.jobRequests,"request"],["jobOffers",demoState.jobOffers,"offer"]];
   specs.forEach(([id,items,type])=>{const el=$(id);if(!el)return;el.innerHTML="";if(!items.length){el.innerHTML='<div class="dempty">'+tr("emptyListings")+'</div>';return}items.forEach(item=>{let meta="";if(type==="sale")meta=item.quantity+" · "+item.price+" VOR / unit";if(type==="rent")meta=item.price+" VOR · "+item.duration;if(type==="request")meta=item.wage+" VOR / shift · "+(item.experience||"");if(type==="offer")meta=item.workers+" · "+item.wage+" VOR / worker / shift · "+(item.conditions||"");const card=document.createElement("article");card.className="dlisting";const info=document.createElement("div");const title=document.createElement("strong");title.textContent=item.product||item.role||item.asset;const detail=document.createElement("small");detail.textContent=meta+(item.owner==="local"?" · "+tr("postedByYou"):"");info.append(title,detail);card.appendChild(info);if(item.owner==="local"){const del=document.createElement("button");del.type="button";del.textContent=tr("removeListing");del.addEventListener("click",()=>{const key={sale:"saleListings",rent:"rentListings",request:"jobRequests",offer:"jobOffers"}[type];demoState[key]=demoState[key].filter(x=>x.id!==item.id);saveDemoState();renderDemoListings()});card.appendChild(del)}el.appendChild(card)})});
  }
  function addDemoRecord(form,kind){const v=Object.fromEntries(new FormData(form).entries());v.id="demo-"+Date.now()+"-"+Math.random().toString(36).slice(2,7);v.owner="local";v.created_at=new Date().toISOString();const key={sale:"saleListings",rent:"rentListings",request:"jobRequests",offer:"jobOffers"}[kind];demoState[key].unshift(v);saveDemoState();form.reset();renderDemoListings();alert(tr("listingCreated"))}
- [["marketSellForm","sale"],["marketRentForm","rent"],["jobRequestForm","request"],["jobOfferForm","offer"]].forEach(([id,kind])=>{const f=$(id);if(f)f.addEventListener("submit",e=>{e.preventDefault();if(f.reportValidity())addDemoRecord(f,kind)})});
+ [["jobRequestForm","request"],["jobOfferForm","offer"]].forEach(([id,kind])=>{const f=$(id);if(f)f.addEventListener("submit",e=>{e.preventDefault();if(f.reportValidity())addDemoRecord(f,kind)})});
  document.querySelectorAll("#dashboard [data-market-tab]").forEach(b=>b.addEventListener("click",()=>{const t=b.dataset.marketTab;["sell","buy","rent"].forEach(k=>{const el=$("market"+k.charAt(0).toUpperCase()+k.slice(1)+"Panel");if(el)el.hidden=k!==t})}));
 
  // Close controls return users to the main overview.
