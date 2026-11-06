@@ -624,13 +624,13 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 <button type="submit" class="dprimary" id="withdrawalSubmit" data-i18n="submitWithdrawal">Submit withdrawal request</button>
 <p id="withdrawalRequestMessage" class="reg-message" role="status" aria-live="polite"></p>
 </form>
-<div class="dpanelhead" style="margin-top:18px"><b data-i18n="myWithdrawalHistory">My withdrawal requests</b><small>HISTORY</small></div>
+<div class="dpanelhead" style="margin-top:18px"><b id="myWithdrawalHistory" data-i18n="myWithdrawalHistory">My withdrawal requests</b><small>HISTORY</small></div>
 <div id="myWithdrawalRequests" class="withdraw-request-list"><div class="wallet-empty">No requests yet.</div></div>
 </div></div></section>
   <section class="wallet-tab-panel" data-wallet-panel="loans"><div class="dpanel"><div class="dpanelhead"><b data-i18n="loans">Loans & repayments</b><small data-i18n="loanRecords">LOAN RECORDS</small></div><div class="dpanelbody"><div class="wallet-empty" data-i18n="loanEmpty">No loan records are connected to this account.</div></div></div></section>
   <section class="wallet-tab-panel" data-wallet-panel="convert"><div class="dpanel"><div class="dpanelhead"><b data-i18n="convertTitle">One-way VOR to USDT conversion</b><small>VOR → USDT</small></div><div class="dpanelbody"><div class="wallet-empty" data-i18n="convertDescription">Convert 50% of your available VOR balance into your internal USDT wallet balance at 1:1. This is one-way only; no USDT-to-VOR conversion is available. Internal wallet accounting only, not an on-chain transfer.</div><button type="button" class="dprimary" id="convertVorButton" style="margin-top:14px;width:100%" data-i18n="convertButton">Convert 50% of available VOR</button><p id="walletConversionMessage" class="reg-message" role="status" aria-live="polite"></p></div></div></section>
-  <div class="wallet-rules"><b data-i18n="walletRulesTitle">Wallet rules</b><div data-i18n="walletRulesText">Deposited funds become withdrawable only after they have circulated through platform activity. Withdrawals start at 10 VOR and are limited to 50% of eligible free balance per week. Reserved obligations and unpaid loans are excluded.</div></div>
-  <div class="dnote" data-i18n="walletPreviewNote">Wallet preview only. No deposits, withdrawals or transfers are processed yet.</div>
+  <div class="wallet-rules"><b data-i18n="walletRulesTitle">Wallet rules</b><div id="walletRulesText" data-i18n="walletRulesText">Withdrawals: 10–5,000 USDT, 5% fee, and a weekly limit of 50% of internal USDT balance. Requests are reviewed manually. Outstanding loans prevent withdrawal.</div></div>
+  <div class="dnote" id="walletPreviewNote" data-i18n="walletPreviewNote">Withdrawal requests are recorded for manual review. No automatic USDT payout is made.</div>
  </div>
 </section>
 
