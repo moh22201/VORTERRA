@@ -206,8 +206,129 @@
   }
   document.addEventListener("click",handleProjectAcquisitionClick,true);
 
+
+  const playerNumber = value => Number(value||0).toLocaleString(language()==="ar"?"ar-DZ":language()==="fr"?"fr-FR":"en-US",{minimumFractionDigits:0,maximumFractionDigits:2});
+  const marketWords = {
+    en:{empty:"No active player listings yet.",mine:"Your listing",player:"Player",sale:"For sale",rent:"For rent",qty:"Quantity",unit:"Unit price",duration:"Duration",remove:"Remove listing",posted:"Listing published to the live marketplace.",removed:"Listing removed.",login:"Sign in to use the marketplace.",failed:"Could not load marketplace: ",createFailed:"Could not publish listing: ",productRequired:"Enter a product, quantity and unit price.",assetRequired:"Enter an asset, rent price and duration."},
+    fr:{empty:"Aucune annonce active pour le moment.",mine:"Votre annonce",player:"Joueur",sale:"À vendre",rent:"À louer",qty:"Quantité",unit:"Prix unitaire",duration:"Durée",remove:"Supprimer l’annonce",posted:"Annonce publiée sur le marché.",removed:"Annonce supprimée.",login:"Connectez-vous pour utiliser le marché.",failed:"Impossible de charger le marché : ",createFailed:"Publication impossible : ",productRequired:"Saisissez le produit, la quantité et le prix unitaire.",assetRequired:"Saisissez l’actif, le prix de location et la durée."},
+    ar:{empty:"لا توجد عروض نشطة من اللاعبين حتى الآن.",mine:"عرضك",player:"لاعب",sale:"للبيع",rent:"للإيجار",qty:"الكمية",unit:"سعر الوحدة",duration:"المدة",remove:"حذف العرض",posted:"تم نشر العرض في السوق الفعلي.",removed:"تم حذف العرض.",login:"سجّل الدخول لاستخدام السوق.",failed:"تعذر تحميل السوق: ",createFailed:"تعذر نشر العرض: ",productRequired:"أدخل المنتج والكمية وسعر الوحدة.",assetRequired:"أدخل الأصل وسعر الإيجار والمدة."}
+  };
+  const mw=()=>marketWords[language()];
+  const safeMarketText=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  async function getSignedInPlayer(){
+    const {data,error}=await client.auth.getUser();
+    if(error)throw error;
+    if(!data?.user)throw new Error(mw().login);
+    return data.user;
+  }
+  async function renderLiveMarket(){
+    const ids=["mySaleListings","saleListings","rentListings"];
+    ids.forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML="";});
+    try{
+      const user=await getSignedInPlayer();
+      const {data,error}=await client.from("market_listings").select("id,owner_id,listing_type,product_name,quantity,unit_price,asset_name,rent_duration,created_at").eq("status","active").order("created_at",{ascending:false}).limit(100);
+      if(error)throw error;
+      const rows=data||[];
+      const mine=rows.filter(x=>x.owner_id===user.id);
+      const sales=rows.filter(x=>x.listing_type==="sale");
+      const rents=rows.filter(x=>x.listing_type==="rent");
+      const draw=(id,items,type)=>{
+        const el=document.getElementById(id);if(!el)return;
+        el.innerHTML="";
+        if(!items.length){const empty=document.createElement("div");empty.className="dempty";empty.textContent=mw().empty;el.appendChild(empty);return;}
+        items.forEach(item=>{
+          const card=document.createElement("article");card.className="dlisting";
+          const info=document.createElement("div");
+          const title=document.createElement("strong");title.textContent=type==="sale"?item.product_name:item.asset_name;
+          const detail=document.createElement("small");
+          detail.textContent=type==="sale"
+            ? mw().qty+": "+playerNumber(item.quantity)+" · "+mw().unit+": "+playerNumber(item.unit_price)+" VOR"
+            : mw().unit+": "+playerNumber(item.unit_price)+" VOR · "+mw().duration+": "+item.rent_duration;
+          const who=document.createElement("small");who.textContent=item.owner_id===user.id?mw().mine:mw().player;
+          info.append(title,detail,who);card.appendChild(info);
+          if(item.owner_id===user.id){
+            const del=document.createElement("button");del.type="button";del.textContent=mw().remove;
+            del.addEventListener("click",async()=>{
+              del.disabled=true;
+              try{const {error}=await client.from("market_listings").delete().eq("id",item.id).eq("owner_id",user.id);if(error)throw error;await renderLiveMarket();}
+              catch(err){alert(mw().failed+(err.message||""));del.disabled=false;}
+            });
+            card.appendChild(del);
+          }
+          el.appendChild(card);
+        });
+      };
+      draw("mySaleListings",mine.filter(x=>x.listing_type==="sale"),"sale");
+      draw("saleListings",sales.filter(x=>x.owner_id!==user.id),"sale");
+      draw("rentListings",rents,"rent");
+      const note=document.getElementById("marketLiveNote");if(note)note.textContent=language()==="ar"?"العروض تُقرأ مباشرة من قاعدة بيانات VORTERRA.":language()==="fr"?"Les annonces sont chargées directement depuis la base VORTERRA.":"Listings are loaded directly from the VORTERRA database.";
+    }catch(err){
+      console.warn("Live marketplace:",err);
+      const note=document.getElementById("marketLiveNote");if(note)note.textContent=mw().failed+(err.message||"");
+    }
+  }
+  function bindLiveMarketForms(){
+    const bind=(id,type)=>{
+      const form=document.getElementById(id);if(!form||form.dataset.liveBound)return;form.dataset.liveBound="1";
+      form.addEventListener("submit",async event=>{
+        event.preventDefault();if(!form.reportValidity())return;
+        const button=form.querySelector('button[type="submit"]');if(button)button.disabled=true;
+        try{
+          const user=await getSignedInPlayer();const fd=new FormData(form);
+          let row;
+          if(type==="sale"){
+            const product=String(fd.get("product")||"").trim(),quantity=Number(fd.get("quantity")),price=Number(fd.get("price"));
+            if(!product||!Number.isFinite(quantity)||quantity<=0||!Number.isFinite(price)||price<=0)throw new Error(mw().productRequired);
+            row={owner_id:user.id,listing_type:"sale",product_name:product,quantity,unit_price:price};
+          }else{
+            const asset=String(fd.get("asset")||"").trim(),price=Number(fd.get("price")),duration=String(fd.get("duration")||"").trim();
+            if(!asset||!Number.isFinite(price)||price<=0||!duration)throw new Error(mw().assetRequired);
+            row={owner_id:user.id,listing_type:"rent",asset_name:asset,unit_price:price,rent_duration:duration};
+          }
+          const {error}=await client.from("market_listings").insert(row);if(error)throw error;
+          form.reset();await renderLiveMarket();alert(mw().posted);
+        }catch(err){alert(mw().createFailed+(err.message||""));}
+        finally{if(button)button.disabled=false;}
+      });
+    };
+    bind("marketSellForm","sale");bind("marketRentForm","rent");
+    document.querySelectorAll("#dashboard [data-market-tab]").forEach(b=>{if(b.dataset.liveTabBound)return;b.dataset.liveTabBound="1";b.addEventListener("click",()=>renderLiveMarket());});
+  }
+  async function loadPlayerOverview(user){
+    const ids=["playerOverviewBalance","playerOverviewAssets","playerOverviewContracts","playerOverviewWorkers"];
+    try{
+      const [walletResult,assetsResult,activityResult]=await Promise.all([
+        client.from("wallets").select("total_balance,available_balance").eq("user_id",user.id).eq("currency","VOR").maybeSingle(),
+        client.from("player_projects").select("id",{count:"exact",head:true}).eq("owner_id",user.id),
+        client.from("wallet_transactions").select("id,transaction_type,amount,currency,status,description,created_at").eq("user_id",user.id).order("created_at",{ascending:false}).limit(5)
+      ]);
+      if(walletResult.error)throw walletResult.error;
+      if(assetsResult.error)throw assetsResult.error;
+      if(activityResult.error)throw activityResult.error;
+      const balance=document.getElementById(ids[0]);
+      if(balance)balance.innerHTML=playerNumber(walletResult.data?.available_balance||0)+' <small>VOR</small>';
+      const assets=document.getElementById(ids[1]);if(assets)assets.textContent=String(assetsResult.count||0).padStart(2,"0");
+      const contracts=document.getElementById(ids[2]);if(contracts)contracts.textContent="0";
+      const workers=document.getElementById(ids[3]);if(workers)workers.textContent="0";
+      const activity=document.getElementById("playerRecentActivity");
+      if(activity){
+        activity.innerHTML="";
+        const records=activityResult.data||[];
+        if(!records.length){const empty=document.createElement("div");empty.className="dempty";empty.textContent=language()==="ar"?"لا توجد حركات مالية مسجلة بعد.":language()==="fr"?"Aucune activité financière enregistrée.":"No financial activity recorded yet.";activity.appendChild(empty);}
+        records.forEach(item=>{
+          const row=document.createElement("div");row.className="dactivity";
+          const icon=document.createElement("i");icon.textContent="◈";
+          const info=document.createElement("div");const title=document.createElement("b");title.textContent=item.description||item.transaction_type.replaceAll("_"," ");
+          const meta=document.createElement("small");meta.textContent=new Date(item.created_at).toLocaleString(language()==="ar"?"ar-DZ":language()==="fr"?"fr-FR":"en-GB");
+          const amount=document.createElement("em");amount.textContent=(item.amount>0?"+":"")+playerNumber(item.amount)+" "+item.currency;
+          info.append(title,meta);row.append(icon,info,amount);activity.appendChild(row);
+        });
+      }
+    }catch(err){console.warn("Player overview data:",err);const activity=document.getElementById("playerRecentActivity");if(activity)activity.textContent=language()==="ar"?"تعذر تحميل بيانات الحساب.": "Could not load account data: "+(err.message||"");}
+  }
+
   async function init(user) {
-    if(!user)return;styles();localizeWithdrawalForm();bindWithdrawalForm();await Promise.all([loadLoan(),loadPlayerWithdrawalRequests(),loadActualProjectData(user)]);
+    if(!user)return;styles();localizeWithdrawalForm();bindWithdrawalForm();bindLiveMarketForms();await Promise.all([loadLoan(),loadPlayerWithdrawalRequests(),loadActualProjectData(user),loadPlayerOverview(user),renderLiveMarket()]);
     const r=await client.rpc("get_owner_dashboard_summary");
     if(!r.error){addOwnerPanel();await loadOwner()}
   }
