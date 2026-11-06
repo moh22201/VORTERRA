@@ -1,0 +1,4 @@
+alter table public.player_transport_contracts drop constraint if exists player_transport_contracts_check2;
+alter table public.player_transport_contracts add constraint player_transport_provider_required check(status not in('accepted','in_transit','delivered') or provider_id is not null);
+drop policy if exists "Transport parties read their contracts" on public.player_transport_contracts;
+create policy "Players read open requests and their transport contracts" on public.player_transport_contracts for select to authenticated using(status='open' or (select auth.uid())=requester_id or (select auth.uid())=provider_id);
