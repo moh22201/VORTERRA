@@ -103,6 +103,6 @@
     } catch(error) { target.textContent=error.message||t.empty; }
   }
   render();
-  document.querySelectorAll("[data-lang]").forEach(button=>button.addEventListener("click",()=>setTimeout(translate,0)));
+  document.querySelectorAll("[data-lang]").forEach(button=>button.addEventListener("click",()=>setTimeout(translate,0)));\n  document.querySelectorAll("[data-wallet-tab]").forEach(button=>button.addEventListener("click",()=>{if(button.dataset.walletTab==="deposit")setTimeout(loadHistory,0)}));
   new MutationObserver(translate).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
 })();
