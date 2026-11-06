@@ -1,0 +1,2 @@
+alter table public.production_cycles drop constraint if exists production_cycles_check;
+alter table public.production_cycles add constraint production_cycles_terminal_timestamp_check check ((status in ('completed','cancelled'))=(completed_at is not null));
