@@ -8,7 +8,25 @@
     "wages_and_resource_costs_settle_at_shift_end": true,
     "no_wages_or_resource_consumption_while_stopped": true,
     "project_image_mode": "individual_project_image",
-    "images_pending": false
+    "images_pending": false,
+    "utility_station_storage": {
+      "electricity": {
+        "capacity": 10000,
+        "unit": "kWh",
+        "keep_unsold_stock": true,
+        "stop_when_full": true,
+        "production_per_shift": 1200
+      },
+      "water": {
+        "capacity": 6000,
+        "unit": "m3",
+        "keep_unsold_stock": true,
+        "stop_when_full": true,
+        "production_per_shift": 600
+      }
+    },
+    "utilities_bypass_general_warehouse": true,
+    "utility_station_requires_active_workers": true
   },
   "projects": [
     {
@@ -134,7 +152,7 @@
         }
       ],
       "storage_capacity": {
-        "quantity": 400,
+        "quantity": 10000,
         "unit": "kWh"
       },
       "resource_cost_per_shift": {
@@ -165,7 +183,7 @@
         }
       ],
       "storage_capacity": {
-        "quantity": 300,
+        "quantity": 6000,
         "unit": "m3"
       },
       "resource_cost_per_shift": {
