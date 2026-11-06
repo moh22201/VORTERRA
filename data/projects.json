@@ -45,7 +45,7 @@
         "fuel_vor": 5,
         "water_vor": 2
       },
-      "image": "assets/projects/quarry.svg"
+      "image": "assets/projects/gpt-image-2_Photorealistic_large_open-pit_stone_quarry_terraced_rock_excavation_massive_yell-0.jpg"
     },
     {
       "id": "forest",
@@ -76,7 +76,7 @@
         "fuel_vor": 5,
         "water_vor": 2
       },
-      "image": "assets/projects/forest.svg"
+      "image": "assets/projects/gpt-image-2_Photorealistic_sustainable_commercial_forestry_operation_in_a_vast_green_pine_fo-0.jpg"
     },
     {
       "id": "mine",
@@ -112,7 +112,7 @@
         "fuel_vor": 6,
         "water_vor": 3
       },
-      "image": "assets/projects/mine.svg"
+      "image": "assets/projects/gpt-image-2_Photorealistic_large-scale_metallic_ore_mine_with_deep_terraced_excavation_giant-0.jpg"
     },
     {
       "id": "electricity",
@@ -143,7 +143,7 @@
         "water_vor": 2
       },
       "sale_tariff_vor_per_kwh": 0.15,
-      "image": "assets/projects/electricity.svg"
+      "image": "assets/projects/gpt-image-2_Photorealistic_modern_industrial_power_generation_complex_large_generators_turbi-0.jpg"
     },
     {
       "id": "water",
@@ -173,7 +173,7 @@
         "fuel_vor": 4,
         "water_vor": 1
       },
-      "image": "assets/projects/water.svg"
+      "image": "assets/projects/gpt-image-2_Photorealistic_large_modern_water_treatment_and_desalination_facility_circular_p-0.jpg"
     },
     {
       "id": "oil",
@@ -213,7 +213,7 @@
         "fuel_vor": 5,
         "water_vor": 3
       },
-      "image": "assets/projects/oil.svg"
+      "image": "assets/projects/gpt-image-2_Photorealistic_industrial_oil_production_complex_multiple_oil_pumpjacks_drilling-0.jpg"
     },
     {
       "id": "recycling",
@@ -260,7 +260,7 @@
         "fuel_vor": 5,
         "water_vor": 2
       },
-      "image": "assets/projects/recycling.svg"
+      "image": "assets/projects/gpt-image-2_Photorealistic_advanced_industrial_recycling_complex_automated_waste_sorting_con-0.jpg"
     },
     {
       "id": "city_storage",
@@ -293,7 +293,7 @@
         "fuel_vor": 4,
         "water_vor": 1
       },
-      "image": "assets/projects/city_storage.svg"
+      "image": "assets/projects/gpt-image-2_Photorealistic_massive_modern_logistics_warehouse_and_general_goods_distribution-0.jpg"
     },
     {
       "id": "road_transport",
@@ -321,7 +321,7 @@
         "fuel_vor": 6,
         "water_vor": 1
       },
-      "image": "assets/projects/road_transport.svg"
+      "image": "assets/projects/gpt-image-2_Photorealistic_major_road_freight_logistics_terminal_large_fleet_of_modern_semi_-0.jpg"
     },
     {
       "id": "sea_transport",
@@ -353,7 +353,7 @@
         "fuel_vor": 6,
         "water_vor": 2
       },
-      "image": "assets/projects/sea_transport.svg"
+      "image": "assets/projects/gpt-image-2_Photorealistic_international_commercial_seaport_enormous_container_ship_towering-0.jpg"
     },
     {
       "id": "air_transport",
@@ -385,7 +385,7 @@
         "fuel_vor": 6,
         "water_vor": 2
       },
-      "image": "assets/projects/air_transport.svg"
+      "image": "assets/projects/gpt-image-2_Photorealistic_international_air_cargo_logistics_airport_large_cargo_aircraft_at-0.jpg"
     },
     {
       "id": "maintenance",
@@ -408,7 +408,7 @@
         "fuel_vor": 4,
         "water_vor": 1
       },
-      "image": "assets/projects/maintenance.svg"
+      "image": "assets/projects/gpt-image-2_Photorealistic_large_industrial_machinery_maintenance_and_engineering_service_ce-0.jpg"
     }
   ]
 }
