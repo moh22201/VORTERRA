@@ -269,6 +269,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 
 #dashboard .dproject-card{overflow:hidden;border:1px solid #f6d88955;border-radius:14px;background:linear-gradient(145deg,#202225f2,#090a0c);box-shadow:0 14px 34px #0008,inset 0 1px #ffffff1c}
 #dashboard .dproject-art{height:auto;aspect-ratio:16/9;display:block;position:relative;overflow:hidden;background:#111315;border-bottom:1px solid #f6d88930} #dashboard .dproject-art img{display:block;width:100%;height:100%;object-fit:cover}
+#dashboard .dproject-art-fallback{width:100%;height:100%;min-height:150px;display:grid;place-items:center;padding:18px;text-align:center;color:#b8a477;background:radial-gradient(ellipse at center,#29231a,#101112);font-size:11px;letter-spacing:.5px}
 
 #dashboard .dproject-art small{position:absolute;bottom:9px;right:11px;color:#dfc987;font-size:8px;letter-spacing:1.2px}
 #dashboard .dproject-info{padding:13px}
@@ -1063,6 +1064,8 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
    const payload=p.total_payload_per_trip?number(p.total_payload_per_trip.quantity)+" "+unit(p.total_payload_per_trip.unit):"";
    const fleet=p.fleet?number(p.fleet.vehicles)+" "+(p.fleet.type==="truck"?(lang==="ar"?"شاحنة":lang==="fr"?"camions":"trucks"):p.fleet.type==="cargo_ship"?(lang==="ar"?"سفينة":lang==="fr"?"navires":"ships"):(lang==="ar"?"طائرة شحن":lang==="fr"?"avions cargo":"cargo aircraft")):"";
    card.innerHTML='<div class="dproject-art"><img src="'+(p.image||("assets/projects/"+p.id+".svg"))+'" alt="'+title+'" loading="lazy"></div><div class="dproject-info"><h3></h3><div class="dproject-stats"></div><div class="dproject-detail"></div></div>';
+   const projectImage=card.querySelector(".dproject-art img");
+   projectImage.addEventListener("error",()=>{const fallback=document.createElement("div");fallback.className="dproject-art-fallback";fallback.textContent=lang==="ar"?"صورة المشروع غير متاحة":lang==="fr"?"Image du projet indisponible":"Project image unavailable";projectImage.replaceWith(fallback)},{once:true});
    card.querySelector("h3").textContent=String(p.number).padStart(2,"0")+" · "+title;
    const sg=card.querySelector(".dproject-stats");
    stats.forEach(([k,v])=>{const e=document.createElement("span"),b=document.createElement("b");b.textContent=k;e.append(b,document.createTextNode(v));sg.appendChild(e)});
