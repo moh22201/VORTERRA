@@ -7,8 +7,8 @@
     "next_shift_requires_project_yard_to_be_empty": true,
     "wages_and_resource_costs_settle_at_shift_end": true,
     "no_wages_or_resource_consumption_while_stopped": true,
-    "project_image_mode": "single_integrated_project_image",
-    "images_pending": true
+    "project_image_mode": "individual_project_image",
+    "images_pending": false
   },
   "projects": [
     {
@@ -44,7 +44,8 @@
         "electricity_vor": 6,
         "fuel_vor": 5,
         "water_vor": 2
-      }
+      },
+      "image": "assets/projects/quarry.svg"
     },
     {
       "id": "forest",
@@ -74,7 +75,8 @@
         "electricity_vor": 5,
         "fuel_vor": 5,
         "water_vor": 2
-      }
+      },
+      "image": "assets/projects/forest.svg"
     },
     {
       "id": "mine",
@@ -109,7 +111,8 @@
         "electricity_vor": 7,
         "fuel_vor": 6,
         "water_vor": 3
-      }
+      },
+      "image": "assets/projects/mine.svg"
     },
     {
       "id": "electricity",
@@ -139,7 +142,8 @@
         "fuel_vor": 6,
         "water_vor": 2
       },
-      "sale_tariff_vor_per_kwh": 0.15
+      "sale_tariff_vor_per_kwh": 0.15,
+      "image": "assets/projects/electricity.svg"
     },
     {
       "id": "water",
@@ -168,7 +172,8 @@
         "electricity_vor": 6,
         "fuel_vor": 4,
         "water_vor": 1
-      }
+      },
+      "image": "assets/projects/water.svg"
     },
     {
       "id": "oil",
@@ -207,7 +212,8 @@
         "electricity_vor": 7,
         "fuel_vor": 5,
         "water_vor": 3
-      }
+      },
+      "image": "assets/projects/oil.svg"
     },
     {
       "id": "recycling",
@@ -253,7 +259,8 @@
         "electricity_vor": 6,
         "fuel_vor": 5,
         "water_vor": 2
-      }
+      },
+      "image": "assets/projects/recycling.svg"
     },
     {
       "id": "city_storage",
@@ -285,7 +292,8 @@
         "electricity_vor": 6,
         "fuel_vor": 4,
         "water_vor": 1
-      }
+      },
+      "image": "assets/projects/city_storage.svg"
     },
     {
       "id": "road_transport",
@@ -312,7 +320,8 @@
         "electricity_vor": 5,
         "fuel_vor": 6,
         "water_vor": 1
-      }
+      },
+      "image": "assets/projects/road_transport.svg"
     },
     {
       "id": "sea_transport",
@@ -343,7 +352,8 @@
         "electricity_vor": 5,
         "fuel_vor": 6,
         "water_vor": 2
-      }
+      },
+      "image": "assets/projects/sea_transport.svg"
     },
     {
       "id": "air_transport",
@@ -374,7 +384,8 @@
         "electricity_vor": 6,
         "fuel_vor": 6,
         "water_vor": 2
-      }
+      },
+      "image": "assets/projects/air_transport.svg"
     },
     {
       "id": "maintenance",
@@ -396,7 +407,8 @@
         "electricity_vor": 5,
         "fuel_vor": 4,
         "water_vor": 1
-      }
+      },
+      "image": "assets/projects/maintenance.svg"
     }
   ]
 }
