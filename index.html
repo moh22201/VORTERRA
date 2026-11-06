@@ -725,6 +725,8 @@ function play(){b.classList.remove('play');void b.offsetWidth;b.classList.add('p
 play();
 const identityForm=document.getElementById('identityForm');
 const countrySelect=document.getElementById('iC');
+const countryNames=['Afghanistan','Albania','Algeria','Andorra','Angola','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahrain','Bangladesh','Belgium','Brazil','Canada','China','Denmark','Egypt','Finland','France','Germany','Greece','India','Indonesia','Iraq','Ireland','Italy','Japan','Jordan','Kuwait','Lebanon','Libya','Malaysia','Mauritania','Mexico','Morocco','Netherlands','New Zealand','Nigeria','Norway','Oman','Pakistan','Palestine','Philippines','Poland','Portugal','Qatar','Russia','Saudi Arabia','Senegal','Singapore','South Africa','South Korea','Spain','Sudan','Sweden','Switzerland','Syria','Tunisia','Turkey','Ukraine','United Arab Emirates','United Kingdom','United States','Yemen'];
+countryNames.forEach(name=>{const option=document.createElement('option');option.value=name;option.textContent=name;countrySelect.appendChild(option);});
 const cityInput=document.getElementById('iY');
 countrySelect.addEventListener('change',()=>{document.getElementById('oC').textContent=countrySelect.value||'—';document.getElementById('oY').textContent=cityInput.value.trim()||'—'});
 cityInput.addEventListener('input',()=>{document.getElementById('oY').textContent=cityInput.value.trim()||'—'});
