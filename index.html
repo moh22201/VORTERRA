@@ -695,8 +695,16 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
    <button class="google-register" id="showLogin" type="button" style="margin-top:10px">Already have an account? Sign in</button>
    <form class="registration-form" id="loginForm" hidden style="margin-top:14px">
     <div><label for="loginEmail">EMAIL ADDRESS</label><input id="loginEmail" type="email" autocomplete="username" placeholder="name@example.com" required></div>
-    <div><label for="loginPassword">PASSWORD</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" required></div>
+    <div id="loginFields"><div><label for="loginPassword">PASSWORD</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" required></div>
     <button class="register-submit" type="submit">SIGN IN · دخول</button>
+    <button class="google-register" id="forgotPasswordButton" type="button" style="margin-top:8px">Forgot password? · نسيت كلمة المرور؟</button></div>
+    <div id="passwordRecoveryFields" hidden>
+     <p style="color:#d9c89e;font-size:12px;line-height:1.6">Recovery link verified. Choose your new password.</p>
+     <div><label for="recoveryNewPassword">NEW PASSWORD</label><input id="recoveryNewPassword" type="password" autocomplete="new-password" minlength="8"></div>
+     <div><label for="recoveryConfirmPassword">CONFIRM NEW PASSWORD</label><input id="recoveryConfirmPassword" type="password" autocomplete="new-password" minlength="8"></div>
+     <button class="register-submit" id="saveRecoveryPassword" type="button">SAVE NEW PASSWORD · حفظ</button>
+    </div>
+    <p id="loginRecoveryMessage" role="status" aria-live="polite" style="font-size:12px;margin:6px 0 0"></p>
    </form>
    <p class="reg-note">Your account is secured by Supabase Authentication. Passwords are sent directly to Supabase over HTTPS and are never stored in VORTERRA code.</p>
   </section>
@@ -915,6 +923,40 @@ document.getElementById('showLogin').addEventListener('click',()=>{
  loginForm.hidden=!loginForm.hidden;
  document.getElementById('showLogin').textContent=loginForm.hidden?'Already have an account? Sign in':'Back to create account';
 });
+document.getElementById('forgotPasswordButton').addEventListener('click',async()=>{
+ const email=document.getElementById('loginEmail').value.trim();
+ const message=document.getElementById('loginRecoveryMessage');
+ if(!email){message.textContent='Enter your email address first.';message.style.color='#ffaaa0';document.getElementById('loginEmail').focus();return;}
+ const button=document.getElementById('forgotPasswordButton');button.disabled=true;
+ message.textContent='Sending password recovery email…';message.style.color='#e5cf98';
+ try{
+  const {error}=await vortERRAAuth.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname});
+  if(error)throw error;
+  message.textContent='If this email belongs to an account, a recovery link has been sent. Check your inbox and spam folder.';
+  message.style.color='#9bd6a5';
+ }catch(error){message.textContent=error.message||'Could not send the recovery email.';message.style.color='#ffaaa0';}
+ finally{button.disabled=false;}
+});
+document.getElementById('saveRecoveryPassword').addEventListener('click',async()=>{
+ const password=document.getElementById('recoveryNewPassword');
+ const confirm=document.getElementById('recoveryConfirmPassword');
+ const message=document.getElementById('loginRecoveryMessage');
+ const button=document.getElementById('saveRecoveryPassword');
+ if(password.value.length<8){message.textContent='Password must contain at least 8 characters.';message.style.color='#ffaaa0';return;}
+ if(password.value!==confirm.value){message.textContent='The passwords do not match.';message.style.color='#ffaaa0';return;}
+ button.disabled=true;
+ try{
+  const {error}=await vortERRAAuth.auth.updateUser({password:password.value});
+  if(error)throw error;
+  password.value='';confirm.value='';
+  document.getElementById('passwordRecoveryFields').hidden=true;
+  document.getElementById('loginFields').hidden=false;
+  message.textContent='Password changed successfully. You can now sign in with your new password.';
+  message.style.color='#9bd6a5';
+  await vortERRAAuth.auth.signOut({scope:'local'});
+ }catch(error){message.textContent=error.message||'Could not update the password. Open a fresh recovery link and retry.';message.style.color='#ffaaa0';}
+ finally{button.disabled=false;}
+});
 loginForm.addEventListener('submit',async event=>{
  event.preventDefault();
  const submit=loginForm.querySelector('button[type="submit"]');submit.disabled=true;
@@ -945,6 +987,18 @@ async function openConfirmedAccount(user){
  finally{authRoutePromise=null;}
 }
 vortERRAAuth.auth.onAuthStateChange((event,session)=>{
+ if(event==='PASSWORD_RECOVERY'){
+  document.getElementById('registrationPanel').hidden=false;
+  document.getElementById('registrationGate').hidden=true;
+  document.getElementById('loginForm').hidden=false;
+  document.getElementById('loginFields').hidden=true;
+  document.getElementById('passwordRecoveryFields').hidden=false;
+  document.getElementById('loginRecoveryMessage').textContent='Recovery link verified. Choose your new password.';
+  document.getElementById('loginRecoveryMessage').style.color='#9bd6a5';
+  document.getElementById('intro').style.display='none';
+  document.getElementById('cardScene').style.display='flex';
+  return;
+ }
  if(event==='SIGNED_OUT'){lastRoutedAuthUserId=null;return;}
  if(session?.user&&['INITIAL_SESSION','SIGNED_IN','TOKEN_REFRESHED','USER_UPDATED'].includes(event)){
   // Defer Supabase queries until the auth callback has returned.
