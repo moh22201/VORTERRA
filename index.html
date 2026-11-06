@@ -1151,6 +1151,7 @@ const opsLabels={
    return;
   }
   const auth=window.vortERRAAuth;
+  try{const {error:settleError}=await auth.rpc("settle_due_production_cycles");if(settleError)console.warn("Due production settlement:",settleError.message)}catch(settleError){console.warn("Due production settlement:",settleError.message||settleError)}
   const {data:userData,error:userError}=await auth.auth.getUser();if(userError)throw userError;
   const user=userData.user;if(!user)throw new Error("Authentication required");
   const [{data:contracts,error:contractError},{data:cycles,error:cycleError},{data:stock,error:stockError}]=await Promise.all([
@@ -1204,6 +1205,16 @@ const opsLabels={
   run($("startProductionButton"),"start_project_production",p=>({p_project_id:p.entry.id}),"startOk");
   run($("completeProductionButton"),"complete_project_production",p=>({p_cycle_id:window.currentProductionCycleId}),"completeOk");
   run($("cancelProductionButton"),"cancel_project_production",p=>({p_cycle_id:window.currentProductionCycleId}),"cancelOk");
+  if(!window.vorterraProductionTimer){
+   window.vorterraProductionTimer=window.setInterval(()=>{
+    if(document.visibilityState==="visible"&&$("dashboard")?.classList.contains("active")){
+     refreshProductionPanel().catch(error=>console.warn("Production refresh:",error));
+    }
+   },60000);
+   document.addEventListener("visibilitychange",()=>{
+    if(document.visibilityState==="visible"&&$("dashboard")?.classList.contains("active"))refreshProductionPanel().catch(error=>console.warn("Production refresh:",error));
+   });
+  }
  }
  function renderOperations(){
    const select=$("operationProjectSelect");if(!select)return;
