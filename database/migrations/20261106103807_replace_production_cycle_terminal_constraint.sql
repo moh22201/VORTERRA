@@ -1,0 +1,1 @@
+alter table public.production_cycles drop constraint if exists production_cycles_check1;
