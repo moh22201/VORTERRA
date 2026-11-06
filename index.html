@@ -511,7 +511,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
  <div class="dcols">
   <section class="dpanel"><div class="dpanelhead"><b data-i18n="recentActivity">Recent Activity</b><small data-i18n="accountOverview">ACCOUNT OVERVIEW</small></div><div class="dpanelbody">
    <div class="dactivity"><i>▦</i><div><b data-i18n="libraryShortcut">Asset Library</b><small data-i18n="libraryShortcutText">Choose a sector and explore its assets.</small></div><em>→</em></div>
-   <div class="dactivity"><i>⚙</i><div><b data-i18n="productionShortcut">Production readiness</b><small data-i18n="productionShortcutText">Check assets and worker requirements before an 8-hour shift.</small></div><em data-i18n="notActive">NOT ACTIVE</em></div>
+   <div class="dactivity"><i>⚙</i><div><b data-i18n="productionShortcut">Production readiness</b><small data-i18n="productionShortcutText">Check assets and worker requirements before an 8-hour shift.</small></div><em id="productionShortcutStatus">SYSTEM IDLE</em></div>
    <div class="dactivity"><i>◈</i><div><b data-i18n="financeShortcut">Financial records</b><small data-i18n="financeShortcutText">Track wallet activity, costs and obligations.</small></div><em>→</em></div>
    <div id="playerRecentActivity" class="player-recent-activity" aria-live="polite"></div>
   </div></section>
@@ -532,7 +532,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 </section></section>
 
 <section class="dview" data-panel="operations">
- <div class="dtoolbar"><div><h2 data-i18n="operations">Operations & Production</h2><p data-i18n="operationsIntro">Production is connected. Start an 8-hour shift when the project has its required active workers.</p></div><span class="dtag" data-i18n="notActive">NOT ACTIVE</span></div>
+ <div class="dtoolbar"><div><h2 data-i18n="operations">Operations & Production</h2><p data-i18n="operationsIntro">Production is connected. Start an 8-hour shift when the project has its required active workers.</p></div><span class="dtag" id="opsSystemStatus">SYSTEM IDLE</span></div>
  <div class="dcols">
   <section class="dpanel"><div class="dpanelhead"><b data-i18n="readiness">Project status</b><small data-i18n="beforeStart">SYSTEM STATUS</small></div><div class="dpanelbody">
    <label class="dmuted" id="operationSelectLabel" for="operationProjectSelect">Choose an acquired project</label>
@@ -1145,9 +1145,9 @@ function renderProjects(){
  }
 
 const opsLabels={
- en:{choose:"Choose an acquired project",none:"No acquired projects",ownership:"Project ownership",workers:"Active workers",ready:"Verified",notConnected:"Not connected",noProject:"Acquire a project from the library first.",needWorkers:"No active workers yet. Production can still start at 50% output.",readyProduction:"Ready to start. Base output is 50%, increasing with active worker-hours.",running:"Production shift is running",finished:"Shift completed",start:"Start 8-hour shift",complete:"Complete shift",cancel:"Cancel shift",inventory:"Stored production",emptyInventory:"No stored products yet.",waitUntil:"Shift completes at ",working:"Working…",startOk:"Production shift started. Wages and operating costs are reserved.",completeOk:"Production cycle completed. Products were stored; unfinished worker time is paused for the next cycle.",cancelOk:"Cycle cancelled. Operating funds were returned and worked time was preserved.",error:"Production action failed: ",required:"Required workers: ",assigned:"Active workers: ",wage:"Wages: ",cost:"Operating costs: ",reserved:"Reserved: ",noOutput:"This project has no production output.",transfer:"Transfer to warehouse",waitingTransfer:"Cycle completed. Transfer products to the general warehouse before starting the next cycle. Output: ",transferOk:"Products transferred to the general warehouse."},
- fr:{choose:"Choisir un projet acquis",none:"Aucun projet acquis",ownership:"Propriété du projet",workers:"Travailleurs actifs",ready:"Vérifié",notConnected:"Non connecté",noProject:"Acquérez d'abord un projet dans la bibliothèque.",needWorkers:"Aucun travailleur actif. La production peut démarrer à 50 %.",readyProduction:"Prêt à démarrer. La production commence à 50 % et augmente avec les heures travaillées.",running:"Poste de production en cours",finished:"Poste terminé",start:"Démarrer un poste de 8 heures",complete:"Terminer le poste",cancel:"Annuler le poste",inventory:"Production stockée",emptyInventory:"Aucun produit stocké.",waitUntil:"Fin du poste : ",working:"Traitement…",startOk:"Poste démarré. Salaires et coûts d'exploitation réservés.",completeOk:"Cycle terminé. Les produits sont stockés et le temps restant des travailleurs est mis en pause.",cancelOk:"Cycle annulé. Les coûts d’exploitation sont restitués et le temps travaillé est conservé.",error:"Échec de l'opération : ",required:"Travailleurs requis : ",assigned:"Travailleurs actifs : ",wage:"Salaires : ",cost:"Coûts d'exploitation : ",reserved:"Réservé : ",noOutput:"Ce projet ne produit aucun article.",transfer:"Transférer vers l’entrepôt",waitingTransfer:"Cycle terminé. Transférez les produits vers l’entrepôt général avant de démarrer le cycle suivant. Production : ",transferOk:"Produits transférés vers l’entrepôt général."},
- ar:{choose:"اختر مشروعاً تم اقتناؤه",none:"لا توجد مشاريع مقتناة",ownership:"ملكية المشروع",workers:"العمال النشطون",ready:"متحقق",notConnected:"غير مربوط",noProject:"اقتَنِ مشروعاً من المكتبة أولاً.",needWorkers:"لا يوجد عمال نشطون حالياً، ويمكن بدء الإنتاج بنسبة 50%.",readyProduction:"جاهز للتشغيل. يبدأ الإنتاج بنسبة 50% وترتفع حسب ساعات عمل العمال.",running:"وردية الإنتاج جارية",finished:"اكتملت الوردية",start:"بدء وردية 8 ساعات",complete:"إنهاء الوردية",cancel:"إلغاء الوردية",inventory:"الإنتاج المخزن",emptyInventory:"لا توجد منتجات مخزنة بعد.",waitUntil:"تنتهي الوردية في ",working:"جارٍ التنفيذ…",startOk:"بدأت الوردية. تم حجز الأجور وتكاليف التشغيل.",completeOk:"اكتملت دورة الإنتاج وأُضيفت المنتجات للمخزون، وحُفظ الوقت المتبقي للعمال للدورة التالية.",cancelOk:"أُلغيت الدورة وأُعيدت تكاليف التشغيل مع الاحتفاظ بوقت عمل العمال.",error:"فشل تنفيذ العملية: ",required:"العمال المطلوبون: ",assigned:"العمال النشطون: ",wage:"الأجور: ",cost:"تكاليف التشغيل: ",reserved:"المبلغ المحجوز: ",noOutput:"هذا المشروع لا يملك إنتاجاً محدداً.",transfer:"نقل إلى المستودع العام",waitingTransfer:"اكتملت الدورة. انقل المنتجات إلى المستودع العام قبل بدء الدورة التالية. نسبة الإنتاج: ",transferOk:"تم نقل المنتجات إلى المستودع العام."}
+ en:{choose:"Choose an acquired project",none:"No acquired projects",ownership:"Project ownership",workers:"Active workers",ready:"Verified",notConnected:"Not connected",noProject:"Acquire a project from the library first.",needWorkers:"No active workers yet. Production can still start at 50% output.",readyProduction:"Ready to start. Base output is 50%, increasing with active worker-hours.",running:"Production shift is running",finished:"Shift completed",start:"Start 8-hour shift",complete:"Complete shift",cancel:"Cancel shift",inventory:"Last shift output and stored goods",utilityStorage:"Utility station storage",emptyInventory:"No stored products yet.",waitUntil:"Shift completes at ",working:"Working…",startOk:"Production shift started. Wages and operating costs are reserved.",completeOk:"Production cycle completed.",cancelOk:"Cycle cancelled. Operating funds were returned and worked time was preserved.",error:"Production action failed: ",required:"Required workers: ",assigned:"Active workers: ",workersLabel:"Workers: ",wage:"Wages: ",cost:"Operating costs: ",reserved:"Reserved: ",noOutput:"This project has no production output.",transfer:"Move your stock to the general warehouse",waitingTransfer:"Cycle completed. Move your stock to the general warehouse before the next shift. Output: ",transferOk:"Products transferred to the general warehouse.",shiftOutput:"Last shift production",internalCapacity:"Internal storage capacity",utilityStoredInternally:"Output is kept in the station's internal storage.",outputPercent:"Output: ",transferPending:"MOVE STOCK",readyToSettle:"READY TO SETTLE",systemIdle:"SYSTEM IDLE",systemReady:"SYSTEM READY",systemRunning:"SHIFT RUNNING"},
+ fr:{choose:"Choisir un projet acquis",none:"Aucun projet acquis",ownership:"Propriété du projet",workers:"Travailleurs actifs",ready:"Vérifié",notConnected:"Non connecté",noProject:"Acquérez d'abord un projet dans la bibliothèque.",needWorkers:"Sans travailleurs, la production démarre à 50 %.",readyProduction:"Prêt. La production commence à 50 % et augmente avec les heures des travailleurs.",running:"Poste de production en cours",finished:"Poste terminé",start:"Démarrer un poste de 8 heures",complete:"Terminer le poste",cancel:"Annuler le poste",inventory:"Production du dernier poste et stock",utilityStorage:"Stockage interne de la station",emptyInventory:"Aucun produit stocké.",waitUntil:"Fin du poste : ",working:"Traitement…",startOk:"Poste démarré. Salaires et coûts d'exploitation réservés.",completeOk:"Cycle de production terminé.",cancelOk:"Cycle annulé. Les coûts d’exploitation sont restitués et le temps travaillé est conservé.",error:"Échec de l'opération : ",required:"Travailleurs requis : ",assigned:"Travailleurs actifs : ",workersLabel:"Travailleurs : ",wage:"Salaires : ",cost:"Coûts d'exploitation : ",reserved:"Réservé : ",noOutput:"Ce projet ne produit aucun article.",transfer:"Déplacer le stock vers l’entrepôt général",waitingTransfer:"Cycle terminé. Déplacez le stock vers l’entrepôt général avant le prochain poste. Production : ",transferOk:"Produits transférés vers l'entrepôt général.",shiftOutput:"Production du dernier poste",internalCapacity:"Capacité de stockage interne",utilityStoredInternally:"La production reste dans le stockage interne de la station.",outputPercent:"Production : ",transferPending:"STOCK À DÉPLACER",readyToSettle:"PRÊT À RÉGLER",systemIdle:"SYSTÈME ARRÊTÉ",systemReady:"SYSTÈME PRÊT",systemRunning:"POSTE EN COURS"},
+ ar:{choose:"اختر مشروعاً تم اقتناؤه",none:"لا توجد مشاريع مقتناة",ownership:"ملكية المشروع",workers:"العمال النشطون",ready:"متحقق",notConnected:"غير مربوط",noProject:"اقتَنِ مشروعاً من المكتبة أولاً.",needWorkers:"يمكن بدء الإنتاج دون عمال بنسبة 50%، وترتفع النسبة مع ساعات عمل العمال.",readyProduction:"جاهز للتشغيل. يبدأ الإنتاج بنسبة 50% وترتفع الإنتاجية حسب ساعات عمل العمال حتى 100%.",running:"وردية الإنتاج جارية",finished:"اكتملت الوردية",start:"بدء وردية 8 ساعات",complete:"إنهاء الوردية",cancel:"إلغاء الوردية",inventory:"إنتاج الوردية الأخيرة والمخزون",utilityStorage:"مخزون محطة المرافق الداخلي",emptyInventory:"لا توجد منتجات مخزنة بعد.",waitUntil:"تنتهي الوردية في ",working:"جارٍ التنفيذ…",startOk:"بدأت الوردية. تم حجز الأجور وتكاليف التشغيل.",completeOk:"اكتملت دورة الإنتاج.",cancelOk:"أُلغيت الدورة وأُعيدت تكاليف التشغيل مع الاحتفاظ بوقت عمل العمال.",error:"فشل تنفيذ العملية: ",required:"العمال المطلوبون: ",assigned:"العمال النشطون: ",workersLabel:"العمال: ",wage:"الأجور: ",cost:"تكاليف التشغيل: ",reserved:"المبلغ المحجوز: ",noOutput:"هذا المشروع لا يملك إنتاجاً محدداً.",transfer:"انقل مخزونك إلى المستودع العام",waitingTransfer:"اكتملت الدورة. انقل مخزونك إلى المستودع العام قبل بدء الوردية التالية. الإنتاج: ",transferOk:"تم نقل المنتجات إلى المستودع العام.",shiftOutput:"إنتاج الوردية الأخيرة",internalCapacity:"سعة التخزين الداخلي",utilityStoredInternally:"يبقى الإنتاج داخل مخزون المحطة ولا يحتاج إلى نقل للمستودع.",outputPercent:"نسبة الإنتاج: ",transferPending:"المخزون جاهز للنقل",readyToSettle:"جاهز للتسوية",systemIdle:"النظام متوقف",systemReady:"النظام جاهز",systemRunning:"الوردية جارية"}
  };
  let actualOwnedProjects=[],currentPlayerCityId=null,currentPlayerCity=null;
  function renderOwnedProjects(){
@@ -1202,13 +1202,16 @@ const opsLabels={
   const labels=opsLabels[lang]||opsLabels.en;
   const projectId=$("operationProjectSelect")?.value;
   const selected=actualOwnedProjects.find(x=>x.entry.id===projectId);
-  const status=$("productionCycleStatus"),tag=$("productionStateTag");
+  const status=$("productionCycleStatus"),tag=$("productionStateTag"),systemTag=$("opsSystemStatus"),shortcut=$("productionShortcutStatus");
   const start=$("startProductionButton"),complete=$("completeProductionButton"),cancel=$("cancelProductionButton"),transfer=$("transferProductionButton");
   const inventoryBox=$("productionInventory"),inventoryTitle=$("productionInventoryTitle");
   if(!selected){
    if(status)status.textContent=labels.noProject;
    if(tag)tag.textContent="IDLE";
-   [start,complete,cancel,transfer].forEach(b=>{if(b)b.disabled=true});
+   if(systemTag)systemTag.textContent=labels.systemIdle;
+   if(shortcut)shortcut.textContent=labels.systemIdle;
+   [start,complete,cancel,transfer].forEach(button=>{if(button)button.disabled=true});
+   if(transfer)transfer.hidden=false;
    if(inventoryBox)inventoryBox.innerHTML='<div class="dempty">'+labels.emptyInventory+'</div>';
    return;
   }
@@ -1218,47 +1221,71 @@ const opsLabels={
   const user=userData.user;if(!user)throw new Error("Authentication required");
   const [{data:contracts,error:contractError},{data:cycles,error:cycleError},{data:stock,error:stockError}]=await Promise.all([
    auth.from("player_employment_contracts").select("worker_id,wage_per_shift").eq("project_id",projectId).eq("employer_id",user.id).eq("status","active"),
-   auth.from("production_cycles").select("id,status,started_at,completes_at,wage_total_vor,operating_cost_vor,reserved_total_vor,production_percent,output_transferred_at").eq("project_id",projectId).eq("owner_id",user.id).or("status.eq.running,and(status.eq.completed,output_transferred_at.is.null)").order("started_at",{ascending:false}).limit(1),
+   auth.from("production_cycles").select("id,status,started_at,completes_at,worker_count,required_worker_count,wage_total_vor,operating_cost_vor,reserved_total_vor,production_percent,output_transferred_at").eq("project_id",projectId).eq("owner_id",user.id).order("started_at",{ascending:false}).limit(1),
    auth.from("player_inventory").select("item_key,unit,quantity").eq("owner_id",user.id).order("item_key")
   ]);
   if(contractError)throw contractError;if(cycleError)throw cycleError;if(stockError)throw stockError;
-  const workers=new Set((contracts||[]).map(c=>c.worker_id)).size;
-  const required=Number(selected.project.workers||0);
-  const wages=(contracts||[]).reduce((sum,c)=>sum+Number(c.wage_per_shift||0),0);
   const cycle=cycles?.[0]||null;
+  const contractWorkers=new Set((contracts||[]).map(contract=>contract.worker_id)).size;
+  const workers=cycle&&(cycle.status==="running"||cycle.status==="completed")?Number(cycle.worker_count||0):contractWorkers;
+  const required=Number(selected.project.workers||cycle?.required_worker_count||0);
+  const wages=cycle&&(cycle.status==="running"||cycle.status==="completed")?Number(cycle.wage_total_vor||0):(contracts||[]).reduce((sum,contract)=>sum+Number(contract.wage_per_shift||0),0);
   window.currentProductionCycleId=cycle?.id||null;
   const supportsProduction=Array.isArray(selected.project.production_per_shift)&&selected.project.production_per_shift.length>0;
-  const money=n=>Number(n||0).toLocaleString(lang==="ar"?"ar-DZ":"en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" VOR";
+  const isUtility=["electricity","water"].includes(selected.project.id);
+  const money=value=>Number(value||0).toLocaleString(lang==="ar"?"ar-DZ":"en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" VOR";
+  const qty=value=>Number(value||0).toLocaleString(lang==="ar"?"ar-DZ":"en-US",{maximumFractionDigits:2});
   const workerStatus=$("opWorkersStatus");
   if(workerStatus){workerStatus.textContent=workers+" / "+required;workerStatus.dataset.state=workers>=required?"ok":"idle"}
-  if(inventoryTitle)inventoryTitle.textContent=labels.inventory;
+  if(inventoryTitle)inventoryTitle.textContent=isUtility?labels.utilityStorage:labels.inventory;
   if(inventoryBox){
    inventoryBox.innerHTML="";
-   if(!stock?.length){inventoryBox.innerHTML='<div class="dempty">'+labels.emptyInventory+'</div>'}
-   else stock.forEach(row=>{const item=document.createElement("article");item.className="dlisting";const title=document.createElement("strong");title.textContent=row.item_key;const detail=document.createElement("small");detail.textContent=Number(row.quantity).toLocaleString()+" "+row.unit;item.append(title,detail);inventoryBox.appendChild(item)});
+   const addLine=(titleText,detailText)=>{
+    const item=document.createElement("article");item.className="dlisting";
+    const title=document.createElement("strong"),detail=document.createElement("small");
+    title.textContent=titleText;detail.textContent=detailText;item.append(title,detail);inventoryBox.appendChild(item);
+   };
+   if(cycle&&cycle.status==="completed"&&supportsProduction){
+    const percent=Number(cycle.production_percent||50);
+    addLine(labels.shiftOutput,selected.project.production_per_shift.map(row=>row.item+": "+qty(Number(row.quantity||0)*percent/100)+" "+row.unit).join(" · "));
+   }
+   if(isUtility&&selected.project.storage_capacity){
+    addLine(labels.internalCapacity,qty(selected.project.storage_capacity.quantity)+" "+selected.project.storage_capacity.unit);
+   }
+   (stock||[]).forEach(row=>addLine(row.item_key,qty(row.quantity)+" "+row.unit));
+   if(!inventoryBox.children.length)inventoryBox.innerHTML='<div class="dempty">'+labels.emptyInventory+'</div>';
   }
+  if(transfer){transfer.hidden=isUtility;transfer.textContent=labels.transfer}
   if(cycle&&cycle.status==="running"){
-   const finish=new Date(cycle.completes_at);
-   const ready=Date.now()>=finish.getTime();
-   if(status)status.textContent=labels.running+" · "+labels.waitUntil+finish.toLocaleString()+" · "+labels.wage+money(wages)+" · "+labels.cost+money(cycle.operating_cost_vor)+" · "+labels.reserved+money(cycle.reserved_total_vor);
-   if(tag)tag.textContent=ready?"READY TO SETTLE":"RUNNING";
+   const finish=new Date(cycle.completes_at),ready=Date.now()>=finish.getTime();
+   if(status)status.textContent=labels.running+" · "+labels.waitUntil+finish.toLocaleString()+" · "+labels.workersLabel+workers+"/"+required+" · "+labels.wage+money(wages)+" · "+labels.cost+money(cycle.operating_cost_vor)+" · "+labels.reserved+money(cycle.reserved_total_vor);
+   if(tag)tag.textContent=ready?labels.readyToSettle:"RUNNING";
+   if(systemTag)systemTag.textContent=labels.systemRunning;
+   if(shortcut)shortcut.textContent=labels.systemRunning;
    if(start)start.disabled=true;if(complete)complete.disabled=!ready;if(cancel)cancel.disabled=false;if(transfer)transfer.disabled=true;
-  }else if(cycle&&cycle.status==="completed"){
-   if(status)status.textContent=labels.waitingTransfer+Number(cycle.production_percent||50).toFixed(2)+"%";
-   if(tag)tag.textContent="TRANSFER REQUIRED";
+  }else if(cycle&&cycle.status==="completed"&&!cycle.output_transferred_at&&!isUtility){
+   const percent=Number(cycle.production_percent||50);
+   if(status)status.textContent=labels.finished+" · "+labels.outputPercent+percent.toFixed(2)+"% · "+labels.workersLabel+workers+"/"+required;
+   if(tag)tag.textContent=labels.transferPending;
+   if(systemTag)systemTag.textContent=labels.systemReady;
+   if(shortcut)shortcut.textContent=labels.systemReady;
    if(start)start.disabled=true;if(complete)complete.disabled=true;if(cancel)cancel.disabled=true;if(transfer)transfer.disabled=false;
   }else{
    const ready=supportsProduction;
-   if(status)status.textContent=!supportsProduction?labels.noOutput:(ready?labels.readyProduction:labels.needWorkers)+" "+labels.required+required+" · "+labels.assigned+workers+" · "+labels.wage+money(wages);
-   if(tag)tag.textContent=!supportsProduction?"N/A":ready?"READY":"WAITING";
+   if(status){
+    if(!supportsProduction)status.textContent=labels.noOutput;
+    else if(cycle&&cycle.status==="completed")status.textContent=labels.finished+" · "+labels.outputPercent+Number(cycle.production_percent||50).toFixed(2)+"% · "+labels.workersLabel+workers+"/"+required+(isUtility?" · "+labels.utilityStoredInternally:"");
+    else status.textContent=labels.readyProduction+" "+labels.required+required+" · "+labels.assigned+workers+" · "+labels.wage+money(wages);
+   }
+   if(tag)tag.textContent=!supportsProduction?"N/A":labels.ready;
+   if(systemTag)systemTag.textContent=!supportsProduction?labels.systemIdle:labels.systemReady;
+   if(shortcut)shortcut.textContent=!supportsProduction?labels.systemIdle:labels.systemReady;
    if(start){start.disabled=!ready;start.textContent=labels.start}
    if(complete)complete.disabled=true;if(cancel)cancel.disabled=true;if(transfer)transfer.disabled=true;
   }
   if(complete)complete.textContent=labels.complete;
-  if(transfer)transfer.textContent=labels.transfer;
   if(cancel)cancel.textContent=labels.cancel;
- }
- function bindProductionActions(){
+ } function bindProductionActions(){
   const run=async(button,rpc,args,success)=>{
    if(!button||button.dataset.bound)return;button.dataset.bound="1";
    button.addEventListener("click",async()=>{
