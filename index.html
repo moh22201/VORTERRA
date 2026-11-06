@@ -51,6 +51,10 @@ canvas{position:fixed;inset:0;width:100%;height:100%}
 .reg-message{min-height:17px;color:#e5cf98;font-size:10px;line-height:1.6;text-align:center;margin-top:10px}
 .reg-note{margin-top:12px;padding-top:11px;border-top:1px solid #ffffff18;color:#99958b;font-size:9px;line-height:1.7;text-align:center}
 @media(max-width:520px){.registration-panel{padding:18px}.registration-heading h2{font-size:20px}}
+.registration-gate{width:min(88vw,460px);text-align:center;display:grid;gap:10px;justify-items:center;padding:8px 0}
+.registration-gate p{color:#ffe3a0;font-size:12px;letter-spacing:.4px}
+.registration-gate .continue{margin-top:0;background:linear-gradient(110deg,#a77a31,#f6d889 48%,#b68a42);color:#15110a;box-shadow:0 7px 22px #f6d88922}
+.registration-panel[hidden],.registration-gate[hidden]{display:none!important}
 
 /* CARD */
 #cardScene{opacity:0;pointer-events:none;flex-direction:column;gap:22px;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
@@ -656,8 +660,12 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
   <select id="iY" aria-label="اختر المدينة / Select city" required disabled><option value="" selected disabled>اختر البلد أولاً / Select country first</option></select>
   <button id="issueCard" type="submit">إصدار البطاقة ✦</button>
  </form>
+ <div class="registration-gate" id="registrationGate" hidden>
+  <p>تم إصدار بطاقة عضويتك بنجاح</p>
+  <button class="continue" id="openRegistration" type="button">سجل الآن · REGISTER NOW</button>
+ </div>
  
-  <section class="registration-panel" id="registrationPanel" aria-labelledby="registrationTitle">
+  <section class="registration-panel" id="registrationPanel" aria-labelledby="registrationTitle" hidden>
    <div class="registration-heading"><div class="reg-mark">V</div><h2 id="registrationTitle">CREATE YOUR ACCOUNT</h2><p>Join VORTERRA and enter your business world.</p></div>
    <form class="registration-form" id="registrationForm">
     <div><label for="regEmail">EMAIL ADDRESS · البريد الإلكتروني</label><input id="regEmail" type="email" name="email" autocomplete="email" placeholder="name@example.com" required></div>
@@ -719,7 +727,15 @@ identityForm.addEventListener('submit',event=>{
  event.preventDefault();
  if(!identityForm.reportValidity())return;
  identityForm.hidden=true;
- document.getElementById('registrationPanel').scrollIntoView({behavior:'smooth',block:'center'});
+ const gate=document.getElementById('registrationGate');
+ gate.hidden=false;
+ gate.scrollIntoView({behavior:'smooth',block:'center'});
+});
+document.getElementById('openRegistration').addEventListener('click',()=>{
+ const panel=document.getElementById('registrationPanel');
+ document.getElementById('registrationGate').hidden=true;
+ panel.hidden=false;
+ panel.scrollIntoView({behavior:'smooth',block:'center'});
 });
 const SUPABASE_URL='https://qnfjtpwtwvlvbzyliwmh.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_tWieCfaR6RN2S01dFwH7vg_7ZkSXbDv';
