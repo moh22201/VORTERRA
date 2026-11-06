@@ -336,7 +336,7 @@
         .order("created_at",{ascending:false}).limit(50);
       if(error)throw error;
       if(!data?.length){const empty=document.createElement("div");empty.className="wallet-empty";empty.textContent=labels.empty;target.appendChild(empty);return;}
-      const debitTypes=new Set(["project_purchase","project_monthly_rent","conversion_out","loan_repayment","market_purchase","withdrawal"]);
+      const debitTypes=new Set(["project_purchase","project_monthly_rent","conversion_out","loan_repayment","market_purchase","production_wage","production_cost","project_rent_payment","withdrawal"]);
       data.forEach(item=>{
         const row=document.createElement("article");row.className="dactivity wallet-activity-row";
         const icon=document.createElement("i");icon.textContent=debitTypes.has(item.transaction_type)?"↘":"↗";
