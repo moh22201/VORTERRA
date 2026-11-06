@@ -336,7 +336,7 @@
         .order("created_at",{ascending:false}).limit(50);
       if(error)throw error;
       if(!data?.length){const empty=document.createElement("div");empty.className="wallet-empty";empty.textContent=labels.empty;target.appendChild(empty);return;}
-      const debitTypes=new Set(["project_purchase","project_monthly_rent","conversion_out","loan_repayment","market_purchase","production_wage","production_cost","project_rent_payment","withdrawal"]);
+      const debitTypes=new Set(["project_purchase","project_monthly_rent","conversion_out","loan_repayment","market_purchase","production_wage","production_cost","project_rent_payment","transport_payment","withdrawal"]);
       data.forEach(item=>{
         const row=document.createElement("article");row.className="dactivity wallet-activity-row";
         const icon=document.createElement("i");icon.textContent=debitTypes.has(item.transaction_type)?"↘":"↗";
@@ -390,7 +390,7 @@
           const icon=document.createElement("i");icon.textContent="◈";
           const info=document.createElement("div");const title=document.createElement("b");title.textContent=item.description||item.transaction_type.replaceAll("_"," ");
           const meta=document.createElement("small");meta.textContent=new Date(item.created_at).toLocaleString(language()==="ar"?"ar-DZ":language()==="fr"?"fr-FR":"en-GB");
-          const amount=document.createElement("em");amount.textContent=(item.amount>0?"+":"")+playerNumber(item.amount)+" "+item.currency;
+          const amount=document.createElement("em");const debit=new Set(["project_purchase","project_monthly_rent","conversion_out","loan_repayment","market_purchase","production_wage","production_cost","project_rent_payment","transport_payment","withdrawal"]);amount.textContent=(debit.has(item.transaction_type)?"−":"+")+playerNumber(item.amount)+" "+item.currency;
           info.append(title,meta);row.append(icon,info,amount);activity.appendChild(row);
         });
       }
