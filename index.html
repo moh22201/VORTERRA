@@ -1122,6 +1122,11 @@ const opsLabels={
    $("operationMessage").textContent=labels.productionUnavailable;
   }
 
+ window.refreshVorterraOperations=async function(){
+  await loadActualOwnedProjects();
+  renderOperations();
+ };
+
  async function loadProjects(){
   try{const r=await fetch("data/projects.json",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const d=await r.json();if(!Array.isArray(d.projects)||d.projects.length!==12)throw Error("Invalid project catalogue");projects=d.projects.sort((a,b)=>a.number-b.number);renderProjects();await loadActualOwnedProjects();renderOperations()}
   catch(e){console.error("VORTERRA projects:",e);const g=$("projectGrid");if(g)g.innerHTML='<div class="dproject-empty">Could not load the approved projects file. The data remains saved in GitHub.</div>'}
