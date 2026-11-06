@@ -731,7 +731,13 @@ identityForm.addEventListener('submit',event=>{
  gate.hidden=false;
  gate.scrollIntoView({behavior:'smooth',block:'center'});
 });
-document.getElementById('openRegistration').addEventListener('click',()=>{
+document.getElementById('openRegistration').addEventListener('click',async()=>{
+ if(currentAuthUser){
+  const button=document.getElementById('openRegistration');button.disabled=true;
+  try{await savePlayerCardProfile(currentAuthUser);enterAuthenticatedDashboard(currentAuthUser);}
+  catch(error){document.querySelector('#registrationGate p').textContent=error.message||'تعذر حفظ بيانات البطاقة. حاول مجدداً.';button.disabled=false;}
+  return;
+ }
  const panel=document.getElementById('registrationPanel');
  document.getElementById('registrationGate').hidden=true;
  panel.hidden=false;
@@ -757,7 +763,22 @@ async function savePlayerCardProfile(user){
  }).eq('id',user.id);
  if(error)throw error;
 }
+let currentAuthUser=null;
+function showCardSetup(user,profile={}){
+ currentAuthUser=user;
+ document.getElementById('intro').style.display='none';
+ document.getElementById('skip').style.display='none';
+ const scene=document.getElementById('cardScene');
+ scene.style.display='flex';scene.style.opacity='1';scene.style.pointerEvents='auto';scene.style.animation='none';
+ document.getElementById('registrationPanel').hidden=true;
+ document.getElementById('registrationGate').hidden=true;
+ const identityForm=document.getElementById('identityForm');identityForm.hidden=false;
+ for(const [inputId,value] of [['iN',profile.first_name],['iL',profile.last_name]])if(value)document.getElementById(inputId).value=value;
+ for(const [outputId,value] of [['oN',profile.first_name],['oL',profile.last_name],['oC',profile.country],['oY',profile.city]])if(value)document.getElementById(outputId).textContent=value;
+ const countrySelect=document.getElementById('iC');if(profile.country)countrySelect.value=profile.country;
+}
 function enterAuthenticatedDashboard(user){
+ currentAuthUser=user;
  document.getElementById('cardScene').style.display='none';
  document.getElementById('intro').style.display='none';
  document.getElementById('skip').style.display='none';
@@ -824,9 +845,14 @@ document.getElementById('googleRegister').addEventListener('click',async()=>{
  const {error}=await vortERRAAuth.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+window.location.pathname}});
  if(error)showAuthMessage(error.message||'Google sign-in is not configured yet in Supabase.',true);
 });
-vortERRAAuth.auth.getSession().then(({data,error})=>{
+vortERRAAuth.auth.getSession().then(async({data,error})=>{
  if(error){console.warn('Auth session:',error);return;}
- if(data.session?.user)enterAuthenticatedDashboard(data.session.user);
+ if(!data.session?.user)return;
+ const user=data.session.user;
+ const {data:profile,error:profileError}=await vortERRAAuth.from('profiles').select('first_name,last_name,country,city').eq('id',user.id).maybeSingle();
+ if(profileError){console.warn('Player profile:',profileError);enterAuthenticatedDashboard(user);return;}
+ if(!profile?.first_name||!profile?.last_name||!profile?.country||!profile?.city)showCardSetup(user,profile||{});
+ else enterAuthenticatedDashboard(user);
 });
 
 function openDashboardPanel(view){
