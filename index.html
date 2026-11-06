@@ -1199,8 +1199,28 @@ const opsLabels={
    actualOwnedProjects=[];renderOwnedProjects();
   }
  }
+ async function refreshProductionShortcutStatus(){
+  const shortcut=$("productionShortcutStatus");
+  if(!shortcut||!window.vortERRAAuth?.auth)return;
+  const labels=opsLabels[lang]||opsLabels.en;
+  try{
+   const {data:userData,error:userError}=await window.vortERRAAuth.auth.getUser();
+   if(userError)throw userError;
+   const user=userData.user;if(!user)return;
+   const {data:cycles,error}=await window.vortERRAAuth.from("production_cycles")
+    .select("status,output_transferred_at")
+    .eq("owner_id",user.id)
+    .order("started_at",{ascending:false})
+    .limit(100);
+   if(error)throw error;
+   const running=(cycles||[]).some(cycle=>cycle.status==="running");
+   const awaiting=(cycles||[]).some(cycle=>cycle.status==="completed"&&!cycle.output_transferred_at);
+   shortcut.textContent=running?labels.systemRunning:awaiting?labels.systemReady:labels.systemIdle;
+  }catch(error){console.warn("Could not refresh dashboard production status:",error)}
+ }
  async function refreshProductionPanel(){
   const labels=opsLabels[lang]||opsLabels.en;
+  await refreshProductionShortcutStatus();
   const projectId=$("operationProjectSelect")?.value;
   const selected=actualOwnedProjects.find(x=>x.entry.id===projectId);
   const status=$("productionCycleStatus"),tag=$("productionStateTag"),systemTag=$("opsSystemStatus"),shortcut=$("productionShortcutStatus");
@@ -1210,7 +1230,6 @@ const opsLabels={
    if(status)status.textContent=labels.noProject;
    if(tag)tag.textContent="IDLE";
    if(systemTag)systemTag.textContent=labels.systemIdle;
-   if(shortcut)shortcut.textContent=labels.systemIdle;
    [start,complete,cancel,transfer].forEach(button=>{if(button)button.disabled=true});
    if(transfer)transfer.hidden=false;
    if(inventoryBox)inventoryBox.innerHTML='<div class="dempty">'+labels.emptyInventory+'</div>';
@@ -1262,14 +1281,12 @@ const opsLabels={
    if(status)status.textContent=labels.running+" · "+labels.waitUntil+finish.toLocaleString()+" · "+labels.workersLabel+workers+"/"+required+" · "+labels.wage+money(wages)+" · "+labels.cost+money(cycle.operating_cost_vor)+" · "+labels.reserved+money(cycle.reserved_total_vor);
    if(tag)tag.textContent=ready?labels.readyToSettle:"RUNNING";
    if(systemTag)systemTag.textContent=labels.systemRunning;
-   if(shortcut)shortcut.textContent=labels.systemRunning;
    if(start)start.disabled=true;if(complete)complete.disabled=!ready;if(cancel)cancel.disabled=false;if(transfer)transfer.disabled=true;
   }else if(cycle&&cycle.status==="completed"&&!cycle.output_transferred_at&&!isUtility){
    const percent=Number(cycle.production_percent||50);
    if(status)status.textContent=labels.finished+" · "+labels.outputPercent+percent.toFixed(2)+"% · "+labels.workersLabel+workers+"/"+required;
    if(tag)tag.textContent=labels.transferPending;
    if(systemTag)systemTag.textContent=labels.systemReady;
-   if(shortcut)shortcut.textContent=labels.systemReady;
    if(start)start.disabled=true;if(complete)complete.disabled=true;if(cancel)cancel.disabled=true;if(transfer)transfer.disabled=false;
   }else{
    const ready=supportsProduction;
@@ -1280,7 +1297,6 @@ const opsLabels={
    }
    if(tag)tag.textContent=!supportsProduction?"N/A":labels.ready;
    if(systemTag)systemTag.textContent=!supportsProduction?labels.systemIdle:labels.systemReady;
-   if(shortcut)shortcut.textContent=!supportsProduction?labels.systemIdle:labels.systemReady;
    if(start){start.disabled=!ready;start.textContent=labels.start}
    if(complete)complete.disabled=true;if(cancel)cancel.disabled=true;if(transfer)transfer.disabled=true;
   }
