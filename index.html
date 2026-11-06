@@ -478,10 +478,11 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 
 /* Sections stay inside the main workspace; no modal overlay or forced centering. */
 
+.dbrand img{display:block;width:clamp(118px,14vw,178px);height:64px;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 0 10px #d9b36e44)}@media(max-width:680px){.dbrand img{width:clamp(105px,30vw,145px);height:48px}}
 </style></head><body>
 
 <canvas id="c"></canvas><div id="dashboard">
-<header class="dtop"><div class="dbrand"><div class="demblem"><b>V</b></div><div><strong>VORTERRA</strong><small>WORLD OF INDUSTRY &amp; TRADE</small></div></div>
+<header class="dtop"><div class="dbrand"><img src="assets/vorterra-logo.webp" alt="VORTERRA — World of Industry &amp; Trade"></div>
 <div class="dlang-switch" aria-label="Language"><button type="button" data-lang="en" class="active">ENG</button><button type="button" data-lang="fr">FRA</button><button type="button" data-lang="ar">ARB</button></div>
 <div class="daccount"><button type="button" class="dbalance dbalance-wallet" id="walletOpenButton" aria-label="Open VORTERRA wallet"><span class="dwallet-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v15H6.5A2.5 2.5 0 0 1 4 16.5z"/><path d="M4 7h13a2 2 0 0 1 2 2v2h-5a2 2 0 0 0 0 4h5v2"/><path d="M17 13h.01"/></svg></span><span class="dbalance-copy"><small data-i18n="available">AVAILABLE BALANCE</small><b>0.00 VOR</b></span></button><div class="davatar">V</div><div class="dmember">Member Account<small>VOR · MEMBER</small></div><button type="button" id="signOutButton" class="dsignout">↪ Sign out</button></div></header>
 <div class="dlayout"><aside class="dside">
