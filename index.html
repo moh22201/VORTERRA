@@ -743,6 +743,20 @@ const vortERRAAuth=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABL
 const registrationForm=document.getElementById('registrationForm');
 const registrationMessage=document.getElementById('registrationMessage');
 function showAuthMessage(message,isError=false){registrationMessage.textContent=message;registrationMessage.style.color=isError?'#ffaaa0':'#e5cf98';}
+async function savePlayerCardProfile(user){
+ const firstName=document.getElementById('iN')?.value.trim()||'';
+ const lastName=document.getElementById('iL')?.value.trim()||'';
+ const country=document.getElementById('iC')?.value||'';
+ const city=document.getElementById('iY')?.value||'';
+ if(!firstName||!lastName||!country||!city)return;
+ const {error}=await vortERRAAuth.from('profiles').update({
+  first_name:firstName,last_name:lastName,country,city,
+  display_name:[firstName,lastName].join(' '),
+  membership_card_issued_at:new Date().toISOString(),
+  updated_at:new Date().toISOString()
+ }).eq('id',user.id);
+ if(error)throw error;
+}
 function enterAuthenticatedDashboard(user){
  document.getElementById('cardScene').style.display='none';
  document.getElementById('intro').style.display='none';
@@ -780,7 +794,7 @@ registrationForm.addEventListener('submit',async event=>{
  try{
   const {data,error}=await vortERRAAuth.auth.signUp({
    email,password:password.value,
-   options:{emailRedirectTo:window.location.origin+window.location.pathname,data:{full_name:[firstName,lastName].filter(Boolean).join(' '),first_name:firstName,last_name:lastName,country,city}}
+   options:{emailRedirectTo:window.location.origin+window.location.pathname,data:{full_name:[firstName,lastName].filter(Boolean).join(' '),first_name:firstName,last_name:lastName,country,city,membership_card_issued:true}}
   });
   if(error)throw error;
   password.value='';confirm.value='';
@@ -801,7 +815,7 @@ loginForm.addEventListener('submit',async event=>{
  try{
   const {data,error}=await vortERRAAuth.auth.signInWithPassword({email:document.getElementById('loginEmail').value.trim(),password:document.getElementById('loginPassword').value});
   if(error)throw error;
-  if(data.user){document.getElementById('loginPassword').value='';showAuthMessage('Signed in successfully.');enterAuthenticatedDashboard(data.user);}
+  if(data.user){document.getElementById('loginPassword').value='';await savePlayerCardProfile(data.user);showAuthMessage('Signed in successfully.');enterAuthenticatedDashboard(data.user);}
  }catch(error){showAuthMessage(error.message||'Sign-in failed. Please try again.',true);}
  finally{submit.disabled=false;}
 });
