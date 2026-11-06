@@ -82,13 +82,13 @@
 
   function localizeWithdrawalForm(){
     const copy={
-      en:{amount:"Amount to withdraw (USDT)",rules:"Minimum 10 USDT · Maximum 5,000 USDT · 5% fee · Weekly limit: 50% of internal USDT balance. Requests are reviewed manually. Accounts with outstanding loans cannot withdraw.",submit:"Submit withdrawal request",history:"My withdrawal requests",empty:"No requests yet."},
-      fr:{amount:"Montant du retrait (USDT)",rules:"Minimum 10 USDT · Maximum 5 000 USDT · frais de 5 % · Limite hebdomadaire : 50 % du solde USDT interne. Les demandes sont examinées manuellement. Les comptes ayant un prêt impayé ne peuvent pas retirer.",submit:"Envoyer la demande de retrait",history:"Mes demandes de retrait",empty:"Aucune demande pour le moment."},
-      ar:{amount:"مبلغ السحب (USDT)",rules:"الحد الأدنى 10 USDT · الحد الأقصى 5,000 USDT · رسوم 5٪ · الحد الأسبوعي 50٪ من رصيد USDT الداخلي. الطلبات تخضع للمراجعة اليدوية، والحساب المدين لا يمكنه السحب.",submit:"إرسال طلب السحب",history:"طلبات السحب الخاصة بي",empty:"لا توجد طلبات حتى الآن."}
+      en:{amount:"Amount to withdraw (USDT)",rules:"Minimum 10 USDT · Maximum 5,000 USDT · 5% fee · Weekly limit: 50% of internal USDT balance. Requests are reviewed manually. Accounts with outstanding loans cannot withdraw.",submit:"Submit withdrawal request",history:"My withdrawal requests",empty:"No requests yet.",walletRules:"Withdrawals: 10–5,000 USDT, 5% fee, and a weekly limit of 50% of internal USDT balance. Requests are reviewed manually. Outstanding loans prevent withdrawal.",manual:"Withdrawal requests are recorded for manual review. No automatic USDT payout is made."},
+      fr:{amount:"Montant du retrait (USDT)",rules:"Minimum 10 USDT · Maximum 5 000 USDT · frais de 5 % · Limite hebdomadaire : 50 % du solde USDT interne. Les demandes sont examinées manuellement. Les comptes ayant un prêt impayé ne peuvent pas retirer.",submit:"Envoyer la demande de retrait",history:"Mes demandes de retrait",empty:"Aucune demande pour le moment.",walletRules:"Retraits : 10 à 5 000 USDT, frais de 5 % et limite hebdomadaire de 50 % du solde USDT interne. Examen manuel. Les prêts impayés bloquent les retraits.",manual:"Les demandes sont enregistrées pour examen manuel. Aucun paiement USDT automatique n’est effectué."},
+      ar:{amount:"مبلغ السحب (USDT)",rules:"الحد الأدنى 10 USDT · الحد الأقصى 5,000 USDT · رسوم 5٪ · الحد الأسبوعي 50٪ من رصيد USDT الداخلي. الطلبات تخضع للمراجعة اليدوية، والحساب المدين لا يمكنه السحب.",submit:"إرسال طلب السحب",history:"طلبات السحب الخاصة بي",empty:"لا توجد طلبات حتى الآن.",walletRules:"السحب: من 10 إلى 5,000 USDT، رسوم 5٪، وحد أسبوعي 50٪ من رصيد USDT الداخلي. الطلبات تخضع للمراجعة اليدوية، والقروض المستحقة تمنع السحب.",manual:"تُسجّل طلبات السحب للمراجعة اليدوية، ولا يتم إرسال USDT تلقائياً."}
     }[language()];
     const set=(q,v)=>{const el=document.querySelector(q);if(el)el.textContent=v};
     set('label[for="withdrawalAmount"]',copy.amount);set('.withdraw-help',copy.rules);set('#withdrawalSubmit',copy.submit);set('[data-wallet-panel="withdraw"] .dpanelhead b',language()==="ar"?"طلب السحب":language()==="fr"?"Demande de retrait":"Withdrawal request");
-    const history=document.querySelector('[data-wallet-panel="withdraw"] .dpanelhead b:last-child');if(history)history.textContent=copy.history;
+    set("#myWithdrawalHistory",copy.history);set("#walletRulesText",copy.walletRules);set("#walletPreviewNote",copy.manual);
   }
 
   function bindWithdrawalForm(){
