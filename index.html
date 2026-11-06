@@ -1149,6 +1149,8 @@ const opsLabels={
   const required=Number(selected.project.workers||0);
   const wages=(contracts||[]).reduce((sum,c)=>sum+Number(c.wage_per_shift||0),0);
   const cycle=cycles?.[0]||null;
+  window.currentProductionCycleId=cycle?.id||null;
+  const supportsProduction=Array.isArray(selected.project.production_per_shift)&&selected.project.production_per_shift.length>0;
   const money=n=>Number(n||0).toLocaleString(lang==="ar"?"ar-DZ":"en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" VOR";
   const workerStatus=$("opWorkersStatus");
   if(workerStatus){workerStatus.textContent=workers+" / "+required;workerStatus.dataset.state=workers>=required?"ok":"idle"}
@@ -1165,9 +1167,9 @@ const opsLabels={
    if(tag)tag.textContent=ready?"READY TO SETTLE":"RUNNING";
    if(start)start.disabled=true;if(complete)complete.disabled=!ready;if(cancel)cancel.disabled=false;
   }else{
-   const ready=workers>=required&&required>0;
-   if(status)status.textContent=(ready?labels.readyProduction:labels.needWorkers)+" "+labels.required+required+" · "+labels.assigned+workers+" · "+labels.wage+money(wages);
-   if(tag)tag.textContent=ready?"READY":"WAITING";
+   const ready=supportsProduction&&workers>=required&&required>0;
+   if(status)status.textContent=!supportsProduction?labels.noOutput:(ready?labels.readyProduction:labels.needWorkers)+" "+labels.required+required+" · "+labels.assigned+workers+" · "+labels.wage+money(wages);
+   if(tag)tag.textContent=!supportsProduction?"N/A":ready?"READY":"WAITING";
    if(start){start.disabled=!ready;start.textContent=labels.start}
    if(complete)complete.disabled=true;if(cancel)cancel.disabled=true;
   }
