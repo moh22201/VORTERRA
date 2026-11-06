@@ -1167,7 +1167,7 @@ const opsLabels={
      info.append(title,detail);card.appendChild(info);
      if(item.owner_id===currentUser.id){
       const del=document.createElement("button");del.type="button";del.textContent=words.remove;
-      del.addEventListener("click",async()=>{del.disabled=true;try{const {error}=await vortERRAAuth.from("player_job_listings").delete().eq("id",item.id).eq("owner_id",currentUser.id);if(error)throw error;await renderLiveJobListings()}catch(err){alert(words.failed+(err.message||""));del.disabled=false}});
+      del.addEventListener("click",async()=>{del.disabled=true;try{const {error}=await vortERRAAuth.from("player_job_listings").update({status:"cancelled",updated_at:new Date().toISOString()}).eq("id",item.id).eq("owner_id",currentUser.id);if(error)throw error;await renderLiveJobListings()}catch(err){alert(words.failed+(err.message||""));del.disabled=false}});
       card.appendChild(del);
      }else{
       const action=document.createElement("button");action.type="button";action.textContent=type==="offer"?words.accept:words.hire;
