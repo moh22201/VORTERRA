@@ -1,0 +1,1 @@
+alter table public.player_transport_contracts drop constraint if exists player_transport_contracts_check1;
