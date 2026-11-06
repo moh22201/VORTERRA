@@ -579,16 +579,16 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
  </div>
  <div class="dpanel"><div class="dpanelbody">
   <section class="dsubpanel" id="marketSellPanel"><h3 data-i18n="sellTab">بيع المنتجات</h3><form id="marketSellForm" class="dform">
-   <label><span data-i18n="productName">اسم المنتج</span><input name="product" required maxlength="80"></label>
+   <label><span id="marketSaleItemLabel">اختر منتجاً من مخزونك</span><select name="item_key" id="marketSaleItem" required><option value="">لا توجد منتجات متاحة</option></select></label>
    <label><span data-i18n="quantity">الكمية</span><input name="quantity" type="number" min="0.01" step="0.01" required></label>
    <label><span data-i18n="unitPrice">السعر لكل وحدة (VOR)</span><input name="price" type="number" min="0.01" step="0.01" required></label>
    <button class="dprimary" type="submit" data-i18n="publishListing">نشر عرض البيع</button>
   </form><div id="mySaleListings" class="dlisting-list"></div></section>
   <section class="dsubpanel" id="marketBuyPanel" hidden><h3 data-i18n="buyTab">شراء المنتجات</h3><p class="dmuted" data-i18n="buyIntro">العروض المنشورة من اللاعبين الآخرين تظهر هنا.</p><div id="saleListings" class="dlisting-list"></div></section>
   <section class="dsubpanel" id="marketRentPanel" hidden><h3 data-i18n="rentTab">الإيجار بين اللاعبين</h3><form id="marketRentForm" class="dform">
-   <label><span data-i18n="assetName">اسم المشروع أو الأصل</span><input name="asset" required maxlength="100"></label>
-   <label><span data-i18n="rentPriceLabel">سعر الإيجار (VOR)</span><input name="price" type="number" min="0.01" step="0.01" required></label>
-   <label><span data-i18n="rentDuration">مدة الإيجار</span><input name="duration" required maxlength="60"></label>
+   <label><span id="marketRentProjectLabel">اختر مشروعاً تملكه</span><select name="project_id" id="marketRentProject" required><option value="">لا توجد مشاريع مؤهلة</option></select></label>
+   <label><span id="marketRentPriceLabel">السعر الشهري (VOR)</span><input name="price" type="number" min="0.01" step="0.01" required></label>
+   <label><span id="marketRentMonthsLabel">مدة الإيجار</span><select name="months" id="marketRentMonths" required><option value="1">شهر واحد</option><option value="3">3 أشهر</option></select></label>
    <button class="dprimary" type="submit" data-i18n="publishRent">نشر عرض الإيجار</button>
   </form><div id="rentListings" class="dlisting-list"></div></section>
  </div></div><div class="dnote" id="marketLiveNote" data-i18n="marketLiveNote">Listing data is loaded directly from the database.</div>
@@ -616,8 +616,22 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 </section>
 
 <section class="dview" data-panel="contracts">
- <div class="dtoolbar"><div><h2 data-i18n="contracts">Contracts & Logistics</h2><p data-i18n="contractsIntro">Contracts, transport and delivery are not active yet.</p></div></div>
- <div class="dplaceholder"><i>⇄</i><h3 data-i18n="contractsUnavailableTitle">Contracts and logistics are not active yet</h3><p data-i18n="contractsUnavailableText">No contract, transport booking or delivery-tracking actions are available until their database workflows are implemented.</p></div>
+ <div class="dtoolbar"><div><h2 data-i18n="contracts">Contracts & Logistics</h2><p id="transportIntro">Transport requests, provider acceptance, tracking and payment settlement.</p></div></div>
+ <div class="dpanel"><div class="dpanelbody">
+  <section class="dsubpanel"><h3 id="transportRequestTitle">طلب خدمة نقل</h3>
+   <form id="transportRequestForm" class="dform">
+    <label><span id="transportCargoLabel">وصف الحمولة</span><input name="cargo" required maxlength="100"></label>
+    <label><span id="transportQuantityLabel">الكمية</span><input name="quantity" type="number" min="0.01" step="0.01" required></label>
+    <label><span id="transportUnitLabel">الوحدة</span><input name="unit" required maxlength="24" placeholder="ton, m³, pallet..."></label>
+    <label><span id="transportPickupLabel">مكان الاستلام</span><input name="pickup" required maxlength="140"></label>
+    <label><span id="transportDeliveryLabel">مكان التسليم</span><input name="delivery" required maxlength="140"></label>
+    <label><span id="transportPriceLabel">أجرة النقل (VOR)</span><input name="price" type="number" min="0.01" step="0.01" required></label>
+    <button class="dprimary" type="submit" id="transportRequestSubmit">نشر طلب النقل وحجز الأجرة</button>
+   </form>
+  </section>
+  <section class="dsubpanel"><h3 id="transportContractsTitle">طلبات وعقود النقل</h3><div id="transportContractsList" class="dlisting-list"><div class="dempty">لا توجد طلبات نقل بعد.</div></div></section>
+ </div></div>
+ <div class="dnote" id="transportEscrowNote">تُحجز أجرة النقل عند إنشاء الطلب، ولا تُحوّل إلى شركة النقل إلا بعد تأكيد التسليم.</div>
 </section>
 
 <section class="dview" data-panel="wallet">
@@ -1359,6 +1373,154 @@ const opsLabels={
  }
  [["jobRequestForm","request"],["jobOfferForm","offer"]].forEach(([id,kind])=>{const form=$(id);if(form&&!form.dataset.dbBound){form.dataset.dbBound="1";form.addEventListener("submit",e=>{e.preventDefault();if(form.reportValidity())submitJobListing(form,kind)})}});
 
+ async function loadLiveMarketplace(){
+  const saleMine=$("mySaleListings"),saleOthers=$("saleListings"),rentList=$("rentListings");
+  const itemSelect=$("marketSaleItem"),projectSelect=$("marketRentProject");
+  const langNow=lang||"en";
+  const t={
+   en:{chooseItem:"Choose an item from your inventory",chooseProject:"Choose a project you own",none:"No eligible items",noProjects:"No eligible projects",mine:"Your listing",buy:"Buy all",rent:"Rent project",cancel:"Cancel listing",sale:"Sale",rentLabel:"Rent",empty:"No active listings.",working:"Processing…",failed:"Marketplace action failed: ",listed:"Listing published.",bought:"Purchase completed.",rented:"Project lease activated.",cancelled:"Listing cancelled.",monthly:"/ month",months:"months"},
+   fr:{chooseItem:"Choisir un article de votre stock",chooseProject:"Choisir un projet que vous possédez",none:"Aucun article disponible",noProjects:"Aucun projet éligible",mine:"Votre annonce",buy:"Tout acheter",rent:"Louer le projet",cancel:"Annuler l’annonce",sale:"Vente",rentLabel:"Location",empty:"Aucune annonce active.",working:"Traitement…",failed:"Échec de l’opération : ",listed:"Annonce publiée.",bought:"Achat effectué.",rented:"Location activée.",cancelled:"Annonce annulée.",monthly:"/ mois",months:"mois"},
+   ar:{chooseItem:"اختر منتجاً من مخزونك",chooseProject:"اختر مشروعاً تملكه",none:"لا توجد منتجات متاحة",noProjects:"لا توجد مشاريع مؤهلة",mine:"إعلانك",buy:"شراء الكمية كاملة",rent:"استئجار المشروع",cancel:"إلغاء الإعلان",sale:"بيع",rentLabel:"إيجار",empty:"لا توجد عروض نشطة.",working:"جارٍ التنفيذ…",failed:"فشلت العملية: ",listed:"تم نشر العرض.",bought:"تم الشراء بنجاح.",rented:"تم تفعيل إيجار المشروع.",cancelled:"تم إلغاء الإعلان.",monthly:"/ شهرياً",months:"أشهر"}
+  }[langNow]||{chooseItem:"Choose item",chooseProject:"Choose project",none:"No items",noProjects:"No projects",mine:"Your listing",buy:"Buy all",rent:"Rent",cancel:"Cancel",sale:"Sale",rentLabel:"Rent",empty:"No active listings.",working:"Working…",failed:"Failed: ",listed:"Listed.",bought:"Bought.",rented:"Rented.",cancelled:"Cancelled.",monthly:"/ month",months:"months"};
+  try{
+   const {data:userData,error:userError}=await vortERRAAuth.auth.getUser();if(userError)throw userError;
+   const user=userData.user;if(!user)return;
+   const [{data:inventory,error:inventoryError},{data:owned,error:ownedError},{data:listings,error:listError}]=await Promise.all([
+    vortERRAAuth.from("player_inventory").select("item_key,unit,quantity").eq("owner_id",user.id).gt("quantity",0).order("item_key"),
+    vortERRAAuth.from("player_projects").select("id,project_key,acquisition_type,expires_at,operating_status").eq("owner_id",user.id).eq("acquisition_type","purchase").eq("operating_status","idle"),
+    vortERRAAuth.from("market_listings").select("id,owner_id,listing_type,product_name,quantity,unit_price,asset_name,rent_duration,unit,project_id,lease_months,created_at").eq("status","active").order("created_at",{ascending:false}).limit(100)
+   ]);
+   if(inventoryError)throw inventoryError;if(ownedError)throw ownedError;if(listError)throw listError;
+   const options=(select,rows,label,empty,mapper)=>{if(!select)return;select.innerHTML="";const first=document.createElement("option");first.value="";first.textContent=rows.length?label:empty;select.appendChild(first);rows.forEach(row=>{const option=document.createElement("option");option.value=mapper(row).value;option.textContent=mapper(row).label;select.appendChild(option)});select.disabled=!rows.length};
+   options(itemSelect,inventory||[],t.chooseItem,t.none,row=>({value:row.item_key+"::"+row.unit,label:row.item_key+" · "+Number(row.quantity).toLocaleString()+" "+row.unit}));
+   options(projectSelect,owned||[],t.chooseProject,t.noProjects,row=>{const p=projects.find(x=>x.id===row.project_key);return {value:row.id,label:p?.name?.[langNow]||p?.name?.en||row.project_key}});
+   const itemLookup=new Map((inventory||[]).map(x=>[x.item_key+"::"+x.unit,x]));
+   if(saleMine)saleMine.innerHTML="";if(saleOthers)saleOthers.innerHTML="";if(rentList)rentList.innerHTML="";
+   const projectName=key=>{const p=projects.find(x=>x.id===key);return p?.name?.[langNow]||p?.name?.en||key||"Project"};
+   const addCard=(target,item,kind)=>{
+    if(!target)return;const card=document.createElement("article");card.className="dlisting";
+    const info=document.createElement("div"),title=document.createElement("strong"),detail=document.createElement("small");
+    const own=item.owner_id===user.id;
+    title.textContent=kind==="sale"?item.product_name:projectName(item.asset_name);
+    detail.textContent=kind==="sale"?Number(item.quantity).toLocaleString()+" "+(item.unit||"")+" · "+Number(item.unit_price).toFixed(2)+" VOR / unit · "+(Number(item.quantity)*Number(item.unit_price)).toFixed(2)+" VOR":Number(item.unit_price).toFixed(2)+" VOR "+t.monthly+" · "+item.lease_months+" "+t.months+" · "+(Number(item.unit_price)*Number(item.lease_months)).toFixed(2)+" VOR";
+    info.append(title,detail);card.appendChild(info);
+    const button=document.createElement("button");button.type="button";
+    button.textContent=own?t.cancel:(kind==="sale"?t.buy:t.rent);
+    button.addEventListener("click",async()=>{
+     button.disabled=true;button.textContent=t.working;
+     try{
+      const rpc=own?"cancel_market_listing":kind==="sale"?"buy_market_sale_listing":"rent_market_project";
+      const args=own?{p_listing_id:item.id}:{p_listing_id:item.id};
+      const {error}=await vortERRAAuth.rpc(rpc,args);if(error)throw error;
+      alert(own?t.cancelled:kind==="sale"?t.bought:t.rented);await loadLiveMarketplace();
+      if(typeof refreshWalletBalances==="function")await refreshWalletBalances(user);
+     }catch(error){alert(t.failed+(error.message||""));button.disabled=false;button.textContent=own?t.cancel:(kind==="sale"?t.buy:t.rent)}
+    });
+    card.appendChild(button);target.appendChild(card);
+   };
+   (listings||[]).forEach(item=>{
+    if(item.listing_type==="sale")addCard(item.owner_id===user.id?saleMine:saleOthers,item,"sale");
+    if(item.listing_type==="rent")addCard(rentList,item,"rent");
+   });
+   [[saleMine,"my sale listings"],[saleOthers,"sales"],[rentList,"rental offers"]].forEach(([el,label])=>{if(el&&!el.children.length){const empty=document.createElement("div");empty.className="dempty";empty.textContent=t.empty;el.appendChild(empty)}});
+   const note=$("marketLiveNote");if(note)note.textContent=langNow==="ar"?"البيع مرتبط بالمخزون، والإيجار مرتبط بمشاريع مملوكة مع سقف السعر المعتمد.":langNow==="fr"?"Les ventes sont liées au stock et les locations aux projets détenus, avec un plafond de prix.":"Sales reserve real inventory; project rentals are ownership-checked and price-capped.";
+  }catch(error){console.error("Marketplace:",error);const note=$("marketLiveNote");if(note)note.textContent=(langNow==="ar"?"تعذر تحميل السوق: ":langNow==="fr"?"Impossible de charger le marché : ":"Could not load marketplace: ")+(error.message||"")}
+ }
+ function bindMarketplaceForms(){
+  const sell=$("marketSellForm"),rent=$("marketRentForm");
+  if(sell&&!sell.dataset.bound){sell.dataset.bound="1";sell.addEventListener("submit",async e=>{
+   e.preventDefault();const values=Object.fromEntries(new FormData(sell).entries());const [itemKey,unit]=String(values.item_key||"").split("::");
+   const quantity=Number(values.quantity),price=Number(values.price);const button=sell.querySelector('button[type="submit"]');
+   if(!itemKey||!unit||quantity<=0||price<=0)return;
+   button.disabled=true;
+   try{const {error}=await vortERRAAuth.rpc("create_inventory_sale_listing",{p_item_key:itemKey,p_unit:unit,p_quantity:quantity,p_unit_price:price});if(error)throw error;sell.reset();alert((lang==="ar"?"تم نشر عرض البيع.":lang==="fr"?"Annonce de vente publiée.":"Sale listing published."));await loadLiveMarketplace()}
+   catch(error){alert((lang==="ar"?"تعذر نشر العرض: ":lang==="fr"?"Impossible de publier : ":"Could not publish listing: ")+(error.message||""))}
+   finally{button.disabled=false}
+  })}
+  if(rent&&!rent.dataset.bound){rent.dataset.bound="1";rent.addEventListener("submit",async e=>{
+   e.preventDefault();const values=Object.fromEntries(new FormData(rent).entries());const price=Number(values.price),months=Number(values.months);const button=rent.querySelector('button[type="submit"]');
+   if(!values.project_id||price<=0||![1,3].includes(months))return;
+   button.disabled=true;
+   try{const {error}=await vortERRAAuth.rpc("create_project_rent_listing",{p_project_id:values.project_id,p_monthly_price_vor:price,p_lease_months:months});if(error)throw error;rent.reset();alert(lang==="ar"?"تم نشر عرض الإيجار.":lang==="fr"?"Offre de location publiée.":"Rental offer published.");await loadLiveMarketplace()}
+   catch(error){alert((lang==="ar"?"تعذر نشر عرض الإيجار: ":lang==="fr"?"Impossible de publier la location : ":"Could not publish rental: ")+(error.message||""))}
+   finally{button.disabled=false}
+  })}
+ }
+ async function loadLiveTransportContracts(){
+  const list=$("transportContractsList");if(!list)return;
+  const langNow=lang||"en";
+  const t={
+   en:{empty:"No transport requests yet.",open:"Open",accepted:"Accepted",transit:"In transit",delivered:"Delivered",cancelled:"Cancelled",accept:"Accept request",start:"Start transport",complete:"Confirm delivery",cancel:"Cancel contract",choose:"Choose your transport project",noProjects:"No active transport projects",working:"Working…",failed:"Transport action failed: ",cargo:"Cargo",from:"Pickup",to:"Delivery",price:"Escrowed payment",mine:"Your request"},
+   fr:{empty:"Aucune demande de transport.",open:"Ouverte",accepted:"Acceptée",transit:"En transit",delivered:"Livrée",cancelled:"Annulée",accept:"Accepter",start:"Démarrer le transport",complete:"Confirmer la livraison",cancel:"Annuler le contrat",choose:"Choisir votre projet de transport",noProjects:"Aucun projet de transport actif",working:"Traitement…",failed:"Échec du transport : ",cargo:"Marchandise",from:"Enlèvement",to:"Livraison",price:"Paiement bloqué",mine:"Votre demande"},
+   ar:{empty:"لا توجد طلبات نقل بعد.",open:"مفتوح",accepted:"مقبول",transit:"قيد النقل",delivered:"تم التسليم",cancelled:"ملغى",accept:"قبول الطلب",start:"بدء النقل",complete:"تأكيد التسليم",cancel:"إلغاء العقد",choose:"اختر مشروع النقل الذي تملكه",noProjects:"لا توجد مشاريع نقل نشطة",working:"جارٍ التنفيذ…",failed:"فشلت عملية النقل: ",cargo:"الحمولة",from:"الاستلام",to:"التسليم",price:"الأجرة المحجوزة",mine:"طلبك"}
+  }[langNow]||{empty:"No requests",open:"Open",accepted:"Accepted",transit:"In transit",delivered:"Delivered",cancelled:"Cancelled",accept:"Accept",start:"Start",complete:"Deliver",cancel:"Cancel",choose:"Choose transport project",noProjects:"No transport projects",working:"Working…",failed:"Failed: ",cargo:"Cargo",from:"Pickup",to:"Delivery",price:"Escrow",mine:"Your request"};
+  try{
+   const {data:userData,error:userError}=await vortERRAAuth.auth.getUser();if(userError)throw userError;
+   const user=userData.user;if(!user)return;
+   const [{data:contracts,error:contractError},{data:transportRows,error:projectError}]=await Promise.all([
+    vortERRAAuth.from("player_transport_contracts").select("*").order("created_at",{ascending:false}).limit(100),
+    vortERRAAuth.from("player_projects").select("id,project_key,acquisition_type,expires_at,operating_status").eq("owner_id",user.id).in("project_key",["road_transport","sea_transport","air_transport"])
+   ]);
+   if(contractError)throw contractError;if(projectError)throw projectError;
+   const availableTransport=(transportRows||[]).filter(p=>p.operating_status==="idle"&&(p.acquisition_type==="purchase"||(p.expires_at&&new Date(p.expires_at)>new Date())));
+   const name=id=>{const p=projects.find(x=>x.id===id);return p?.name?.[langNow]||p?.name?.en||id};
+   list.innerHTML="";
+   (contracts||[]).forEach(contract=>{
+    const own=contract.requester_id===user.id,provider=contract.provider_id===user.id;
+    const card=document.createElement("article");card.className="dlisting";
+    const info=document.createElement("div"),title=document.createElement("strong"),detail=document.createElement("small");
+    title.textContent=contract.cargo_description+" · "+Number(contract.quantity).toLocaleString()+" "+contract.unit;
+    const statusText=t[contract.status==="in_transit"?"transit":contract.status]||contract.status;
+    detail.textContent=statusText+" · "+t.from+": "+contract.pickup_location+" · "+t.to+": "+contract.delivery_location+" · "+Number(contract.price_vor).toFixed(2)+" VOR";
+    info.append(title,detail);card.appendChild(info);
+    if(contract.status==="open"&&!own){
+     const projectSelect=document.createElement("select");projectSelect.className="dproject-hire-select";
+     const placeholder=document.createElement("option");placeholder.value="";placeholder.textContent=availableTransport.length?t.choose:t.noProjects;projectSelect.appendChild(placeholder);
+     availableTransport.forEach(p=>{const option=document.createElement("option");option.value=p.id;option.textContent=name(p.project_key);projectSelect.appendChild(option)});
+     projectSelect.disabled=!availableTransport.length;card.appendChild(projectSelect);
+     const accept=document.createElement("button");accept.type="button";accept.textContent=t.accept;accept.disabled=!availableTransport.length;
+     accept.addEventListener("click",()=>runTransportAction(accept,"accept_transport_contract",{p_contract_id:contract.id,p_transport_project_id:projectSelect.value},t.accept));
+     card.appendChild(accept);
+    }
+    if(provider&&contract.status==="accepted"){const b=document.createElement("button");b.type="button";b.textContent=t.start;b.addEventListener("click",()=>runTransportAction(b,"start_transport_contract",{p_contract_id:contract.id},t.start));card.appendChild(b)}
+    if(provider&&contract.status==="in_transit"){const b=document.createElement("button");b.type="button";b.textContent=t.complete;b.addEventListener("click",()=>runTransportAction(b,"complete_transport_contract",{p_contract_id:contract.id},t.complete));card.appendChild(b)}
+    if((own||provider)&&["open","accepted"].includes(contract.status)){const b=document.createElement("button");b.type="button";b.textContent=t.cancel;b.addEventListener("click",()=>runTransportAction(b,"cancel_transport_contract",{p_contract_id:contract.id},t.cancel));card.appendChild(b)}
+    list.appendChild(card);
+   });
+   if(!list.children.length){const empty=document.createElement("div");empty.className="dempty";empty.textContent=t.empty;list.appendChild(empty)}
+   const label=(id,text)=>{const el=$(id);if(el)el.textContent=text};
+   label("transportIntro",langNow==="ar"?"طلبات النقل وقبول الناقل وتتبع الرحلة وتسوية الأجرة.":langNow==="fr"?"Demandes, acceptation du transporteur, suivi et paiement.":"Transport requests, carrier acceptance, tracking and payment settlement.");
+   label("transportRequestTitle",langNow==="ar"?"طلب خدمة نقل":langNow==="fr"?"Demander un transport":"Request transport");
+   label("transportCargoLabel",langNow==="ar"?"وصف الحمولة":langNow==="fr"?"Description de la cargaison":"Cargo description");
+   label("transportQuantityLabel",langNow==="ar"?"الكمية":langNow==="fr"?"Quantité":"Quantity");
+   label("transportUnitLabel",langNow==="ar"?"الوحدة":langNow==="fr"?"Unité":"Unit");
+   label("transportPickupLabel",langNow==="ar"?"مكان الاستلام":langNow==="fr"?"Lieu d'enlèvement":"Pickup location");
+   label("transportDeliveryLabel",langNow==="ar"?"مكان التسليم":langNow==="fr"?"Lieu de livraison":"Delivery location");
+   label("transportPriceLabel",langNow==="ar"?"أجرة النقل (VOR)":langNow==="fr"?"Prix du transport (VOR)":"Transport price (VOR)");
+   label("transportRequestSubmit",langNow==="ar"?"نشر الطلب وحجز الأجرة":langNow==="fr"?"Publier et bloquer le paiement":"Publish request and reserve payment");
+   label("transportContractsTitle",langNow==="ar"?"طلبات وعقود النقل":langNow==="fr"?"Demandes et contrats de transport":"Transport requests and contracts");
+   label("transportEscrowNote",langNow==="ar"?"تُحجز الأجرة عند إنشاء الطلب ولا تُحوّل للناقل إلا بعد تأكيد التسليم.":langNow==="fr"?"Le paiement est bloqué à la création et versé après confirmation de livraison.":"Payment is reserved on request and released to the carrier only after delivery is confirmed.");
+  }catch(error){console.error("Transport contracts:",error);list.textContent=t.failed+(error.message||"")}
+ }
+ async function runTransportAction(button,rpc,args,label){
+  button.disabled=true;const langNow=lang||"en";button.textContent=langNow==="ar"?"جارٍ التنفيذ…":langNow==="fr"?"Traitement…":"Working…";
+  try{if(!args.p_transport_project_id&&rpc==="accept_transport_contract")throw new Error(langNow==="ar"?"اختر مشروع نقل أولاً.":langNow==="fr"?"Choisissez un projet de transport.":"Choose a transport project first.");const {error}=await vortERRAAuth.rpc(rpc,args);if(error)throw error;await loadLiveTransportContracts();if(typeof refreshWalletBalances==="function")await refreshWalletBalances(currentAuthUser)}
+  catch(error){alert((langNow==="ar"?"تعذر تنفيذ العملية: ":langNow==="fr"?"Échec de l’opération : ":"Action failed: ")+(error.message||""));button.disabled=false}
+ }
+ function bindTransportRequestForm(){
+  const form=$("transportRequestForm");if(!form||form.dataset.bound)return;form.dataset.bound="1";
+  form.addEventListener("submit",async event=>{
+   event.preventDefault();const values=Object.fromEntries(new FormData(form).entries());const button=form.querySelector('button[type="submit"]');button.disabled=true;
+   try{const {error}=await vortERRAAuth.rpc("create_transport_request",{p_cargo:values.cargo,p_quantity:Number(values.quantity),p_unit:values.unit,p_pickup:values.pickup,p_delivery:values.delivery,p_price_vor:Number(values.price)});if(error)throw error;form.reset();alert(lang==="ar"?"تم نشر طلب النقل وحجز الأجرة.":lang==="fr"?"Demande publiée et paiement bloqué.":"Transport request published and payment reserved.");await loadLiveTransportContracts();if(typeof refreshWalletBalances==="function")await refreshWalletBalances(currentAuthUser)}
+   catch(error){alert((lang==="ar"?"تعذر نشر طلب النقل: ":lang==="fr"?"Impossible de publier la demande : ":"Could not publish transport request: ")+(error.message||""))}
+   finally{button.disabled=false}
+  });
+ }
+ bindMarketplaceForms();
+ bindTransportRequestForm();
+ document.querySelectorAll("#dashboard [data-view='market']").forEach(b=>b.addEventListener("click",()=>loadLiveMarketplace()));
+ document.querySelectorAll("#dashboard [data-view='contracts']").forEach(b=>b.addEventListener("click",()=>loadLiveTransportContracts()));
+ document.querySelectorAll("#dashboard [data-market-tab]").forEach(b=>b.addEventListener("click",()=>setTimeout(loadLiveMarketplace,0)));
  document.querySelectorAll("#dashboard [data-market-tab]").forEach(b=>b.addEventListener("click",()=>{const t=b.dataset.marketTab;["sell","buy","rent"].forEach(k=>{const el=$("market"+k.charAt(0).toUpperCase()+k.slice(1)+"Panel");if(el)el.hidden=k!==t})}));
 
  // Close controls return users to the main overview.
@@ -1369,6 +1531,8 @@ const opsLabels={
  renderLiveJobListings();
  loadProjects();
  renderOperations();
+ loadLiveMarketplace();
+ loadLiveTransportContracts();
  $("operationProjectSelect").addEventListener("change",()=>refreshProductionPanel().catch(e=>console.error(e)));
 })();
 </script>
