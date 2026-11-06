@@ -266,8 +266,8 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 }
 
 #dashboard .dproject-card{overflow:hidden;border:1px solid #f6d88955;border-radius:14px;background:linear-gradient(145deg,#202225f2,#090a0c);box-shadow:0 14px 34px #0008,inset 0 1px #ffffff1c}
-#dashboard .dproject-art{height:auto;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative;background-color:#111315;background-repeat:no-repeat;background-size:400% auto;border-bottom:1px solid #f6d88930}
-#dashboard .dproject-art strong{font-size:48px;filter:drop-shadow(0 5px 12px #000)}
+#dashboard .dproject-art{height:auto;aspect-ratio:16/9;display:block;position:relative;overflow:hidden;background:#111315;border-bottom:1px solid #f6d88930} #dashboard .dproject-art img{display:block;width:100%;height:100%;object-fit:cover}
+
 #dashboard .dproject-art small{position:absolute;bottom:9px;right:11px;color:#dfc987;font-size:8px;letter-spacing:1.2px}
 #dashboard .dproject-info{padding:13px}
 #dashboard .dproject-info h3{margin:0 0 10px;color:#ffe3a0;font:18px Georgia}
@@ -1030,13 +1030,7 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
    const cap=p.storage_capacity?number(p.storage_capacity.quantity)+" "+unit(p.storage_capacity.unit):"";
    const payload=p.total_payload_per_trip?number(p.total_payload_per_trip.quantity)+" "+unit(p.total_payload_per_trip.unit):"";
    const fleet=p.fleet?number(p.fleet.vehicles)+" "+(p.fleet.type==="truck"?(lang==="ar"?"شاحنة":lang==="fr"?"camions":"trucks"):p.fleet.type==="cargo_ship"?(lang==="ar"?"سفينة":lang==="fr"?"navires":"ships"):(lang==="ar"?"طائرة شحن":lang==="fr"?"avions cargo":"cargo aircraft")):"";
-   card.innerHTML='<div class="dproject-art" aria-label="'+title+'"><strong hidden>'+icons[p.id]+'</strong></div><div class="dproject-info"><h3></h3><div class="dproject-stats"></div><div class="dproject-detail"></div><div class="dproject-image-note">'+L[lang].shift+'</div></div>';
-   const art=card.querySelector(".dproject-art");
-   const imageTiles={quarry:[0,0],forest:[1,0],mine:[2,0],electricity:[3,0],water:[0,1],oil:[1,1],recycling:[2,1],city_storage:[3,1],road_transport:[0,2],sea_transport:[1,2],air_transport:[2,2],maintenance:[3,2]};
-   const tile=imageTiles[p.id]||[0,0];
-   art.style.backgroundImage='url("assets/project-gallery.webp")';
-   art.style.backgroundSize='400% auto';
-   art.style.backgroundPosition=(tile[0]*100/3)+'% '+(tile[1]*50)+'%';
+   card.innerHTML='<div class="dproject-art"><img src="'+(p.image||("assets/projects/"+p.id+".svg"))+'" alt="'+title+'" loading="lazy"></div><div class="dproject-info"><h3></h3><div class="dproject-stats"></div><div class="dproject-detail"></div></div>';
    card.querySelector("h3").textContent=String(p.number).padStart(2,"0")+" · "+title;
    const sg=card.querySelector(".dproject-stats");
    stats.forEach(([k,v])=>{const e=document.createElement("span"),b=document.createElement("b");b.textContent=k;e.append(b,document.createTextNode(v));sg.appendChild(e)});
