@@ -735,11 +735,18 @@ function enterAuthenticatedDashboard(user){
  dashboard.classList.add('active');
  const member=dashboard.querySelector('.dmember');
  if(member){member.textContent=user.email||'VORTERRA MEMBER';}
+ const balance=dashboard.querySelector('.dbalance b');
+ if(balance){balance.textContent='Loading…';balance.dataset.walletState='loading';balance.title='Loading wallet balance';}
  vortERRAAuth.from('wallets').select('total_balance,available_balance,reserved_balance').eq('user_id',user.id).maybeSingle().then(({data,error})=>{
-  if(error){console.warn('Wallet read:',error);return;}
-  if(!data)return;
-  const balance=dashboard.querySelector('.dbalance b');
-  if(balance)balance.textContent=Number(data.available_balance).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' VOR';
+  if(!balance)return;
+  if(error){console.warn('Wallet read:',error);balance.textContent='Unavailable';balance.dataset.walletState='error';balance.title='Wallet balance could not be loaded. Please refresh and try again.';return;}
+  if(!data){balance.textContent='Not created';balance.dataset.walletState='missing';balance.title='No wallet record was found for this account.';return;}
+  balance.textContent=Number(data.available_balance).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' VOR';
+  balance.dataset.walletState='loaded';
+  balance.title='Available VOR balance loaded from your VORTERRA wallet';
+ }).catch(error=>{
+  console.warn('Wallet request failed:',error);
+  if(balance){balance.textContent='Unavailable';balance.dataset.walletState='error';balance.title='Wallet balance could not be loaded. Please refresh and try again.';}
  });
 }
 registrationForm.addEventListener('submit',async event=>{
