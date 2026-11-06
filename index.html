@@ -1527,7 +1527,7 @@ const opsLabels={
       const rpc=own?"cancel_market_listing":kind==="sale"?"buy_market_sale_listing":"rent_market_project";
       const args=own?{p_listing_id:item.id}:{p_listing_id:item.id};
       const {data:rpcData,error}=await vortERRAAuth.rpc(rpc,args);if(error)throw error;
-      alert(own?t.cancelled:rpcData?.payment_deferred_until_consumption?(langNow==="ar"?"تم تسليم الكهرباء/المياه إلى موزع مدينتك، وتتم التسوية بعد الاستهلاك.":langNow==="fr"?"Électricité/eau livrée au distributeur de votre ville; règlement après consommation.":"Utility supply delivered to your city distributor; payment is settled after consumption."):kind==="sale"?t.bought:t.rented);await loadLiveMarketplace();
+      alert(own?t.cancelled:rpcData?.payment_deferred_until_consumption?(langNow==="ar"?"تم تسليم الكهرباء/المياه إلى موزع مدينتك، ولم يُخصم المبلغ بعد.":langNow==="fr"?"Électricité/eau livrée au distributeur de votre ville; aucun paiement n’a encore été prélevé.":"Utility supply delivered to your city distributor; no payment has been deducted yet."):kind==="sale"?t.bought:t.rented);await loadLiveMarketplace();
       if(!own&&kind==="rent"){await loadActualOwnedProjects();renderOperations()}
       if(typeof refreshWalletBalances==="function")await refreshWalletBalances(user);
      }catch(error){alert(t.failed+(error.message||""));button.disabled=false;button.textContent=own?t.cancel:(kind==="sale"?t.buy:t.rent)}
@@ -1539,7 +1539,7 @@ const opsLabels={
     if(item.listing_type==="rent")addCard(rentList,item,"rent");
    });
    [[saleMine,"my sale listings"],[saleOthers,"sales"],[rentList,"rental offers"]].forEach(([el,label])=>{if(el&&!el.children.length){const empty=document.createElement("div");empty.className="dempty";empty.textContent=t.empty;el.appendChild(empty)}});
-   const note=$("marketLiveNote");if(note)note.textContent=langNow==="ar"?"الكهرباء والمياه تُعرضان من مخزون المحطة وتُسلّمان إلى موزع مدينة المشتري؛ التسوية بعد الاستهلاك. بقية المنتجات من المستودع العام.":langNow==="fr"?"L'électricité et l'eau proviennent du stock de la station et sont livrées au distributeur de la ville de l'acheteur; règlement après consommation. Les autres produits viennent de l'entrepôt.":"Electricity and water are listed from station stock and delivered to the buyer's city distributor; settlement follows consumption. Other goods come from the general warehouse.";
+   const note=$("marketLiveNote");if(note)note.textContent=langNow==="ar"?"الكهرباء والمياه تُعرضان من مخزون المحطة وتُسلّمان إلى موزع مدينة المشتري؛ تُسجل التسوية بعد قياس الاستهلاك الفعلي. بقية المنتجات من المستودع العام.":langNow==="fr"?"L'électricité et l'eau proviennent du stock de la station et sont livrées au distributeur de la ville de l'acheteur; règlement après consommation. Les autres produits viennent de l'entrepôt.":"Electricity and water are listed from station stock and delivered to the buyer's city distributor; settlement is deferred until actual consumption is measured. Other goods come from the general warehouse.";
   }catch(error){console.error("Marketplace:",error);const note=$("marketLiveNote");if(note)note.textContent=(langNow==="ar"?"تعذر تحميل السوق: ":langNow==="fr"?"Impossible de charger le marché : ":"Could not load marketplace: ")+(error.message||"")}
  }
  function bindMarketplaceForms(){
