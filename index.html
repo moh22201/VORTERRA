@@ -1116,6 +1116,7 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
    const fleet=p.fleet?number(p.fleet.vehicles)+" "+(p.fleet.type==="truck"?(lang==="ar"?"شاحنة":lang==="fr"?"camions":"trucks"):p.fleet.type==="cargo_ship"?(lang==="ar"?"سفينة":lang==="fr"?"navires":"ships"):(lang==="ar"?"طائرة شحن":lang==="fr"?"avions cargo":"cargo aircraft")):"";
    card.innerHTML='<div class="dproject-art"><img src="'+(p.image||("assets/projects/"+p.id+".svg"))+'" alt="'+title+'" loading="lazy"></div><div class="dproject-info"><h3></h3><div class="dproject-stats"></div><div class="dproject-detail"></div></div>';
    const projectImage=card.querySelector(".dproject-art img");
+   projectImage.src=p.image?`${p.image}?v=20261106`:("assets/projects/"+p.id+".svg?v=20261106");
    projectImage.addEventListener("error",()=>{const fallback=document.createElement("div");fallback.className="dproject-art-fallback";fallback.textContent=lang==="ar"?"صورة المشروع غير متاحة":lang==="fr"?"Image du projet indisponible":"Project image unavailable";projectImage.replaceWith(fallback)},{once:true});
    card.querySelector("h3").textContent=String(p.number).padStart(2,"0")+" · "+title;
    const sg=card.querySelector(".dproject-stats");
@@ -1289,7 +1290,7 @@ const opsLabels={
  };
 
  async function loadProjects(){
-  try{const r=await fetch("data/projects.json",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const d=await r.json();if(!Array.isArray(d.projects)||d.projects.length!==12)throw Error("Invalid project catalogue");projects=d.projects.sort((a,b)=>a.number-b.number);renderProjects();await loadActualOwnedProjects();renderOperations();await loadLiveMarketplace();await loadLiveTransportContracts()}
+  try{const r=await fetch("data/projects.json?v=20261106",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const d=await r.json();if(!Array.isArray(d.projects)||d.projects.length!==12)throw Error("Invalid project catalogue");projects=d.projects.sort((a,b)=>a.number-b.number);renderProjects();await loadActualOwnedProjects();renderOperations();await loadLiveMarketplace();await loadLiveTransportContracts()}
   catch(e){console.error("VORTERRA projects:",e);const g=$("projectGrid");if(g)g.innerHTML='<div class="dproject-empty">Could not load the approved projects file. The data remains saved in GitHub.</div>'}
  }
 
