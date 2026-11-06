@@ -564,7 +564,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
    <label><span id="marketSaleItemLabel">اختر منتجاً من مخزونك</span><select name="item_key" id="marketSaleItem" required><option value="">لا توجد منتجات متاحة</option></select></label>
    <label><span data-i18n="quantity">الكمية</span><input name="quantity" type="number" min="0.01" step="0.01" required></label>
    <label><span data-i18n="unitPrice">السعر لكل وحدة (VOR)</span><input name="price" type="number" min="0.001" step="0.001" required></label>
-    <p id="utilityPriceLimitNote" class="dmuted">سقف الكهرباء: 0.05 VOR/kWh · سقف الماء: 0.09 VOR/m³</p>
+    <p id="utilityPriceLimitNote" class="dmuted">سقف الكهرباء: 0.022 VOR/kWh · سقف الماء: 0.049 VOR/m³</p>
    <button class="dprimary" type="submit" data-i18n="publishListing">نشر عرض البيع</button>
   </form><div id="mySaleListings" class="dlisting-list"></div></section>
   <section class="dsubpanel" id="marketBuyPanel" hidden><h3 data-i18n="buyTab">شراء المنتجات</h3><p class="dmuted" data-i18n="buyIntro">العروض المنشورة من اللاعبين الآخرين تظهر هنا.</p><div id="saleListings" class="dlisting-list"></div></section>
@@ -1550,10 +1550,10 @@ const opsLabels={
    const itemSelect=$("marketSaleItem"),priceInput=sell.elements.price,capNote=$("utilityPriceLimitNote");
    const updateUtilityPriceCap=()=>{
     const selected=String(itemSelect?.value||"");
-    const cap=selected.startsWith("electricity::")?0.05:selected.startsWith("treated_water::")?0.09:null;
+    const cap=selected.startsWith("electricity::")?0.022:selected.startsWith("treated_water::")?0.049:null;
     if(cap===null){priceInput.removeAttribute("max");priceInput.min="0.01";priceInput.step="0.01";}
     else{priceInput.max=String(cap);priceInput.min="0.001";priceInput.step="0.001";}
-    if(capNote)capNote.textContent=lang==="ar"?"سقف الكهرباء: 0.05 VOR لكل kWh · سقف الماء: 0.09 VOR لكل m³":lang==="fr"?"Plafond électricité : 0,05 VOR/kWh · plafond eau : 0,09 VOR/m³":"Electricity cap: 0.05 VOR/kWh · Water cap: 0.09 VOR/m³";
+    if(capNote)capNote.textContent=lang==="ar"?"سقف الكهرباء: 0.022 VOR لكل kWh · سقف الماء: 0.049 VOR لكل m³":lang==="fr"?"Plafond électricité : 0,022 VOR/kWh · plafond eau : 0,049 VOR/m³":"Electricity cap: 0.022 VOR/kWh · Water cap: 0.049 VOR/m³";
    };
    itemSelect?.addEventListener("change",updateUtilityPriceCap);
    updateUtilityPriceCap();
