@@ -856,6 +856,7 @@ function enterAuthenticatedDashboard(user){
  const balance=dashboard.querySelector('.dbalance b');if(balance){balance.textContent='Loading…';balance.dataset.walletState='loading';balance.title='Loading wallet balance';}
  loadPlayerIdentity(user).catch(error=>console.warn('Player identity failed:',error));
  refreshWalletBalances(user).catch(error=>console.warn('Wallet refresh failed:',error));
+ if(typeof window.refreshVorterraOperations==='function')window.refreshVorterraOperations().catch(error=>console.warn('Player assets failed:',error));
 }
 registrationForm.addEventListener('submit',async event=>{
  event.preventDefault();
