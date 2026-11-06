@@ -16,7 +16,7 @@
   function styles() {
     if (document.getElementById("ownerDashboardStyles")) return;
     const s = document.createElement("style"); s.id = "ownerDashboardStyles";
-    s.textContent = "#dashboard .owner-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin:18px 0}#dashboard .owner-stat{padding:16px;border:1px solid #d9b36e44;border-radius:12px;background:linear-gradient(145deg,#211b12,#090a0b)}#dashboard .owner-stat small{display:block;color:#cbb88e;font-size:10px}#dashboard .owner-stat strong{display:block;color:#ffe3a0;font-size:22px;margin-top:8px;overflow-wrap:anywhere}#dashboard .owner-table-wrap{overflow:auto;border:1px solid #d9b36e33;border-radius:12px}#dashboard .owner-table{width:100%;border-collapse:collapse;min-width:620px;font-size:11px}#dashboard .owner-table th,#dashboard .owner-table td{padding:11px;text-align:start;border-bottom:1px solid #ffffff12}#dashboard .owner-table th{color:#e8cb8f;background:#ffffff08}#dashboard .owner-table td{color:#ddd2bc}#dashboard .owner-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}#dashboard .owner-refresh{padding:10px 15px;border:1px solid #e4c17c;border-radius:8px;background:#8b6428;color:#fff1d0;font-weight:700}#dashboard .loan-live{padding:15px;border:1px solid #d9b36e55;border-radius:12px;background:linear-gradient(145deg,#201b13,#090a0b);display:grid;gap:12px;margin-bottom:12px}#dashboard .loan-live-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}#dashboard .loan-live-grid div{padding:10px;background:#ffffff08;border-radius:8px}#dashboard .loan-live small{display:block;color:#c6b38b;font-size:10px;margin-bottom:5px}#dashboard .loan-live strong{color:#ffe3a0;font-size:16px;overflow-wrap:anywhere}#dashboard .loan-live p{color:#c9c0ad;font-size:11px;line-height:1.8;margin:0}#dashboard .loan-status{color:#ffcc8c;font-weight:800}#dashboard .loan-repay-form{display:grid;gap:9px;padding-top:12px;border-top:1px solid #d9b36e33}#dashboard .loan-repay-form label{font-size:11px;color:#e5ca95}#dashboard .loan-repay-form input{width:100%;box-sizing:border-box;padding:11px;border:1px solid #d9b36e66;border-radius:8px;background:#090a0b;color:#fff;font:inherit;direction:ltr}#dashboard .loan-repay-form button:disabled{opacity:.45;cursor:not-allowed}#dashboard .owner-review-btn{margin:2px;padding:6px 8px;border:1px solid #d9b36e66;border-radius:6px;background:#241a0e;color:#f2dca8;font-size:10px;cursor:pointer}#dashboard .owner-review-btn:disabled{opacity:.5}";
+    s.textContent = "#dashboard .owner-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin:18px 0}#dashboard .owner-stat{padding:16px;border:1px solid #d9b36e44;border-radius:12px;background:linear-gradient(145deg,#211b12,#090a0b)}#dashboard .owner-stat small{display:block;color:#cbb88e;font-size:10px}#dashboard .owner-stat strong{display:block;color:#ffe3a0;font-size:22px;margin-top:8px;overflow-wrap:anywhere}#dashboard .owner-table-wrap{overflow:auto;border:1px solid #d9b36e33;border-radius:12px}#dashboard .owner-table{width:100%;border-collapse:collapse;min-width:620px;font-size:11px}#dashboard .owner-table th,#dashboard .owner-table td{padding:11px;text-align:start;border-bottom:1px solid #ffffff12}#dashboard .owner-table th{color:#e8cb8f;background:#ffffff08}#dashboard .owner-table td{color:#ddd2bc}#dashboard .owner-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}#dashboard .owner-refresh{padding:10px 15px;border:1px solid #e4c17c;border-radius:8px;background:#8b6428;color:#fff1d0;font-weight:700}#dashboard .wallet-activity-list{display:grid;gap:8px}#dashboard .wallet-activity-row{padding:11px 0;border-bottom:1px solid #d9b36e22}#dashboard .wallet-activity-row em{white-space:nowrap;font-style:normal;font-weight:700;color:#f3d99e}#dashboard .loan-live{padding:15px;border:1px solid #d9b36e55;border-radius:12px;background:linear-gradient(145deg,#201b13,#090a0b);display:grid;gap:12px;margin-bottom:12px}#dashboard .loan-live-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}#dashboard .loan-live-grid div{padding:10px;background:#ffffff08;border-radius:8px}#dashboard .loan-live small{display:block;color:#c6b38b;font-size:10px;margin-bottom:5px}#dashboard .loan-live strong{color:#ffe3a0;font-size:16px;overflow-wrap:anywhere}#dashboard .loan-live p{color:#c9c0ad;font-size:11px;line-height:1.8;margin:0}#dashboard .loan-status{color:#ffcc8c;font-weight:800}#dashboard .loan-repay-form{display:grid;gap:9px;padding-top:12px;border-top:1px solid #d9b36e33}#dashboard .loan-repay-form label{font-size:11px;color:#e5ca95}#dashboard .loan-repay-form input{width:100%;box-sizing:border-box;padding:11px;border:1px solid #d9b36e66;border-radius:8px;background:#090a0b;color:#fff;font:inherit;direction:ltr}#dashboard .loan-repay-form button:disabled{opacity:.45;cursor:not-allowed}#dashboard .owner-review-btn{margin:2px;padding:6px 8px;border:1px solid #d9b36e66;border-radius:6px;background:#241a0e;color:#f2dca8;font-size:10px;cursor:pointer}#dashboard .owner-review-btn:disabled{opacity:.5}";
     document.head.appendChild(s);
   }
 
@@ -88,6 +88,7 @@
             const data=Array.isArray(result.data)?result.data[0]:result.data;
             message.textContent=x.repaySuccess+fmt(data?.paid_vor??payment)+" VOR · "+x.repayRemaining+fmt(data?.remaining_vor??0)+" VOR";
             await loadLoan();
+            await loadWalletActivity();
             const auth=await client.auth.getUser();
             if(auth.data?.user){
               if(typeof refreshWalletBalances==="function")await refreshWalletBalances(auth.data.user);
@@ -321,6 +322,40 @@
     bind("marketSellForm","sale");bind("marketRentForm","rent");
     document.querySelectorAll("#dashboard [data-market-tab]").forEach(b=>{if(b.dataset.liveTabBound)return;b.dataset.liveTabBound="1";b.addEventListener("click",()=>renderLiveMarket());});
   }
+  async function loadWalletActivity(){
+    const target=document.getElementById("walletActivityList");if(!target)return;
+    const labels={
+      en:{empty:"No wallet transactions yet.",failed:"Could not load wallet activity: ",completed:"Completed",pending:"Pending",rejected:"Rejected",cancelled:"Cancelled"},
+      fr:{empty:"Aucune transaction pour le moment.",failed:"Impossible de charger l’activité : ",completed:"Terminée",pending:"En attente",rejected:"Refusée",cancelled:"Annulée"},
+      ar:{empty:"لا توجد معاملات مالية مسجلة بعد.",failed:"تعذر تحميل سجل المحفظة: ",completed:"مكتملة",pending:"قيد الانتظار",rejected:"مرفوضة",cancelled:"ملغاة"}
+    }[language()];
+    target.innerHTML="";
+    try{
+      const {data,error}=await client.from("wallet_transactions")
+        .select("id,transaction_type,amount,currency,status,description,created_at")
+        .order("created_at",{ascending:false}).limit(50);
+      if(error)throw error;
+      if(!data?.length){const empty=document.createElement("div");empty.className="wallet-empty";empty.textContent=labels.empty;target.appendChild(empty);return;}
+      const debitTypes=new Set(["project_purchase","project_monthly_rent","conversion_out","loan_repayment","market_purchase","withdrawal"]);
+      data.forEach(item=>{
+        const row=document.createElement("article");row.className="dactivity wallet-activity-row";
+        const icon=document.createElement("i");icon.textContent=debitTypes.has(item.transaction_type)?"↘":"↗";
+        const info=document.createElement("div");
+        const title=document.createElement("b");title.textContent=item.description||String(item.transaction_type||"").replaceAll("_"," ");
+        const meta=document.createElement("small");
+        const when=new Date(item.created_at).toLocaleString(language()==="ar"?"ar-DZ":language()==="fr"?"fr-FR":"en-GB");
+        const state=labels[item.status]||item.status||"";
+        meta.textContent=when+" · "+state;
+        const amount=document.createElement("em");
+        const sign=debitTypes.has(item.transaction_type)?"−":"+";
+        amount.textContent=sign+fmt(item.amount)+" "+item.currency;
+        info.append(title,meta);row.append(icon,info,amount);target.appendChild(row);
+      });
+    }catch(error){
+      const message=document.createElement("div");message.className="wallet-empty";message.textContent=labels.failed+(error.message||"");target.appendChild(message);
+    }
+  }
+
   async function loadPlayerOverview(user){
     const ids=["playerOverviewBalance","playerOverviewAssets","playerOverviewContracts","playerOverviewWorkers"];
     try{
@@ -359,7 +394,7 @@
   }
 
   async function init(user) {
-    if(!user)return;styles();localizeWithdrawalForm();bindWithdrawalForm();bindLiveMarketForms();await Promise.all([loadLoan(),loadPlayerWithdrawalRequests(),loadActualProjectData(user),loadPlayerOverview(user),renderLiveMarket()]);
+    if(!user)return;styles();localizeWithdrawalForm();bindWithdrawalForm();bindLiveMarketForms();await Promise.all([loadLoan(),loadPlayerWithdrawalRequests(),loadActualProjectData(user),loadPlayerOverview(user),loadWalletActivity(),renderLiveMarket()]);
     if(typeof window.refreshVorterraOperations==="function")await window.refreshVorterraOperations();
     const r=await client.rpc("get_owner_dashboard_summary");
     if(!r.error){addOwnerPanel();await loadOwner()}
