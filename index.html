@@ -836,7 +836,9 @@ registrationForm.addEventListener('submit',async event=>{
  const firstName=document.getElementById('iN')?.value.trim()||'';
  const lastName=document.getElementById('iL')?.value.trim()||'';
  const country=document.getElementById('iC')?.value||'';
- const city=document.getElementById('iY')?.value||'';
+ const citySelect=document.getElementById('iY');
+ const manualCity=document.getElementById('iYManual');
+ const city=(!citySelect.hidden&&!citySelect.disabled?citySelect.value:manualCity?.value.trim())||'';
  const submit=registrationForm.querySelector('button[type="submit"]');
  submit.disabled=true;showAuthMessage('Creating your secure VORTERRA account…');
  try{
