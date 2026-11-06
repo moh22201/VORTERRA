@@ -117,14 +117,12 @@
   }
   async function loadActualProjectData(user){
     try{
-      const [catalog,citiesResult,assetsResult]=await Promise.all([
+      const [catalog,assetsResult]=await Promise.all([
         getProjectCatalog(),
-        client.from("player_cities").select("id,city_name,terrain_type,created_at").eq("owner_id",user.id).order("created_at",{ascending:true}),
         client.from("player_projects").select("id,city_id,project_key,acquisition_type,acquired_at,expires_at,condition_percent").eq("owner_id",user.id).order("acquired_at",{ascending:false})
       ]);
-      if(citiesResult.error)throw citiesResult.error;
       if(assetsResult.error)throw assetsResult.error;
-      const cities=citiesResult.data||[],assets=assetsResult.data||[];
+      const assets=assetsResult.data||[];
       try{
         const saved=JSON.parse(localStorage.getItem("vorterra-demo-v1")||"{}");
         if(saved.owned?.length){saved.owned=[];localStorage.setItem("vorterra-demo-v1",JSON.stringify(saved));}
@@ -134,7 +132,6 @@
         grid.innerHTML="";
         assets.forEach(asset=>{
           const p=catalog.find(x=>x.id===asset.project_key);if(!p)return;
-          const city=cities.find(x=>x.id===asset.city_id);
           const card=document.createElement("article");card.className="downed-card";
           const h=document.createElement("h3");h.textContent=p.name?.[language()]||p.name?.en||p.id;
           const detail=document.createElement("p");
@@ -142,7 +139,7 @@
           const price=isBuy?p.purchase_price:p.monthly_rent;
           detail.textContent=(isBuy?(language()==="ar"?"شراء":"Purchase"):(language()==="ar"?"إيجار شهري":"Monthly rent"))+" · "+fmt(price)+" VOR";
           const meta=document.createElement("small");
-          meta.textContent=(city?.city_name||"")+(asset.expires_at&&!isBuy?" · "+(language()==="ar"?"ينتهي ":"Expires ")+date(asset.expires_at):"");
+          meta.textContent=(language()==="ar"?"ضمن أصول حسابك":language()==="fr"?"Dans vos actifs":"In your account assets")+(asset.expires_at&&!isBuy?" · "+(language()==="ar"?"ينتهي ":"Expires ")+date(asset.expires_at):"");
           card.append(h,detail,meta);grid.appendChild(card);
         });
       }
@@ -157,7 +154,7 @@
         if(active&&actions){
           actions.innerHTML="";
           const label=document.createElement("button");label.type="button";label.disabled=true;
-          label.textContent=language()==="ar"?"موجود في مدينتك":language()==="fr"?"Déjà acquis":"Already acquired";
+          label.textContent=language()==="ar"?"تم اقتناؤه":language()==="fr"?"Déjà acquis":"Already acquired";
           actions.appendChild(label);
         }
       });
@@ -182,25 +179,14 @@
       if(!project)throw new Error("Project not found");
       const actionIndex=[...card.querySelectorAll(".dproject-actions button")].indexOf(button);
       const mode=actionIndex===0?"purchase":"monthly_rent";
-      const citiesResult=await client.from("player_cities").select("id,city_name").eq("owner_id",user.id).order("created_at",{ascending:true});
-      if(citiesResult.error)throw citiesResult.error;
-      const cities=citiesResult.data||[];
-      if(!cities.length)throw new Error(language()==="ar"?"لا توجد مدينة مرتبطة بحسابك. يجب إنشاء المدينة أولاً.":"No city is linked to your account yet. Create your city first.");
-      let city=cities[0];
-      if(cities.length>1){
-        const promptText=cities.map((c,i)=>(i+1)+". "+c.city_name).join("\n");
-        const choice=Number(window.prompt((language()==="ar"?"اختر رقم المدينة:":"Choose city number:")+"\n"+promptText,"1"));
-        if(!Number.isInteger(choice)||choice<1||choice>cities.length)throw new Error(language()==="ar"?"تم إلغاء العملية.":"Operation cancelled.");
-        city=cities[choice-1];
-      }
       const price=mode==="purchase"?project.purchase_price:project.monthly_rent;
       const question=language()==="ar"?(mode==="purchase"?"تأكيد شراء "+project.name.ar+" مقابل "+price+" VOR؟":"تأكيد إيجار "+project.name.ar+" شهرياً مقابل "+price+" VOR؟"):(mode==="purchase"?"Confirm purchase for "+price+" VOR?":"Confirm first month rent for "+price+" VOR?");
       if(!window.confirm(question))return;
       const result=await client.rpc("acquire_vorterra_project",{
-        p_project_key:project.id,p_city_id:city.id,p_acquisition_type:mode
+        p_project_key:project.id,p_city_id:null,p_acquisition_type:mode
       });
       if(result.error)throw result.error;
-      const wallet=await client.from("wallets").select("available_balance").eq("user_id",user.id).maybeSingle();
+      const wallet=await client.from("wallets").select("available_balance").eq("user_id",user.id).eq("currency","VOR").maybeSingle();
       if(!wallet.error&&wallet.data){
         const balance=document.querySelector("#dashboard .dbalance b");
         if(balance)balance.textContent=fmt(wallet.data.available_balance)+" VOR";
