@@ -561,7 +561,11 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
    
    <small class="dmuted" id="operationMessage">Acquire a project from the library first.</small>
   </div></section>
-  <section class="dpanel"><div class="dpanelhead"><b data-i18n="productionStatus">Production status</b><small data-i18n="notActive">NOT ACTIVE</small></div><div class="dpanelbody"><div class="dplaceholder"><i>◷</i><h3 data-i18n="productionUnavailableTitle">Production is not active yet</h3><p data-i18n="productionUnavailableText">Worker assignments, 8-hour cycles, wage settlement and production records must be connected before this feature can be enabled.</p></div></div></section>
+  <section class="dpanel"><div class="dpanelhead"><b data-i18n="productionStatus">Production status</b><small id="productionStateTag">IDLE</small></div><div class="dpanelbody">
+   <div id="productionCycleStatus" class="dmuted">Select a project to view its production status.</div>
+   <div class="dproduction-actions"><button type="button" id="startProductionButton" class="dprimary" disabled>Start 8-hour shift</button><button type="button" id="completeProductionButton" class="dprimary" disabled>Complete shift</button><button type="button" id="cancelProductionButton" class="dsecondary" disabled>Cancel shift</button></div>
+   <div class="dproduction-inventory"><b id="productionInventoryTitle">Stored production</b><div id="productionInventory" class="dlisting-list"><div class="dempty">No stored products yet.</div></div></div>
+  </div></section>
   
  </div>
 </section>
@@ -1091,9 +1095,9 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
  }
 
 const opsLabels={
- en:{choose:"Choose an acquired project",none:"No acquired projects",ownership:"Project ownership",workers:"Worker assignments",ready:"Verified",notConnected:"Not connected",noProject:"Acquire a project from the library first.",productionUnavailable:"Worker assignments and production cycles are not connected to the live database yet. Production is unavailable."},
- fr:{choose:"Choisir un projet acquis",none:"Aucun projet acquis",ownership:"Propriété du projet",workers:"Affectation des travailleurs",ready:"Vérifié",notConnected:"Non connecté",noProject:"Acquérez d'abord un projet dans la bibliothèque.",productionUnavailable:"Les affectations des travailleurs et les cycles de production ne sont pas encore reliés à la base de données. La production n'est pas disponible."},
- ar:{choose:"اختر مشروعاً تم اقتناؤه",none:"لا توجد مشاريع مقتناة",ownership:"ملكية المشروع",workers:"تعيين العمال",ready:"متحقق",notConnected:"غير مربوط بعد",noProject:"اقتَنِ مشروعاً من المكتبة أولاً.",productionUnavailable:"نظام تعيين العمال ودورات الإنتاج غير مربوط بقاعدة البيانات بعد. التشغيل غير متاح حالياً."}
+ en:{choose:"Choose an acquired project",none:"No acquired projects",ownership:"Project ownership",workers:"Active workers",ready:"Verified",notConnected:"Not connected",noProject:"Acquire a project from the library first.",needWorkers:"More active employment contracts are required before production.",readyProduction:"Project and worker requirements are met. You can start an 8-hour shift.",running:"Production shift is running",finished:"Shift completed",start:"Start 8-hour shift",complete:"Complete shift",cancel:"Cancel shift",inventory:"Stored production",emptyInventory:"No stored products yet.",waitUntil:"Shift completes at ",working:"Working…",startOk:"Production shift started. Wages and operating costs are reserved.",completeOk:"Shift completed. Products were added to inventory and wages were settled.",cancelOk:"Shift cancelled. Reserved funds were returned.",error:"Production action failed: ",required:"Required workers: ",assigned:"Active workers: ",wage:"Wages: ",cost:"Operating costs: ",reserved:"Reserved: ",noOutput:"This project has no production output."},
+ fr:{choose:"Choisir un projet acquis",none:"Aucun projet acquis",ownership:"Propriété du projet",workers:"Travailleurs actifs",ready:"Vérifié",notConnected:"Non connecté",noProject:"Acquérez d'abord un projet dans la bibliothèque.",needWorkers:"Des contrats de travail actifs supplémentaires sont nécessaires.",readyProduction:"Le projet et les effectifs sont prêts pour un poste de 8 heures.",running:"Poste de production en cours",finished:"Poste terminé",start:"Démarrer un poste de 8 heures",complete:"Terminer le poste",cancel:"Annuler le poste",inventory:"Production stockée",emptyInventory:"Aucun produit stocké.",waitUntil:"Fin du poste : ",working:"Traitement…",startOk:"Poste démarré. Salaires et coûts d'exploitation réservés.",completeOk:"Poste terminé. Produits stockés et salaires réglés.",cancelOk:"Poste annulé. Fonds réservés restitués.",error:"Échec de l'opération : ",required:"Travailleurs requis : ",assigned:"Travailleurs actifs : ",wage:"Salaires : ",cost:"Coûts d'exploitation : ",reserved:"Réservé : ",noOutput:"Ce projet ne produit aucun article."},
+ ar:{choose:"اختر مشروعاً تم اقتناؤه",none:"لا توجد مشاريع مقتناة",ownership:"ملكية المشروع",workers:"العمال النشطون",ready:"متحقق",notConnected:"غير مربوط",noProject:"اقتَنِ مشروعاً من المكتبة أولاً.",needWorkers:"يلزم توفير عقود عمل نشطة إضافية قبل التشغيل.",readyProduction:"المشروع وعدد العمال مستوفيان للشروط. يمكنك بدء وردية من 8 ساعات.",running:"وردية الإنتاج جارية",finished:"اكتملت الوردية",start:"بدء وردية 8 ساعات",complete:"إنهاء الوردية",cancel:"إلغاء الوردية",inventory:"الإنتاج المخزن",emptyInventory:"لا توجد منتجات مخزنة بعد.",waitUntil:"تنتهي الوردية في ",working:"جارٍ التنفيذ…",startOk:"بدأت الوردية. تم حجز الأجور وتكاليف التشغيل.",completeOk:"اكتملت الوردية. أضيف الإنتاج للمخزون وسُويت الأجور.",cancelOk:"أُلغيت الوردية وأُعيدت الأموال المحجوزة.",error:"فشل تنفيذ العملية: ",required:"العمال المطلوبون: ",assigned:"العمال النشطون: ",wage:"الأجور: ",cost:"تكاليف التشغيل: ",reserved:"المبلغ المحجوز: ",noOutput:"هذا المشروع لا يملك إنتاجاً محدداً."}
  };
  let actualOwnedProjects=[];
  async function loadActualOwnedProjects(){
@@ -1118,6 +1122,73 @@ const opsLabels={
    actualOwnedProjects=[];
   }
  }
+ async function refreshProductionPanel(){
+  const labels=opsLabels[lang]||opsLabels.en;
+  const projectId=$("operationProjectSelect")?.value;
+  const selected=actualOwnedProjects.find(x=>x.entry.id===projectId);
+  const status=$("productionCycleStatus"),tag=$("productionStateTag");
+  const start=$("startProductionButton"),complete=$("completeProductionButton"),cancel=$("cancelProductionButton");
+  const inventoryBox=$("productionInventory"),inventoryTitle=$("productionInventoryTitle");
+  if(!selected){
+   if(status)status.textContent=labels.noProject;
+   if(tag)tag.textContent="IDLE";
+   [start,complete,cancel].forEach(b=>{if(b)b.disabled=true});
+   if(inventoryBox)inventoryBox.innerHTML='<div class="dempty">'+labels.emptyInventory+'</div>';
+   return;
+  }
+  const auth=window.vortERRAAuth;
+  const {data:userData,error:userError}=await auth.auth.getUser();if(userError)throw userError;
+  const user=userData.user;if(!user)throw new Error("Authentication required");
+  const [{data:contracts,error:contractError},{data:cycles,error:cycleError},{data:stock,error:stockError}]=await Promise.all([
+   auth.from("player_employment_contracts").select("worker_id,wage_per_shift").eq("project_id",projectId).eq("employer_id",user.id).eq("status","active"),
+   auth.from("production_cycles").select("id,status,started_at,completes_at,wage_total_vor,operating_cost_vor,reserved_total_vor").eq("project_id",projectId).eq("owner_id",user.id).eq("status","running").order("started_at",{ascending:false}).limit(1),
+   auth.from("player_inventory").select("item_key,unit,quantity").eq("owner_id",user.id).order("item_key")
+  ]);
+  if(contractError)throw contractError;if(cycleError)throw cycleError;if(stockError)throw stockError;
+  const workers=new Set((contracts||[]).map(c=>c.worker_id)).size;
+  const required=Number(selected.project.workers||0);
+  const wages=(contracts||[]).reduce((sum,c)=>sum+Number(c.wage_per_shift||0),0);
+  const cycle=cycles?.[0]||null;
+  const money=n=>Number(n||0).toLocaleString(lang==="ar"?"ar-DZ":"en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" VOR";
+  const workerStatus=$("opWorkersStatus");
+  if(workerStatus){workerStatus.textContent=workers+" / "+required;workerStatus.dataset.state=workers>=required?"ok":"idle"}
+  if(inventoryTitle)inventoryTitle.textContent=labels.inventory;
+  if(inventoryBox){
+   inventoryBox.innerHTML="";
+   if(!stock?.length){inventoryBox.innerHTML='<div class="dempty">'+labels.emptyInventory+'</div>'}
+   else stock.forEach(row=>{const item=document.createElement("article");item.className="dlisting";const title=document.createElement("strong");title.textContent=row.item_key;const detail=document.createElement("small");detail.textContent=Number(row.quantity).toLocaleString()+" "+row.unit;item.append(title,detail);inventoryBox.appendChild(item)});
+  }
+  if(cycle){
+   const finish=new Date(cycle.completes_at);
+   const ready=Date.now()>=finish.getTime();
+   if(status)status.textContent=labels.running+" · "+labels.waitUntil+finish.toLocaleString()+" · "+labels.wage+money(cycle.wage_total_vor)+" · "+labels.cost+money(cycle.operating_cost_vor)+" · "+labels.reserved+money(cycle.reserved_total_vor);
+   if(tag)tag.textContent=ready?"READY TO SETTLE":"RUNNING";
+   if(start)start.disabled=true;if(complete)complete.disabled=!ready;if(cancel)cancel.disabled=false;
+  }else{
+   const ready=workers>=required&&required>0;
+   if(status)status.textContent=(ready?labels.readyProduction:labels.needWorkers)+" "+labels.required+required+" · "+labels.assigned+workers+" · "+labels.wage+money(wages);
+   if(tag)tag.textContent=ready?"READY":"WAITING";
+   if(start){start.disabled=!ready;start.textContent=labels.start}
+   if(complete)complete.disabled=true;if(cancel)cancel.disabled=true;
+  }
+  if(complete)complete.textContent=labels.complete;
+  if(cancel)cancel.textContent=labels.cancel;
+ }
+ function bindProductionActions(){
+  const run=async(button,rpc,args,success)=>{
+   if(!button||button.dataset.bound)return;button.dataset.bound="1";
+   button.addEventListener("click",async()=>{
+    const selected=actualOwnedProjects.find(x=>x.entry.id===$("operationProjectSelect")?.value);
+    if(!selected)return;
+    button.disabled=true;const labels=opsLabels[lang]||opsLabels.en;button.textContent=labels.working;
+    try{const {data,error}=await window.vortERRAAuth.rpc(rpc,args(selected));if(error)throw error;alert(labels[success]);await refreshProductionPanel()}
+    catch(error){alert(labels.error+(error.message||""));await refreshProductionPanel()}
+   });
+  };
+  run($("startProductionButton"),"start_project_production",p=>({p_project_id:p.entry.id}),"startOk");
+  run($("completeProductionButton"),"complete_project_production",p=>({p_cycle_id:window.currentProductionCycleId}),"completeOk");
+  run($("cancelProductionButton"),"cancel_project_production",p=>({p_cycle_id:window.currentProductionCycleId}),"cancelOk");
+ }
  function renderOperations(){
    const select=$("operationProjectSelect");if(!select)return;
    const labels=opsLabels[lang]||opsLabels.en;
@@ -1126,10 +1197,10 @@ const opsLabels={
    select.innerHTML="";
    const placeholder=document.createElement("option");placeholder.value="";
    placeholder.textContent=owned.length?labels.choose:labels.none;select.appendChild(placeholder);
-   owned.forEach(({project})=>{const option=document.createElement("option");option.value=project.id;option.textContent=project.name?.[lang]||project.name?.en||project.id;select.appendChild(option)});
-   const selected=owned.some(x=>x.project.id===previous)?previous:(owned[0]?.project.id||"");
+   owned.forEach(({entry,project})=>{const option=document.createElement("option");option.value=entry.id;option.textContent=project.name?.[lang]||project.name?.en||project.id;select.appendChild(option)});
+   const selected=owned.some(x=>x.entry.id===previous)?previous:(owned[0]?.entry.id||"");
    select.value=selected;
-   const project=owned.find(x=>x.project.id===selected)?.project||null;
+   const project=owned.find(x=>x.entry.id===selected)?.project||null;
    const set=(id,value,state)=>{const el=$(id);if(el){el.textContent=value;el.dataset.state=state}};
    $("operationSelectLabel").textContent=labels.choose;
    $("opAssetsLabel").textContent=labels.ownership;
@@ -1138,11 +1209,12 @@ const opsLabels={
     set("opAssetsStatus",labels.notConnected,"idle");
     set("opWorkersStatus",labels.notConnected,"idle");
     $("operationMessage").textContent=labels.noProject;
-    return;
+   }else{
+    set("opAssetsStatus",labels.ready,"ok");
+    $("operationMessage").textContent="";
    }
-   set("opAssetsStatus",labels.ready,"ok");
-   set("opWorkersStatus",labels.notConnected,"idle");
-   $("operationMessage").textContent=labels.productionUnavailable;
+   bindProductionActions();
+   refreshProductionPanel().catch(error=>{console.error("Production status:",error);if($("productionCycleStatus"))$("productionCycleStatus").textContent=error.message||"Could not load production state"});
   }
 
  window.refreshVorterraOperations=async function(){
@@ -1295,7 +1367,7 @@ const opsLabels={
  renderLiveJobListings();
  loadProjects();
  renderOperations();
- $("operationProjectSelect").addEventListener("change",()=>renderOperations());
+ $("operationProjectSelect").addEventListener("change",()=>refreshProductionPanel().catch(e=>console.error(e)));
 })();
 </script>
 <script src="deposit.js"></script>
