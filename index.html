@@ -500,6 +500,8 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 </aside><main class="dmain">
 <section class="dview active" data-panel="overview">
  <div class="dwelcome"><div><div class="deyebrow" data-i18n="memberCenter">MEMBER CONTROL CENTER</div><h1 data-i18n="welcome">Welcome to VORTERRA</h1><p data-i18n="welcomeText">Your business world at a glance.</p></div><div class="dcrumb">MEMBER PORTAL / OVERVIEW</div></div>
+ <section class="dpanel" id="playerIdentityCard" style="margin-bottom:18px"><div class="dpanelhead"><b>Player identity · بطاقة اللاعب</b><small id="playerMemberId">VOR · MEMBER</small></div><div class="dpanelbody" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px"><div><small class="dmuted">Name</small><b id="playerIdentityName">—</b></div><div><small class="dmuted">Country</small><b id="playerIdentityCountry">—</b></div><div><small class="dmuted">City</small><b id="playerIdentityCity">—</b></div><div><small class="dmuted">Account</small><b id="playerIdentityEmail">—</b></div></div></section>
+
  <div class="dstats">
   <article class="dstat"><small data-i18n="balance">ACCOUNT BALANCE</small><strong id="playerOverviewBalance">0.00 <small>VOR</small></strong><em data-i18n="available">Available balance</em><i>◈</i></article>
   <article class="dstat"><small data-i18n="ownedAssets">OWNED ASSETS</small><strong id="playerOverviewAssets">00</strong><em data-i18n="assetsInCity">Owned assets</em><i>◇</i></article>
@@ -524,9 +526,10 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 </section>
 
 <section class="dview" data-panel="city">
- <div class="dtoolbar"><div><h2 data-i18n="myCity">My City</h2><p data-i18n="cityIntro">Manage the projects and facilities you own or rent from this workspace.</p></div></div>
- <div id="ownedProjects" class="dasset-grid" aria-live="polite"></div><div id="cityEmpty" class="dplaceholder"><i>⌂</i><h3 data-i18n="cityEmptyTitle">Your city workspace</h3><p data-i18n="cityEmptyText">Purchase or rent a project from the library. Your active projects and ownership details will appear here.</p></div><div class="dnote" id="projectOwnershipNote"></div>
-</section>
+ <div class="dtoolbar"><div><h2 data-i18n="myCity">My City & Properties</h2><p>All projects you own or rent appear here, even before they are placed in a city.</p></div></div>
+ <section class="dpanel" id="citySetupPanel" style="margin-bottom:18px"><div class="dpanelhead"><b>City registration · تسجيل المدينة</b><small id="playerCityStatus">NO CITY CREATED</small></div><div class="dpanelbody"><p id="citySetupDescription" class="dmuted">Create your game city once. Your currently unassigned properties will then be linked to it.</p><form id="createPlayerCityForm" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end"><label style="flex:2;min-width:180px">City name<input id="newPlayerCityName" required maxlength="80" placeholder="Enter your city name" style="display:block;width:100%;margin-top:6px"></label><label style="flex:1;min-width:150px">Terrain<select id="newPlayerCityTerrain" required style="display:block;width:100%;margin-top:6px"><option value="inland">Inland</option><option value="coastal">Coastal</option><option value="desert">Desert</option></select></label><button class="dprimary" type="submit" id="createPlayerCityButton">Create city and assign properties</button></form><p id="createPlayerCityMessage" class="dmuted" aria-live="polite"></p></div></section>
+ <div id="ownedProjects" class="dasset-grid" aria-live="polite"></div><div id="cityEmpty" class="dplaceholder"><i>⌂</i><h3>No owned properties yet</h3><p>Purchase or rent projects from the asset library. Your ownership will appear here.</p></div><div class="dnote" id="projectOwnershipNote"></div>
+</section></section>
 
 <section class="dview" data-panel="operations">
  <div class="dtoolbar"><div><h2 data-i18n="operations">Operations & Production</h2><p data-i18n="operationsIntro">Production is connected. Start an 8-hour shift when the project has its required active workers.</p></div><span class="dtag" data-i18n="notActive">NOT ACTIVE</span></div>
@@ -776,6 +779,7 @@ async function refreshWalletBalances(user){
  }
  const fmt=value=>Number(value||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
  if(headerBalance){headerBalance.textContent=fmt(data.available_balance)+' VOR';headerBalance.dataset.walletState='loaded';headerBalance.title='Available VOR balance loaded from your VORTERRA wallet';}
+ const overviewBalance=document.getElementById('playerOverviewBalance');if(overviewBalance)overviewBalance.textContent=fmt(data.available_balance)+' VOR';
  const fields=[
   ['walletTotalBalance',data.total_balance,'VOR'],
   ['walletAvailableBalance',data.available_balance,'VOR'],
@@ -835,16 +839,22 @@ if(signOutButton)signOutButton.addEventListener('click',async()=>{
   showAuthMessage(error.message||'Sign out failed.',true);
  }
 });
+async function loadPlayerIdentity(user){
+ const {data:profile,error}=await vortERRAAuth.from('profiles').select('first_name,last_name,country,city,display_name').eq('id',user.id).maybeSingle();
+ if(error)throw error;
+ const full=profile?.display_name||[profile?.first_name,profile?.last_name].filter(Boolean).join(' ')||'VORTERRA MEMBER';
+ const memberId='VOR-'+String(user.id).replace(/-/g,'').slice(-8).toUpperCase();
+ const member=document.querySelector('#dashboard .dmember');if(member){member.textContent=full;const sub=document.createElement('small');sub.textContent=memberId;member.appendChild(sub);}
+ const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value||'—';};
+ set('playerMemberId',memberId);set('playerIdentityName',full);set('playerIdentityCountry',profile?.country);set('playerIdentityCity',profile?.city);set('playerIdentityEmail',user.email);
+ const cityName=document.getElementById('newPlayerCityName');if(cityName&&!cityName.value&&profile?.city)cityName.value=profile.city;
+}
 function enterAuthenticatedDashboard(user){
- currentAuthUser=user;
- document.getElementById('cardScene').style.display='none';
- document.getElementById('intro').style.display='none';
- const dashboard=document.getElementById('dashboard');
- dashboard.classList.add('active');
- const member=dashboard.querySelector('.dmember');
- if(member){member.textContent=user.email||'VORTERRA MEMBER';}
- const balance=dashboard.querySelector('.dbalance b');
- if(balance){balance.textContent='Loading…';balance.dataset.walletState='loading';balance.title='Loading wallet balance';}
+ currentAuthUser=user;document.getElementById('cardScene').style.display='none';document.getElementById('intro').style.display='none';
+ const dashboard=document.getElementById('dashboard');dashboard.classList.add('active');
+ const member=dashboard.querySelector('.dmember');if(member)member.textContent='Loading player…';
+ const balance=dashboard.querySelector('.dbalance b');if(balance){balance.textContent='Loading…';balance.dataset.walletState='loading';balance.title='Loading wallet balance';}
+ loadPlayerIdentity(user).catch(error=>console.warn('Player identity failed:',error));
  refreshWalletBalances(user).catch(error=>console.warn('Wallet refresh failed:',error));
 }
 registrationForm.addEventListener('submit',async event=>{
@@ -1071,7 +1081,14 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
  let projects=[];
  const number=n=>Number(n).toLocaleString(lang==="ar"?"ar-DZ":"en-US",{maximumFractionDigits:2});
  const unit=u=>({ton:lang==="ar"?"طن":lang==="fr"?"tonnes":"tons",m3:"m³",kWh:"kWh",barrel:lang==="ar"?"برميل":lang==="fr"?"barils":"barrels"}[u]||u);
- function renderProjects(){
+ async function acquireProject(p,acquisitionType,button){
+  if(!window.vortERRAAuth||!currentAuthUser){alert("Please sign in first.");return;}
+  const old=button.textContent;button.disabled=true;button.textContent="Working…";
+  try{const {error}=await window.vortERRAAuth.rpc("acquire_vorterra_project",{p_project_key:p.id,p_city_id:currentPlayerCityId,p_acquisition_type:acquisitionType});if(error)throw error;
+   await refreshWalletBalances(currentAuthUser);await loadActualOwnedProjects();renderOperations();alert("Project added to your properties.");
+  }catch(error){alert("Could not acquire project: "+(error.message||""));button.disabled=false;button.textContent=old;}
+}
+function renderProjects(){
   const grid=$("projectGrid");if(!grid)return;grid.innerHTML="";
   $("projectCount").textContent=String(projects.length||12);
   if(!projects.length){grid.innerHTML='<div class="dproject-empty">Project catalogue unavailable. Refresh to retry.</div>';return;}
@@ -1109,6 +1126,8 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
    const buy=document.createElement("button");buy.type="button";buy.textContent=L[lang].buy+" · "+number(p.purchase_price)+" VOR";
    const rent=document.createElement("button");rent.type="button";rent.textContent=L[lang].rent+" · "+number(p.monthly_rent)+" VOR";
    actions.append(buy,rent);
+   buy.addEventListener("click",()=>acquireProject(p,"purchase",buy));
+   rent.addEventListener("click",()=>acquireProject(p,"monthly_rent",rent));
    card.querySelector(".dproject-info").appendChild(actions);
    grid.appendChild(card);
   });
@@ -1119,7 +1138,31 @@ const opsLabels={
  fr:{choose:"Choisir un projet acquis",none:"Aucun projet acquis",ownership:"Propriété du projet",workers:"Travailleurs actifs",ready:"Vérifié",notConnected:"Non connecté",noProject:"Acquérez d'abord un projet dans la bibliothèque.",needWorkers:"Aucun travailleur actif. La production peut démarrer à 50 %.",readyProduction:"Prêt à démarrer. La production commence à 50 % et augmente avec les heures travaillées.",running:"Poste de production en cours",finished:"Poste terminé",start:"Démarrer un poste de 8 heures",complete:"Terminer le poste",cancel:"Annuler le poste",inventory:"Production stockée",emptyInventory:"Aucun produit stocké.",waitUntil:"Fin du poste : ",working:"Traitement…",startOk:"Poste démarré. Salaires et coûts d'exploitation réservés.",completeOk:"Cycle terminé. Les produits sont stockés et le temps restant des travailleurs est mis en pause.",cancelOk:"Cycle annulé. Les coûts d’exploitation sont restitués et le temps travaillé est conservé.",error:"Échec de l'opération : ",required:"Travailleurs requis : ",assigned:"Travailleurs actifs : ",wage:"Salaires : ",cost:"Coûts d'exploitation : ",reserved:"Réservé : ",noOutput:"Ce projet ne produit aucun article.",transfer:"Transférer vers l’entrepôt",waitingTransfer:"Cycle terminé. Transférez les produits vers l’entrepôt général avant de démarrer le cycle suivant. Production : ",transferOk:"Produits transférés vers l’entrepôt général."},
  ar:{choose:"اختر مشروعاً تم اقتناؤه",none:"لا توجد مشاريع مقتناة",ownership:"ملكية المشروع",workers:"العمال النشطون",ready:"متحقق",notConnected:"غير مربوط",noProject:"اقتَنِ مشروعاً من المكتبة أولاً.",needWorkers:"لا يوجد عمال نشطون حالياً، ويمكن بدء الإنتاج بنسبة 50%.",readyProduction:"جاهز للتشغيل. يبدأ الإنتاج بنسبة 50% وترتفع حسب ساعات عمل العمال.",running:"وردية الإنتاج جارية",finished:"اكتملت الوردية",start:"بدء وردية 8 ساعات",complete:"إنهاء الوردية",cancel:"إلغاء الوردية",inventory:"الإنتاج المخزن",emptyInventory:"لا توجد منتجات مخزنة بعد.",waitUntil:"تنتهي الوردية في ",working:"جارٍ التنفيذ…",startOk:"بدأت الوردية. تم حجز الأجور وتكاليف التشغيل.",completeOk:"اكتملت دورة الإنتاج وأُضيفت المنتجات للمخزون، وحُفظ الوقت المتبقي للعمال للدورة التالية.",cancelOk:"أُلغيت الدورة وأُعيدت تكاليف التشغيل مع الاحتفاظ بوقت عمل العمال.",error:"فشل تنفيذ العملية: ",required:"العمال المطلوبون: ",assigned:"العمال النشطون: ",wage:"الأجور: ",cost:"تكاليف التشغيل: ",reserved:"المبلغ المحجوز: ",noOutput:"هذا المشروع لا يملك إنتاجاً محدداً.",transfer:"نقل إلى المستودع العام",waitingTransfer:"اكتملت الدورة. انقل المنتجات إلى المستودع العام قبل بدء الدورة التالية. نسبة الإنتاج: ",transferOk:"تم نقل المنتجات إلى المستودع العام."}
  };
- let actualOwnedProjects=[];
+ let actualOwnedProjects=[],currentPlayerCityId=null,currentPlayerCity=null;
+ function renderOwnedProjects(){
+  const grid=$("ownedProjects"),empty=$("cityEmpty"),note=$("projectOwnershipNote");if(!grid)return;
+  grid.innerHTML="";if(empty)empty.hidden=actualOwnedProjects.length>0;
+  if(note)note.textContent=currentPlayerCity?("City: "+currentPlayerCity.city_name+" · "+currentPlayerCity.terrain_type):"Your assets are saved in your account but are not yet assigned to a game city.";
+  const count=document.getElementById("playerOverviewAssets");if(count)count.textContent=String(actualOwnedProjects.length).padStart(2,"0");
+  actualOwnedProjects.forEach(({entry,project})=>{
+   const card=document.createElement("article");card.className="dproject-card";
+   const art=document.createElement("div");art.className="dproject-art";if(project.image){const img=document.createElement("img");img.src=project.image+"?v=20261106";img.alt=project.name?.[lang]||project.name?.en||project.id;img.loading="lazy";art.appendChild(img);}
+   const info=document.createElement("div");info.className="dproject-info";const h=document.createElement("h3");h.textContent=project.name?.[lang]||project.name?.en||project.id;
+   const meta=document.createElement("div");meta.className="dproject-stats";const kind=entry.acquisition_type==="purchase"?(lang==="ar"?"مملوك":lang==="fr"?"Acheté":"Owned"):(lang==="ar"?"إيجار نشط":lang==="fr"?"Loué":"Rented");
+   const state=entry.operating_status||"idle";const tag=document.createElement("span");tag.textContent=kind+" · "+state;meta.appendChild(tag);
+   const detail=document.createElement("div");detail.className="dproject-detail";detail.textContent=currentPlayerCity?("City: "+currentPlayerCity.city_name):"Not assigned to a city yet";
+   info.append(h,meta,detail);card.append(art,info);grid.appendChild(card);
+  });
+ }
+ async function loadPlayerCity(userId){
+  currentPlayerCityId=null;currentPlayerCity=null;
+  const {data,error}=await window.vortERRAAuth.from("player_cities").select("id,city_name,terrain_type,region_code").eq("owner_id",userId).order("created_at",{ascending:true}).limit(1).maybeSingle();
+  if(error)throw error;if(data){currentPlayerCityId=data.id;currentPlayerCity=data;}
+  const tag=document.getElementById("playerCityStatus"),desc=document.getElementById("citySetupDescription"),form=document.getElementById("createPlayerCityForm");
+  if(tag)tag.textContent=data?"CITY REGISTERED":"NO CITY CREATED";
+  if(desc)desc.textContent=data?("Your current game city: "+data.city_name):"Create your game city once. Your currently unassigned properties will then be linked to it.";
+  if(form)form.hidden=!!data;
+ }
  async function loadActualOwnedProjects(){
   actualOwnedProjects=[];
   try{
@@ -1127,8 +1170,9 @@ const opsLabels={
    if(!auth?.auth)return;
    const {data:userData,error:userError}=await auth.auth.getUser();
    if(userError||!userData?.user)return;
+   await loadPlayerCity(userData.user.id);
    const {data,error}=await auth.from("player_projects")
-    .select("id,project_key,acquisition_type,acquired_at,expires_at,operating_status")
+    .select("id,project_key,city_id,acquisition_type,acquired_at,expires_at,operating_status")
     .eq("owner_id",userData.user.id)
     .order("acquired_at",{ascending:false});
    if(error)throw error;
@@ -1137,9 +1181,10 @@ const opsLabels={
     .filter(entry=>entry.acquisition_type==="purchase"||(entry.expires_at&&new Date(entry.expires_at).getTime()>now))
     .map(entry=>({entry,project:projects.find(p=>p.id===entry.project_key)}))
     .filter(item=>item.project);
+   renderOwnedProjects();
   }catch(error){
    console.error("Could not load owned projects for operations:",error);
-   actualOwnedProjects=[];
+   actualOwnedProjects=[];renderOwnedProjects();
   }
  }
  async function refreshProductionPanel(){
@@ -1587,6 +1632,14 @@ const opsLabels={
    finally{button.disabled=false}
   });
  }
+ const cityForm=$("createPlayerCityForm");
+ if(cityForm&&!cityForm.dataset.bound){cityForm.dataset.bound="1";cityForm.addEventListener("submit",async event=>{
+  event.preventDefault();const button=$("createPlayerCityButton"),message=$("createPlayerCityMessage"),cityName=$("newPlayerCityName").value.trim(),terrain=$("newPlayerCityTerrain").value;
+  if(!cityName||!currentAuthUser)return;button.disabled=true;message.textContent="Creating city and assigning properties…";
+  try{const {error}=await window.vortERRAAuth.rpc("create_player_city_and_assign_assets",{p_city_name:cityName,p_terrain_type:terrain});if(error)throw error;
+   await loadActualOwnedProjects();renderOperations();message.textContent="City created and existing properties assigned.";
+  }catch(error){message.textContent="Could not create city: "+(error.message||"");}finally{button.disabled=false;}
+ });}
  bindMarketplaceForms();
  bindTransportRequestForm();
  document.querySelectorAll("#dashboard [data-view='market']").forEach(b=>b.addEventListener("click",()=>loadLiveMarketplace()));
