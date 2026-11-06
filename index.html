@@ -1239,7 +1239,7 @@ const opsLabels={
  };
 
  async function loadProjects(){
-  try{const r=await fetch("data/projects.json",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const d=await r.json();if(!Array.isArray(d.projects)||d.projects.length!==12)throw Error("Invalid project catalogue");projects=d.projects.sort((a,b)=>a.number-b.number);renderProjects();await loadActualOwnedProjects();renderOperations()}
+  try{const r=await fetch("data/projects.json",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const d=await r.json();if(!Array.isArray(d.projects)||d.projects.length!==12)throw Error("Invalid project catalogue");projects=d.projects.sort((a,b)=>a.number-b.number);renderProjects();await loadActualOwnedProjects();renderOperations();await loadLiveMarketplace();await loadLiveTransportContracts()}
   catch(e){console.error("VORTERRA projects:",e);const g=$("projectGrid");if(g)g.innerHTML='<div class="dproject-empty">Could not load the approved projects file. The data remains saved in GitHub.</div>'}
  }
 
@@ -1391,6 +1391,13 @@ const opsLabels={
     vortERRAAuth.from("market_listings").select("id,owner_id,listing_type,product_name,quantity,unit_price,asset_name,rent_duration,unit,project_id,lease_months,created_at").eq("status","active").order("created_at",{ascending:false}).limit(100)
    ]);
    if(inventoryError)throw inventoryError;if(ownedError)throw ownedError;if(listError)throw listError;
+   const setLabel=(id,value)=>{const el=$(id);if(el)el.textContent=value};
+   setLabel("marketSaleItemLabel",langNow==="ar"?"اختر منتجاً من مخزونك":langNow==="fr"?"Choisir un article de votre stock":"Choose an item from your inventory");
+   setLabel("marketRentProjectLabel",langNow==="ar"?"اختر مشروعاً تملكه":langNow==="fr"?"Choisir un projet que vous possédez":"Choose a project you own");
+   setLabel("marketRentPriceLabel",langNow==="ar"?"السعر الشهري (VOR)":langNow==="fr"?"Prix mensuel (VOR)":"Monthly price (VOR)");
+   setLabel("marketRentMonthsLabel",langNow==="ar"?"مدة الإيجار":langNow==="fr"?"Durée de location":"Lease duration");
+   const monthsSelect=$("marketRentMonths");
+   if(monthsSelect){monthsSelect.options[0].textContent=langNow==="ar"?"شهر واحد":langNow==="fr"?"1 mois":"1 month";monthsSelect.options[1].textContent=langNow==="ar"?"3 أشهر":langNow==="fr"?"3 mois":"3 months"}
    const options=(select,rows,label,empty,mapper)=>{if(!select)return;select.innerHTML="";const first=document.createElement("option");first.value="";first.textContent=rows.length?label:empty;select.appendChild(first);rows.forEach(row=>{const option=document.createElement("option");option.value=mapper(row).value;option.textContent=mapper(row).label;select.appendChild(option)});select.disabled=!rows.length};
    options(itemSelect,inventory||[],t.chooseItem,t.none,row=>({value:row.item_key+"::"+row.unit,label:row.item_key+" · "+Number(row.quantity).toLocaleString()+" "+row.unit}));
    options(projectSelect,owned||[],t.chooseProject,t.noProjects,row=>{const p=projects.find(x=>x.id===row.project_key);return {value:row.id,label:p?.name?.[langNow]||p?.name?.en||row.project_key}});
