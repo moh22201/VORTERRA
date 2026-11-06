@@ -181,18 +181,11 @@ begin
 end;
 $function$
 ;
-CREATE OR REPLACE FUNCTION public.transfer_completed_production(p_cycle_id uuid)
- RETURNS jsonb
- LANGUAGE sql
- SET search_path TO ''
-AS $function$ select private.transfer_completed_production(p_cycle_id); $function$
-;
-CREATE OR REPLACE FUNCTION public.transfer_completed_production(p_cycle_id uuid)
- RETURNS jsonb
- LANGUAGE sql
- SET search_path TO ''
-AS $function$ select public.transfer_completed_production(p_cycle_id); $function$
-;
+create or replace function public.transfer_completed_production(p_cycle_id uuid)
+ returns jsonb language sql set search_path to ''
+as $function$
+ select private.transfer_completed_production(p_cycle_id);
+$function$;
 
 revoke all on function private.start_project_production(uuid) from public,anon,authenticated;
 grant execute on function private.start_project_production(uuid) to authenticated;
