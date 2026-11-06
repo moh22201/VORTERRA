@@ -670,8 +670,8 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
    <div class="registration-heading"><div class="reg-mark">V</div><h2 id="registrationTitle">CREATE YOUR ACCOUNT</h2><p>Join VORTERRA and enter your business world.</p></div>
    <form class="registration-form" id="registrationForm">
     <div><label for="regEmail">EMAIL ADDRESS · البريد الإلكتروني</label><input id="regEmail" type="email" name="email" autocomplete="email" placeholder="name@example.com" required></div>
-    <div><label for="regPassword">PASSWORD · كلمة المرور</label><input id="regPassword" type="password" name="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required></div>
-    <div><label for="regConfirm">CONFIRM PASSWORD · تأكيد كلمة المرور</label><input id="regConfirm" type="password" name="confirmPassword" autocomplete="new-password" minlength="8" placeholder="Repeat your password" required></div>
+    <div><label for="regPassword">PASSWORD · كلمة المرور</label><input id="regPassword" type="password" name="password" autocomplete="off" data-lpignore="true" data-1p-ignore="true" minlength="8" placeholder="At least 8 characters" required></div>
+    <div><label for="regConfirm">CONFIRM PASSWORD · تأكيد كلمة المرور</label><input id="regConfirm" type="password" name="confirmPassword" autocomplete="off" data-lpignore="true" data-1p-ignore="true" minlength="8" placeholder="Repeat your password" required></div>
     <button class="register-submit" id="registerNow" type="submit">سجّل الآن · REGISTER NOW</button>
    </form>
    <div class="reg-divider">OR CONTINUE WITH</div>
@@ -680,7 +680,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
    <button class="google-register" id="showLogin" type="button" style="margin-top:10px">Already have an account? Sign in</button>
    <form class="registration-form" id="loginForm" hidden style="margin-top:14px">
     <div><label for="loginEmail">EMAIL ADDRESS</label><input id="loginEmail" type="email" autocomplete="username" placeholder="name@example.com" required></div>
-    <div><label for="loginPassword">PASSWORD</label><input id="loginPassword" type="password" autocomplete="current-password" required></div>
+    <div><label for="loginPassword">PASSWORD</label><input id="loginPassword" type="password" autocomplete="off" data-lpignore="true" data-1p-ignore="true" required></div>
     <button class="register-submit" type="submit">SIGN IN · دخول</button>
    </form>
    <p class="reg-note">Your account is secured by Supabase Authentication. Passwords are sent directly to Supabase over HTTPS and are never stored in VORTERRA code.</p>
@@ -746,7 +746,7 @@ document.getElementById('openRegistration').addEventListener('click',async()=>{
 });
 const SUPABASE_URL='https://qnfjtpwtwvlvbzyliwmh.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_tWieCfaR6RN2S01dFwH7vg_7ZkSXbDv';
-const vortERRAAuth=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const vortERRAAuth=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit'}});
 const registrationForm=document.getElementById('registrationForm');
 const registrationMessage=document.getElementById('registrationMessage');
 function showAuthMessage(message,isError=false){registrationMessage.textContent=message;registrationMessage.style.color=isError?'#ffaaa0':'#e5cf98';}
@@ -893,9 +893,29 @@ document.getElementById('googleRegister').addEventListener('click',async()=>{
  const {error}=await vortERRAAuth.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+window.location.pathname}});
  if(error)showAuthMessage(error.message||'Google sign-in is not configured yet in Supabase.',true);
 });
-vortERRAAuth.auth.getSession().then(async({data,error})=>{
+let authRoutePromise=null;
+let lastRoutedAuthUserId=null;
+async function openConfirmedAccount(user){
+ if(!user)return;
+ if(lastRoutedAuthUserId===user.id)return;
+ if(authRoutePromise)return authRoutePromise;
+ authRoutePromise=(async()=>{
+  await routeAuthenticatedUser(user);
+  lastRoutedAuthUserId=user.id;
+ })();
+ try{await authRoutePromise;}
+ finally{authRoutePromise=null;}
+}
+vortERRAAuth.auth.onAuthStateChange((event,session)=>{
+ if(event==='SIGNED_OUT'){lastRoutedAuthUserId=null;return;}
+ if(session?.user&&['INITIAL_SESSION','SIGNED_IN','TOKEN_REFRESHED','USER_UPDATED'].includes(event)){
+  // Defer Supabase queries until the auth callback has returned.
+  setTimeout(()=>openConfirmedAccount(session.user).catch(error=>console.warn('Account redirect:',error)),0);
+ }
+});
+vortERRAAuth.auth.getSession().then(({data,error})=>{
  if(error){console.warn('Auth session:',error);return;}
- if(data.session?.user)await routeAuthenticatedUser(data.session.user);
+ if(data.session?.user)openConfirmedAccount(data.session.user).catch(error=>console.warn('Account redirect:',error));
 });
 
 function openDashboardPanel(view){
