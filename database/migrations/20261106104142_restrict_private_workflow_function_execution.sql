@@ -1,0 +1,18 @@
+revoke execute on all functions in schema private from public,anon,authenticated;
+grant execute on function private.convert_vor_to_usdt() to authenticated;
+grant execute on function private.repay_player_loan(numeric) to authenticated;
+grant execute on function private.end_my_employment_contract(uuid) to authenticated;
+grant execute on function private.respond_to_job_listing(uuid,uuid) to authenticated;
+grant execute on function private.start_project_production(uuid) to authenticated;
+grant execute on function private.complete_project_production(uuid) to authenticated;
+grant execute on function private.cancel_project_production(uuid) to authenticated;
+grant execute on function private.create_inventory_sale_listing(text,text,numeric,numeric) to authenticated;
+grant execute on function private.buy_market_sale_listing(uuid) to authenticated;
+grant execute on function private.create_project_rent_listing(uuid,numeric,integer) to authenticated;
+grant execute on function private.rent_market_project(uuid) to authenticated;
+grant execute on function private.cancel_market_listing(uuid) to authenticated;
+grant execute on function private.create_transport_request(text,numeric,text,text,text,numeric) to authenticated;
+grant execute on function private.accept_transport_contract(uuid,uuid) to authenticated;
+grant execute on function private.start_transport_contract(uuid) to authenticated;
+grant execute on function private.complete_transport_contract(uuid) to authenticated;
+grant execute on function private.cancel_transport_contract(uuid) to authenticated;
