@@ -754,14 +754,23 @@ async function savePlayerCardProfile(user){
  const lastName=document.getElementById('iL')?.value.trim()||'';
  const country=document.getElementById('iC')?.value||'';
  const city=document.getElementById('iY')?.value||'';
- if(!firstName||!lastName||!country||!city)return;
- const {error}=await vortERRAAuth.from('profiles').update({
+ if(!firstName||!lastName||!country||!city)throw new Error('أكمل بيانات البطاقة الأربعة أولاً.');
+ const {data,error}=await vortERRAAuth.from('profiles').update({
   first_name:firstName,last_name:lastName,country,city,
   display_name:[firstName,lastName].join(' '),
   membership_card_issued_at:new Date().toISOString(),
   updated_at:new Date().toISOString()
- }).eq('id',user.id);
+ }).eq('id',user.id).select('id').maybeSingle();
  if(error)throw error;
+ if(!data)throw new Error('تعذر حفظ بيانات البطاقة في ملف اللاعب. أعد تحميل الصفحة وحاول مجدداً.');
+}
+async function routeAuthenticatedUser(user){
+ const {data:profile,error}=await vortERRAAuth.from('profiles').select('first_name,last_name,country,city').eq('id',user.id).maybeSingle();
+ if(error){console.warn('Player profile:',error);showAuthMessage('تم تسجيل الدخول، لكن تعذر تحميل ملف اللاعب. أعد المحاولة.',true);return;}
+ const metadata=user.user_metadata||{};
+ const player={first_name:profile?.first_name||metadata.first_name||'',last_name:profile?.last_name||metadata.last_name||'',country:profile?.country||metadata.country||'',city:profile?.city||metadata.city||''};
+ if(player.first_name&&player.last_name&&player.country&&player.city)enterAuthenticatedDashboard(user);
+ else showCardSetup(user,player);
 }
 let currentAuthUser=null;
 function showCardSetup(user,profile={}){
@@ -818,9 +827,28 @@ registrationForm.addEventListener('submit',async event=>{
    options:{emailRedirectTo:window.location.origin+window.location.pathname,data:{full_name:[firstName,lastName].filter(Boolean).join(' '),first_name:firstName,last_name:lastName,country,city,membership_card_issued:true}}
   });
   if(error)throw error;
+  if(data.user&&Array.isArray(data.user.identities)&&data.user.identities.length===0){
+   const {data:loginData,error:loginError}=await vortERRAAuth.auth.signInWithPassword({email,password:password.value});
+   password.value='';confirm.value='';
+   if(loginError){
+    registrationForm.hidden=true;document.getElementById('loginForm').hidden=false;
+    document.getElementById('loginEmail').value=email;
+    document.getElementById('showLogin').textContent='Sign in to your existing account';
+    showAuthMessage('هذا البريد مسجل من قبل. أدخل كلمة مرور حسابك في خانة تسجيل الدخول.',true);
+    return;
+   }
+   if(loginData.user){showAuthMessage('تم العثور على حسابك. جارٍ فتح عالم VORTERRA…');await routeAuthenticatedUser(loginData.user);return;}
+  }
   password.value='';confirm.value='';
-  if(data.session&&data.user){showAuthMessage('Account created successfully. Welcome to VORTERRA.');enterAuthenticatedDashboard(data.user);}
-  else{showAuthMessage('Account created. Please check your email and confirm your address before signing in.');}
+  if(data.session&&data.user){
+   showAuthMessage('Account created successfully. Welcome to VORTERRA.');
+   await routeAuthenticatedUser(data.user);
+  }else{
+   registrationForm.hidden=true;document.getElementById('loginForm').hidden=false;
+   document.getElementById('loginEmail').value=email;
+   document.getElementById('showLogin').textContent='Sign in after email confirmation';
+   showAuthMessage('تم إنشاء الحساب. أكد بريدك الإلكتروني من الرسالة، ثم سجّل الدخول من هنا للانتقال مباشرة إلى اللعبة.');
+  }
  }catch(error){showAuthMessage(error.message||'Account creation failed. Please try again.',true);}
  finally{submit.disabled=false;}
 });
@@ -836,7 +864,7 @@ loginForm.addEventListener('submit',async event=>{
  try{
   const {data,error}=await vortERRAAuth.auth.signInWithPassword({email:document.getElementById('loginEmail').value.trim(),password:document.getElementById('loginPassword').value});
   if(error)throw error;
-  if(data.user){document.getElementById('loginPassword').value='';await savePlayerCardProfile(data.user);showAuthMessage('Signed in successfully.');enterAuthenticatedDashboard(data.user);}
+  if(data.user){document.getElementById('loginPassword').value='';showAuthMessage('Signed in successfully.');await routeAuthenticatedUser(data.user);}
  }catch(error){showAuthMessage(error.message||'Sign-in failed. Please try again.',true);}
  finally{submit.disabled=false;}
 });
@@ -847,12 +875,7 @@ document.getElementById('googleRegister').addEventListener('click',async()=>{
 });
 vortERRAAuth.auth.getSession().then(async({data,error})=>{
  if(error){console.warn('Auth session:',error);return;}
- if(!data.session?.user)return;
- const user=data.session.user;
- const {data:profile,error:profileError}=await vortERRAAuth.from('profiles').select('first_name,last_name,country,city').eq('id',user.id).maybeSingle();
- if(profileError){console.warn('Player profile:',profileError);enterAuthenticatedDashboard(user);return;}
- if(!profile?.first_name||!profile?.last_name||!profile?.country||!profile?.city)showCardSetup(user,profile||{});
- else enterAuthenticatedDashboard(user);
+ if(data.session?.user)await routeAuthenticatedUser(data.session.user);
 });
 
 function openDashboardPanel(view){
