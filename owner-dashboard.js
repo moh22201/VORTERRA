@@ -191,6 +191,8 @@
       }
       alert(language()==="ar"?"تمت العملية بنجاح. خُصم "+fmt(result.data.amount_vor)+" VOR من محفظتك.":"Success. "+fmt(result.data.amount_vor)+" VOR was charged to your wallet.");
       await loadActualProjectData(user);
+      await loadPlayerOverview(user);
+      if(typeof window.refreshVorterraOperations==="function")await window.refreshVorterraOperations();
     }catch(e){
       console.error("Project acquisition failed:",e);
       alert(e.message||"Project acquisition failed");
@@ -325,6 +327,7 @@
 
   async function init(user) {
     if(!user)return;styles();localizeWithdrawalForm();bindWithdrawalForm();bindLiveMarketForms();await Promise.all([loadLoan(),loadPlayerWithdrawalRequests(),loadActualProjectData(user),loadPlayerOverview(user),renderLiveMarket()]);
+    if(typeof window.refreshVorterraOperations==="function")await window.refreshVorterraOperations();
     const r=await client.rpc("get_owner_dashboard_summary");
     if(!r.error){addOwnerPanel();await loadOwner()}
   }
