@@ -118,6 +118,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 #dashboard .dtop{background:linear-gradient(105deg,#050607f5,#17191bf0 48%,#050607f5)!important;border-bottom:1px solid #f6d88970!important;box-shadow:0 14px 40px #000b,inset 0 1px #ffffff18!important}
 #dashboard .demblem{border-color:#f6d889!important;box-shadow:0 0 18px #f6d88955,inset 0 0 12px #f6d88922!important}
 #dashboard .demblem b,#dashboard .dbrand strong{color:#ffe3a0!important;text-shadow:0 0 9px #f6d889aa,0 0 25px #e8c36f66!important}
+#dashboard .dsignout{border:1px solid #f6d88966;border-radius:8px;background:#f6d88910;color:#ffe3a0;padding:8px 11px;font:600 10px Inter,"Segoe UI",Arial;cursor:pointer;white-space:nowrap}#dashboard .dsignout:hover{background:#f6d88925;border-color:#f6d889}@media(max-width:680px){#dashboard .dsignout{padding:7px 8px;font-size:9px}}
 #dashboard .dbrand small{color:#d6c9a8!important}
 #dashboard .dtopnav button{color:#c9c6bd!important}
 #dashboard .dtopnav button:hover,#dashboard .dtopnav button.active{color:#ffe3a0!important;background:linear-gradient(180deg,#f6d8891c,#f6d88908)!important;box-shadow:inset 0 -2px #f6d889,0 0 14px #f6d88918!important}
@@ -503,7 +504,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 <canvas id="c"></canvas><div id="dashboard">
 <header class="dtop"><div class="dbrand"><div class="demblem"><b>V</b></div><div><strong>VORTERRA</strong><small>WORLD OF INDUSTRY &amp; TRADE</small></div></div>
 <div class="dlang-switch" aria-label="Language"><button type="button" data-lang="en" class="active">ENG</button><button type="button" data-lang="fr">FRA</button><button type="button" data-lang="ar">ARB</button></div>
-<div class="daccount"><button type="button" class="dbalance dbalance-wallet" id="walletOpenButton" aria-label="Open VORTERRA wallet"><span class="dwallet-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v15H6.5A2.5 2.5 0 0 1 4 16.5z"/><path d="M4 7h13a2 2 0 0 1 2 2v2h-5a2 2 0 0 0 0 4h5v2"/><path d="M17 13h.01"/></svg></span><span class="dbalance-copy"><small data-i18n="available">AVAILABLE BALANCE</small><b>0.00 VOR</b></span></button><div class="davatar">V</div><div class="dmember">Member Account<small>VOR · MEMBER</small></div></div></header>
+<div class="daccount"><button type="button" class="dbalance dbalance-wallet" id="walletOpenButton" aria-label="Open VORTERRA wallet"><span class="dwallet-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v15H6.5A2.5 2.5 0 0 1 4 16.5z"/><path d="M4 7h13a2 2 0 0 1 2 2v2h-5a2 2 0 0 0 0 4h5v2"/><path d="M17 13h.01"/></svg></span><span class="dbalance-copy"><small data-i18n="available">AVAILABLE BALANCE</small><b>0.00 VOR</b></span></button><div class="davatar">V</div><div class="dmember">Member Account<small>VOR · MEMBER</small></div><button type="button" id="signOutButton" class="dsignout">↪ Sign out</button></div></header>
 <div class="dlayout"><aside class="dside">
 <div class="dlabel" data-i18n="workspace">MAIN WORKSPACE</div>
 <button class="active" data-view="overview"><span>⌂</span><span data-i18n="overview">Overview</span></button>
@@ -687,8 +688,8 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
    <div class="registration-heading"><div class="reg-mark">V</div><h2 id="registrationTitle">CREATE YOUR ACCOUNT</h2><p>Join VORTERRA and enter your business world.</p></div>
    <form class="registration-form" id="registrationForm">
     <div><label for="regEmail">EMAIL ADDRESS · البريد الإلكتروني</label><input id="regEmail" type="email" name="email" autocomplete="email" placeholder="name@example.com" required></div>
-    <div><label for="regPassword">PASSWORD · كلمة المرور</label><input id="regPassword" type="password" name="password" autocomplete="off" data-lpignore="true" data-1p-ignore="true" minlength="8" placeholder="At least 8 characters" required></div>
-    <div><label for="regConfirm">CONFIRM PASSWORD · تأكيد كلمة المرور</label><input id="regConfirm" type="password" name="confirmPassword" autocomplete="off" data-lpignore="true" data-1p-ignore="true" minlength="8" placeholder="Repeat your password" required></div>
+    <div><label for="regPassword">PASSWORD · كلمة المرور</label><input id="regPassword" type="password" name="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required></div>
+    <div><label for="regConfirm">CONFIRM PASSWORD · تأكيد كلمة المرور</label><input id="regConfirm" type="password" name="confirmPassword" autocomplete="new-password" minlength="8" placeholder="Repeat your password" required></div>
     <button class="register-submit" id="registerNow" type="submit">سجّل الآن · REGISTER NOW</button>
    </form>
    <div class="reg-divider">OR CONTINUE WITH</div>
@@ -697,7 +698,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
    <button class="google-register" id="showLogin" type="button" style="margin-top:10px">Already have an account? Sign in</button>
    <form class="registration-form" id="loginForm" hidden style="margin-top:14px">
     <div><label for="loginEmail">EMAIL ADDRESS</label><input id="loginEmail" type="email" autocomplete="username" placeholder="name@example.com" required></div>
-    <div><label for="loginPassword">PASSWORD</label><input id="loginPassword" type="password" autocomplete="off" data-lpignore="true" data-1p-ignore="true" required></div>
+    <div><label for="loginPassword">PASSWORD</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" required></div>
     <button class="register-submit" type="submit">SIGN IN · دخول</button>
    </form>
    <p class="reg-note">Your account is secured by Supabase Authentication. Passwords are sent directly to Supabase over HTTPS and are never stored in VORTERRA code.</p>
@@ -839,6 +840,22 @@ function showCardSetup(user,profile={}){
   }
  }
 }
+const signOutButton=document.getElementById('signOutButton');
+if(signOutButton)signOutButton.addEventListener('click',async()=>{
+ const lang=(document.documentElement.lang||'en').toLowerCase();
+ signOutButton.disabled=true;
+ signOutButton.textContent=lang.startsWith('ar')?'جارٍ تسجيل الخروج…':lang.startsWith('fr')?'Déconnexion…':'Signing out…';
+ try{
+  const {error}=await vortERRAAuth.auth.signOut({scope:'local'});
+  if(error)throw error;
+  currentAuthUser=null;lastRoutedAuthUserId=null;
+  window.location.reload();
+ }catch(error){
+  signOutButton.disabled=false;
+  signOutButton.textContent=lang.startsWith('ar')?'تسجيل الخروج':lang.startsWith('fr')?'Se déconnecter':'Sign out';
+  showAuthMessage(error.message||'Sign out failed.',true);
+ }
+});
 function enterAuthenticatedDashboard(user){
  currentAuthUser=user;
  document.getElementById('cardScene').style.display='none';
