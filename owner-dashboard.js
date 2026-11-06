@@ -123,10 +123,6 @@
       ]);
       if(assetsResult.error)throw assetsResult.error;
       const assets=assetsResult.data||[];
-      try{
-        const saved=JSON.parse(localStorage.getItem("vorterra-demo-v1")||"{}");
-        if(saved.owned?.length){saved.owned=[];localStorage.setItem("vorterra-demo-v1",JSON.stringify(saved));}
-      }catch(_){}
       const grid=document.getElementById("ownedProjects"),empty=document.getElementById("cityEmpty");
       if(grid){
         grid.innerHTML="";
@@ -144,7 +140,7 @@
         });
       }
       if(empty)empty.hidden=assets.length>0;
-      const note=document.getElementById("demoStorageNote");
+      const note=document.getElementById("projectOwnershipNote");
       if(note)note.textContent=language()==="ar"?"الملكية والمدفوعات محفوظة في قاعدة البيانات.":"Ownership and payments are stored in the database.";
       const cards=[...document.querySelectorAll("#projectGrid .dproject-card")];
       cards.forEach((card,index)=>{
@@ -194,10 +190,6 @@
         if(available)available.textContent=fmt(wallet.data.available_balance)+" VOR";
       }
       alert(language()==="ar"?"تمت العملية بنجاح. خُصم "+fmt(result.data.amount_vor)+" VOR من محفظتك.":"Success. "+fmt(result.data.amount_vor)+" VOR was charged to your wallet.");
-      try{
-        const saved=JSON.parse(localStorage.getItem("vorterra-demo-v1")||"{}");
-        saved.owned=[];localStorage.setItem("vorterra-demo-v1",JSON.stringify(saved));
-      }catch(_){}
       await loadActualProjectData(user);
     }catch(e){
       console.error("Project acquisition failed:",e);
