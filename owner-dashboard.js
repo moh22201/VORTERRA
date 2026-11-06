@@ -37,7 +37,7 @@
     [["[data-owner-title]",x.title],["[data-owner-subtitle]",x.subtitle],["[data-owner-refresh]",x.refresh],["[data-owner-list-title]",x.list],["[data-owner-email]",x.email],["[data-owner-joined]",x.joined],["[data-owner-balance]",x.balance],["[data-owner-debt]",x.debtValue],["[data-owner-due]",x.due],["[data-owner-withdrawal-title]",x.withdrawalList],["[data-owner-withdraw-amount]",x.withdrawAmount],["[data-owner-fee]",x.fee],["[data-owner-net]",x.net],["[data-owner-status]",x.status],["[data-owner-requested]",x.requested],["[data-owner-message]",x.loading]].forEach(([q,v])=>panel.querySelector(q).textContent=v);
     const stats=panel.querySelector("[data-owner-stats]"), rows=panel.querySelector("[data-owner-players]"), withdrawalRows=panel.querySelector("[data-owner-withdrawals]");stats.innerHTML="";rows.innerHTML="";withdrawalRows.innerHTML="";
     try {
-      const [a,b,c]=await Promise.all([client.rpc("get_owner_dashboard_summary"),client.rpc("get_owner_dashboard_players",{p_limit:100}),client.rpc("get_owner_withdrawal_requests",{p_limit:200})]);
+      const [a,b,c]=await Promise.all([client.rpc("get_owner_dashboard_summary"),client.rpc("get_owner_dashboard_players",{p_limit:5000}),client.rpc("get_owner_withdrawal_requests",{p_limit:200})]);
       if(a.error)throw a.error;if(b.error)throw b.error;if(c.error)throw c.error;const d=a.data||{};
       [[x.players,d.players],[x.cities,d.cities],[x.assets,d.owned_projects],[x.total,fmt(d.wallet_total_vor)],[x.available,fmt(d.wallet_available_vor)],[x.usdt,fmt(d.wallet_usdt_internal)],[x.deposits,fmt(d.confirmed_deposits_usdt)+" USDT"],[x.debt,fmt(d.outstanding_loans_vor)+" VOR"],[x.cohort,String(d.loan_slots_awarded??0)+" / 1,000"],[x.withdrawalCount,d.withdrawal_requests??0],[x.pendingWithdrawals,d.pending_withdrawals??0],[x.pendingAmount,fmt(d.pending_withdrawal_amount_usdt)+" USDT"]].forEach(([label,value])=>{const card=document.createElement("article");card.className="owner-stat";const small=document.createElement("small");small.textContent=label;const strong=document.createElement("strong");strong.textContent=value??"0";card.append(small,strong);stats.appendChild(card)});
       (Array.isArray(b.data)?b.data:[]).forEach(p=>{const tr=document.createElement("tr");[p.email||p.display_name||p.user_id,date(p.created_at),fmt(p.wallet_total_vor)+" VOR",(Number(p.loan_outstanding_vor||0)>0?x.indebted+" · ":"")+fmt(p.loan_outstanding_vor)+" VOR",date(p.loan_due_at)].forEach(v=>{const td=document.createElement("td");td.textContent=v;tr.appendChild(td)});rows.appendChild(tr)});
@@ -79,6 +79,18 @@
       r.data.forEach(w=>{const item=document.createElement("div");item.className="withdraw-request-item";const left=document.createElement("div"),amount=document.createElement("strong"),meta=document.createElement("small"),status=document.createElement("span");amount.textContent=fmt(w.amount_usdt)+" USDT";meta.textContent=new Date(w.created_at).toLocaleString();left.append(amount,meta);status.className="withdraw-status";status.textContent=l[w.status]||w.status;item.append(left,status);list.appendChild(item)});
     }catch(e){list.textContent=l.error+(e.message||"");}
   }
+
+  function localizeWithdrawalForm(){
+    const copy={
+      en:{amount:"Amount to withdraw (USDT)",rules:"Minimum 10 USDT · Maximum 5,000 USDT · 5% fee · Weekly limit: 50% of internal USDT balance. Requests are reviewed manually. Accounts with outstanding loans cannot withdraw.",submit:"Submit withdrawal request",history:"My withdrawal requests",empty:"No requests yet."},
+      fr:{amount:"Montant du retrait (USDT)",rules:"Minimum 10 USDT · Maximum 5 000 USDT · frais de 5 % · Limite hebdomadaire : 50 % du solde USDT interne. Les demandes sont examinées manuellement. Les comptes ayant un prêt impayé ne peuvent pas retirer.",submit:"Envoyer la demande de retrait",history:"Mes demandes de retrait",empty:"Aucune demande pour le moment."},
+      ar:{amount:"مبلغ السحب (USDT)",rules:"الحد الأدنى 10 USDT · الحد الأقصى 5,000 USDT · رسوم 5٪ · الحد الأسبوعي 50٪ من رصيد USDT الداخلي. الطلبات تخضع للمراجعة اليدوية، والحساب المدين لا يمكنه السحب.",submit:"إرسال طلب السحب",history:"طلبات السحب الخاصة بي",empty:"لا توجد طلبات حتى الآن."}
+    }[language()];
+    const set=(q,v)=>{const el=document.querySelector(q);if(el)el.textContent=v};
+    set('label[for="withdrawalAmount"]',copy.amount);set('.withdraw-help',copy.rules);set('#withdrawalSubmit',copy.submit);set('[data-wallet-panel="withdraw"] .dpanelhead b',language()==="ar"?"طلب السحب":language()==="fr"?"Demande de retrait":"Withdrawal request");
+    const history=document.querySelector('[data-wallet-panel="withdraw"] .dpanelhead b:last-child');if(history)history.textContent=copy.history;
+  }
+
   function bindWithdrawalForm(){
     const form=document.getElementById("withdrawalRequestForm");if(!form||form.dataset.bound)return;form.dataset.bound="1";
     form.addEventListener("submit",async e=>{
@@ -95,7 +107,7 @@
   }
 
   async function init(user) {
-    if(!user)return;styles();bindWithdrawalForm();await Promise.all([loadLoan(),loadPlayerWithdrawalRequests()]);
+    if(!user)return;styles();localizeWithdrawalForm();bindWithdrawalForm();await Promise.all([loadLoan(),loadPlayerWithdrawalRequests()]);
     const r=await client.rpc("get_owner_dashboard_summary");
     if(!r.error){addOwnerPanel();await loadOwner()}
   }
@@ -107,7 +119,7 @@
   document.addEventListener("click",event=>{
     if(event.target.closest("#dashboard [data-lang]"))setTimeout(()=>{
       const label=document.querySelector('#dashboard [data-view="owner"] span:last-child');if(label)label.textContent=t().owner;
-      loadLoan();loadPlayerWithdrawalRequests();if(document.querySelector('[data-panel="owner"]'))loadOwner();
+      localizeWithdrawalForm();loadLoan();loadPlayerWithdrawalRequests();if(document.querySelector('[data-panel="owner"]'))loadOwner();
     },0);
   });
 })();
