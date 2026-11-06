@@ -593,17 +593,18 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
   <section class="dsubpanel"><h3 data-i18n="jobRequest">طلب عمل</h3><form id="jobRequestForm" class="dform">
    <label><span data-i18n="jobTitle">نوع العمل</span><input name="role" required maxlength="80"></label>
    <label><span data-i18n="experience">الخبرة أو المهارات</span><input name="experience" maxlength="160"></label>
-   <label><span data-i18n="expectedWage">الأجر المطلوب لكل وردية (VOR)</span><input name="wage" type="number" min="0" step="0.01" required></label>
+   <label><span data-i18n="expectedWage">الأجر المطلوب لكل وردية (VOR)</span><input name="wage" type="number" min="0.01" step="0.01" required></label>
    <button class="dprimary" type="submit" data-i18n="publishRequest">نشر طلب العمل</button>
   </form><div id="jobRequests" class="dlisting-list"></div></section>
   <section class="dsubpanel"><h3 data-i18n="jobOffers">عروض عمل</h3><form id="jobOfferForm" class="dform">
    <label><span data-i18n="jobTitle">المسمى الوظيفي</span><input name="role" required maxlength="80"></label>
    <label><span data-i18n="workersCount">عدد العمال</span><input name="workers" type="number" min="1" step="1" required></label>
-   <label><span data-i18n="offeredWage">الأجر لكل عامل / وردية (VOR)</span><input name="wage" type="number" min="0" step="0.01" required></label>
+   <label><span data-i18n="offeredWage">الأجر لكل عامل / وردية (VOR)</span><input name="wage" type="number" min="0.01" step="0.01" required></label>
    <label><span data-i18n="jobConditions">شروط العمل</span><input name="conditions" maxlength="200"></label>
    <button class="dprimary" type="submit" data-i18n="publishOffer">نشر عرض العمل</button>
   </form><div id="jobOffers" class="dlisting-list"></div></section>
- </div></div><div class="dnote" data-i18n="hiringStorageNote">إعلانات التوظيف محفوظة في قاعدة البيانات، لكن قبول العروض وتعيين العمال غير مفعّل بعد.</div>
+  <section class="dsubpanel"><h3 data-i18n="activeEmployment">عقود العمل النشطة</h3><div id="myEmploymentContracts" class="dlisting-list"><div class="dempty" data-i18n="employmentEmpty">لا توجد عقود عمل نشطة.</div></div></section>
+ </div></div><div class="dnote" data-i18n="hiringStorageNote">يمكن قبول عروض العمل وتوظيف أصحاب طلبات العمل. تُسوى الأجور عند تفعيل دورات الإنتاج.</div>
 </section>
 
 <section class="dview" data-panel="contracts">
