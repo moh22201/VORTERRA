@@ -158,6 +158,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 #dashboard .dlang-switch button{padding:8px 11px;border:1px solid transparent;border-radius:8px;background:transparent;color:#c9c4b7;font-size:11px;font-weight:800;cursor:pointer}
 #dashboard .dlang-switch button.active{color:#ffe3a0;border-color:#f6d88980;background:linear-gradient(135deg,#f6d88922,#fff1)}
 #dashboard .dside button span+span{font-size:13px}
+#dashboard .dproject-hire-select{min-width:180px;max-width:260px;padding:9px 11px;border:1px solid #f6d88966;border-radius:8px;background:#0b0c0e;color:#ffe3a0;font:inherit;font-size:11px}#dashboard #jobOfferProject{width:100%;padding:10px;border:1px solid #f6d88966;border-radius:8px;background:#0b0c0e;color:#ffe3a0;font:inherit;font-size:11px}#dashboard .dproject-hire-select:disabled,#dashboard #jobOfferProject:disabled{opacity:.55;cursor:not-allowed}
 #dashboard .dside button{display:flex;align-items:center;gap:12px}
 #dashboard .dsector-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0}
 #dashboard .dsector{display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;min-height:104px;padding:16px;border:1px solid #f6d88935;border-radius:14px;background:linear-gradient(145deg,#191b1e,#070809);color:#eee9dc;cursor:pointer;transition:.2s}
@@ -598,7 +599,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
   </form><div id="jobRequests" class="dlisting-list"></div></section>
   <section class="dsubpanel"><h3 data-i18n="jobOffers">عروض عمل</h3><form id="jobOfferForm" class="dform">
    <label><span data-i18n="jobTitle">المسمى الوظيفي</span><input name="role" required maxlength="80"></label>
-   <label><span>Project for this hiring offer</span><select name="project_id" id="jobOfferProject" required><option value="">Choose an owned project</option></select></label>
+   <label><span id="jobOfferProjectLabel">Project for this hiring offer</span><select name="project_id" id="jobOfferProject" required><option value="">Choose an owned project</option></select></label>
    <label><span data-i18n="workersCount">عدد العمال</span><input name="workers" type="number" min="1" step="1" required></label>
    <label><span data-i18n="offeredWage">الأجر لكل عامل / وردية (VOR)</span><input name="wage" type="number" min="0.01" step="0.01" required></label>
    <label><span data-i18n="jobConditions">شروط العمل</span><input name="conditions" maxlength="200"></label>
@@ -1149,15 +1150,17 @@ const opsLabels={
    if(userError)throw userError;
    if(!userData?.user)throw new Error(lang==="ar"?"سجّل الدخول لعرض إعلانات التوظيف.":"Sign in to view hiring posts.");
    const currentUser=userData.user;
-   const [{data:ownedRows,error:ownedError},{data:catalogData,error:catalogError}]=await Promise.all([
+   const [ownedResult,catalogData]=await Promise.all([
     vortERRAAuth.from("player_projects").select("id,project_key,acquisition_type,expires_at").eq("owner_id",currentUser.id),
     fetch("data/projects.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("Project catalogue unavailable");return r.json()})
    ]);
-   if(ownedError)throw ownedError;
-   if(catalogError)throw catalogError;
+   if(ownedResult.error)throw ownedResult.error;
+   const ownedRows=ownedResult.data||[];
    const catalog=catalogData.projects||[];
    const activeProjects=(ownedRows||[]).filter(p=>p.acquisition_type==="purchase"||(p.expires_at&&new Date(p.expires_at)>new Date()));
    const projectName=id=>{const row=activeProjects.find(p=>p.id===id);const meta=row&&catalog.find(p=>p.id===row.project_key);return meta?(meta.name?.[lang]||meta.name?.en||meta.id):(row?.project_key||"Project")};
+   const projectLabel=$("jobOfferProjectLabel");
+   if(projectLabel)projectLabel.textContent=lang==="ar"?"المشروع المخصص للتوظيف":lang==="fr"?"Projet concerné par le recrutement":"Project for this hiring offer";
    const projectSelect=$("jobOfferProject");
    if(projectSelect){
     projectSelect.innerHTML="";
