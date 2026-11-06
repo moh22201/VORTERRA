@@ -267,7 +267,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 }
 
 #dashboard .dproject-card{overflow:hidden;border:1px solid #f6d88955;border-radius:14px;background:linear-gradient(145deg,#202225f2,#090a0c);box-shadow:0 14px 34px #0008,inset 0 1px #ffffff1c}
-#dashboard .dproject-art{height:126px;display:flex;align-items:center;justify-content:center;position:relative;background:radial-gradient(ellipse at 50% 40%,#b18a3c35,#17191b 68%,#090a0b);border-bottom:1px solid #f6d88930}
+#dashboard .dproject-art{height:auto;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative;background-color:#111315;background-repeat:no-repeat;background-size:400% auto;border-bottom:1px solid #f6d88930}
 #dashboard .dproject-art strong{font-size:48px;filter:drop-shadow(0 5px 12px #000)}
 #dashboard .dproject-art small{position:absolute;bottom:9px;right:11px;color:#dfc987;font-size:8px;letter-spacing:1.2px}
 #dashboard .dproject-info{padding:13px}
@@ -279,7 +279,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 #dashboard .dproject-detail b{color:#e8c36f}
 #dashboard .dproject-image-note{margin-top:9px;color:#8f897c;font-size:9px}
 #dashboard .dproject-empty{grid-column:1/-1;padding:20px;border:1px solid #f6d88933;border-radius:10px;color:#c9c4b7}
-@media(max-width:680px){#dashboard .dproject-art{height:115px}#dashboard .dproject-info{padding:11px}}
+@media(max-width:680px){#dashboard .dproject-art{height:auto;aspect-ratio:16/9}#dashboard .dproject-info{padding:11px}}
 
 /* Close button for secondary dashboard views */
 #dashboard .dview{position:relative}#dashboard .dview-close{position:absolute;top:0;right:0;z-index:9;width:34px;height:34px;display:grid;place-items:center;padding:0;border:1px solid #f6d88988;border-radius:8px;background:#111315;color:#ffe3a0;font:25px Arial;cursor:pointer;box-shadow:0 3px 14px #0008}#dashboard .dview-close:hover{background:#f6d88922;border-color:#ffe3a0}#dashboard[dir=rtl] .dview-close{right:auto;left:0}#dashboard .dview:not([data-panel=overview]) .dtoolbar{padding-right:44px}#dashboard[dir=rtl] .dview:not([data-panel=overview]) .dtoolbar{padding-right:0;padding-left:44px}
@@ -514,7 +514,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
 <section class="dview" data-panel="library">
  <div class="dtoolbar"><div><h2 data-i18n="library">Project Library</h2><p data-i18n="libraryIntro">Browse the 12 approved integrated projects.</p></div><span class="dtag"><span id="projectCount">12</span> <span>PROJECTS</span></span></div>
  <div class="dasset-grid" id="projectGrid" aria-live="polite"></div>
- <div class="dnote" data-i18n="libraryNote">Each card represents one complete integrated project. Unified project images will be added in the next stage. Marketplace and employment remain separate features.</div>
+ <div class="dnote" data-i18n="libraryNote">Each card represents one complete integrated project. Illustrative project images are now available for all 12 projects. Marketplace and employment remain separate features.</div>
 </section>
 
 <section class="dview" data-panel="city">
@@ -1034,7 +1034,13 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
    const cap=p.storage_capacity?number(p.storage_capacity.quantity)+" "+unit(p.storage_capacity.unit):"";
    const payload=p.total_payload_per_trip?number(p.total_payload_per_trip.quantity)+" "+unit(p.total_payload_per_trip.unit):"";
    const fleet=p.fleet?number(p.fleet.vehicles)+" "+(p.fleet.type==="truck"?(lang==="ar"?"شاحنة":lang==="fr"?"camions":"trucks"):p.fleet.type==="cargo_ship"?(lang==="ar"?"سفينة":lang==="fr"?"navires":"ships"):(lang==="ar"?"طائرة شحن":lang==="fr"?"avions cargo":"cargo aircraft")):"";
-   card.innerHTML='<div class="dproject-art"><strong>'+icons[p.id]+'</strong><small>'+L[lang].image+'</small></div><div class="dproject-info"><h3></h3><div class="dproject-stats"></div><div class="dproject-detail"></div><div class="dproject-image-note">'+L[lang].shift+'</div></div>';
+   card.innerHTML='<div class="dproject-art" aria-label="'+title+'"><strong hidden>'+icons[p.id]+'</strong></div><div class="dproject-info"><h3></h3><div class="dproject-stats"></div><div class="dproject-detail"></div><div class="dproject-image-note">'+L[lang].shift+'</div></div>';
+   const art=card.querySelector(".dproject-art");
+   const imageTiles={quarry:[0,0],forest:[1,0],mine:[2,0],electricity:[3,0],water:[0,1],oil:[1,1],recycling:[2,1],city_storage:[3,1],road_transport:[0,2],sea_transport:[1,2],air_transport:[2,2],maintenance:[3,2]};
+   const tile=imageTiles[p.id]||[0,0];
+   art.style.backgroundImage='url("assets/project-gallery.webp")';
+   art.style.backgroundSize='400% auto';
+   art.style.backgroundPosition=(tile[0]*100/3)+'% '+(tile[1]*50)+'%';
    card.querySelector("h3").textContent=String(p.number).padStart(2,"0")+" · "+title;
    const sg=card.querySelector(".dproject-stats");
    stats.forEach(([k,v])=>{const e=document.createElement("span"),b=document.createElement("b");b.textContent=k;e.append(b,document.createTextNode(v));sg.appendChild(e)});
