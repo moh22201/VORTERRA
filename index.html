@@ -753,6 +753,9 @@ document.getElementById('openRegistration').addEventListener('click',async()=>{
 const SUPABASE_URL='https://qnfjtpwtwvlvbzyliwmh.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_tWieCfaR6RN2S01dFwH7vg_7ZkSXbDv';
 const vortERRAAuth=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'implicit'}});window.vortERRAAuth=vortERRAAuth;
+// Keep recovery links in password-reset mode before Supabase finishes restoring their session.
+const recoveryHashParams=new URLSearchParams((window.location.hash||'').replace(/^#/,''));
+let passwordRecoveryActive=recoveryHashParams.get('type')==='recovery'||new URLSearchParams(window.location.search).get('auth')==='recovery';
 const registrationForm=document.getElementById('registrationForm');
 const registrationMessage=document.getElementById('registrationMessage');
 function showAuthMessage(message,isError=false){registrationMessage.textContent=message;registrationMessage.style.color=isError?'#ffaaa0':'#e5cf98';}
@@ -936,6 +939,7 @@ document.getElementById('saveRecoveryPassword').addEventListener('click',async()
   password.value='';confirm.value='';
   document.getElementById('passwordRecoveryFields').hidden=true;
   document.getElementById('loginFields').hidden=false;
+  passwordRecoveryActive=false;
   message.textContent='Password changed successfully. You can now sign in with your new password.';
   message.style.color='#9bd6a5';
   await vortERRAAuth.auth.signOut({scope:'local'});
@@ -973,6 +977,7 @@ async function openConfirmedAccount(user){
 }
 vortERRAAuth.auth.onAuthStateChange((event,session)=>{
  if(event==='PASSWORD_RECOVERY'){
+  passwordRecoveryActive=true;
   document.getElementById('registrationPanel').hidden=false;
   document.getElementById('registrationGate').hidden=true;
   document.getElementById('loginForm').hidden=false;
@@ -981,18 +986,21 @@ vortERRAAuth.auth.onAuthStateChange((event,session)=>{
   document.getElementById('loginRecoveryMessage').textContent='Recovery link verified. Choose your new password.';
   document.getElementById('loginRecoveryMessage').style.color='#9bd6a5';
   document.getElementById('intro').style.display='none';
-  document.getElementById('cardScene').style.display='flex';
+  const recoveryScene=document.getElementById('cardScene');
+  recoveryScene.style.display='flex';recoveryScene.style.opacity='1';recoveryScene.style.pointerEvents='auto';recoveryScene.style.animation='none';
   return;
  }
  if(event==='SIGNED_OUT'){lastRoutedAuthUserId=null;return;}
- if(session?.user&&['INITIAL_SESSION','SIGNED_IN','TOKEN_REFRESHED','USER_UPDATED'].includes(event)){
+ // A recovery session is authorized only to set a new password, not to enter the city.
+ if(passwordRecoveryActive)return;
+ if(session?.user&&['INITIAL_SESSION','SIGNED_IN','TOKEN_REFRESHED'].includes(event)){
   // Defer Supabase queries until the auth callback has returned.
   setTimeout(()=>openConfirmedAccount(session.user).catch(error=>console.warn('Account redirect:',error)),0);
  }
 });
 vortERRAAuth.auth.getSession().then(({data,error})=>{
  if(error){console.warn('Auth session:',error);return;}
- if(data.session?.user)openConfirmedAccount(data.session.user).catch(error=>console.warn('Account redirect:',error));
+ if(data.session?.user&&!passwordRecoveryActive)openConfirmedAccount(data.session.user).catch(error=>console.warn('Account redirect:',error));
 });
 
 function openDashboardPanel(view){
