@@ -812,10 +812,8 @@ function showCardSetup(user,profile={}){
    if(profile.city){
     const wantedCity=profile.city;
     setTimeout(()=>{
-     const citySelect=document.getElementById('iY'),manualCity=document.getElementById('iYManual');
-     const option=[...citySelect.options].find(item=>item.value.toLowerCase()===wantedCity.toLowerCase());
-     if(option&&!citySelect.hidden){citySelect.value=option.value;document.getElementById('oY').textContent=option.value;}
-     else if(citySelect.hidden||citySelect.disabled){manualCity.value=wantedCity;manualCity.hidden=false;manualCity.required=true;citySelect.hidden=true;document.getElementById('oY').textContent=wantedCity;}
+     const cityInput=document.getElementById('iY');
+     cityInput.value=wantedCity;document.getElementById('oY').textContent=wantedCity;
     },1500);
    }
   }
@@ -858,9 +856,7 @@ registrationForm.addEventListener('submit',async event=>{
  const firstName=document.getElementById('iN')?.value.trim()||'';
  const lastName=document.getElementById('iL')?.value.trim()||'';
  const country=document.getElementById('iC')?.value||'';
- const citySelect=document.getElementById('iY');
- const manualCity=document.getElementById('iYManual');
- const city=(!citySelect.hidden&&!citySelect.disabled?citySelect.value:manualCity?.value.trim())||'';
+ const city=document.getElementById('iY')?.value.trim()||'';
  const submit=registrationForm.querySelector('button[type="submit"]');
  submit.disabled=true;showAuthMessage('Creating your secure VORTERRA account…');
  try{
