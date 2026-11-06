@@ -363,7 +363,7 @@
         client.from("wallets").select("total_balance,available_balance").eq("user_id",user.id).eq("currency","VOR").maybeSingle(),
         client.from("player_projects").select("id",{count:"exact",head:true}).eq("owner_id",user.id),
         client.from("wallet_transactions").select("id,transaction_type,amount,currency,status,description,created_at").eq("user_id",user.id).order("created_at",{ascending:false}).limit(5),
-        client.from("player_employment_contracts").select("id",{count:"exact",head:true}).eq("status","active")
+        client.from("player_employment_contracts").select("id,worker_id").eq("status","active")
       ]);
       if(walletResult.error)throw walletResult.error;
       if(assetsResult.error)throw assetsResult.error;
@@ -372,9 +372,10 @@
       const balance=document.getElementById(ids[0]);
       if(balance)balance.innerHTML=playerNumber(walletResult.data?.available_balance||0)+' <small>VOR</small>';
       const assets=document.getElementById(ids[1]);if(assets)assets.textContent=String(assetsResult.count||0).padStart(2,"0");
-      const activeContracts=contractResult.count||0;
+      const activeContracts=(contractResult.data||[]).length;
+      const uniqueWorkers=new Set((contractResult.data||[]).map(row=>row.worker_id)).size;
       const contracts=document.getElementById(ids[2]);if(contracts)contracts.textContent=String(activeContracts).padStart(2,"0");
-      const workers=document.getElementById(ids[3]);if(workers)workers.textContent=String(activeContracts).padStart(2,"0");
+      const workers=document.getElementById(ids[3]);if(workers)workers.textContent=String(uniqueWorkers).padStart(2,"0");
       const contractsNote=document.getElementById("playerOverviewContractsNote");
       if(contractsNote)contractsNote.textContent=language()==="ar"?"مرتبطة بمشاريع مملوكة":language()==="fr"?"Liés aux projets détenus":"Linked to owned projects";
       const workersNote=document.getElementById("playerOverviewWorkersNote");
