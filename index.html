@@ -530,7 +530,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
    <select id="operationProjectSelect" class="dproject-select"><option value="">No acquired projects</option></select>
    <div class="dcheck"><span id="opAssetsLabel">Project ownership</span><b id="opAssetsStatus">Not met</b></div>
    <div class="dcheck"><span id="opWorkersLabel">Required workers</span><b id="opWorkersStatus">Not met</b></div>
-   <div class="dcheck"><span id="opInputsLabel">Inputs and utilities</span><b id="opInputsStatus">Not checked</b></div>
+   
    <button class="dprimary" id="startShiftButton" type="button" disabled>Start 8-hour work cycle</button>
    <small class="dmuted" id="operationMessage">Acquire a project from the library first.</small>
   </div></section>
@@ -1066,9 +1066,9 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
  }
 
 const opsLabels={
- en:{choose:"Choose an acquired project",none:"No acquired projects",ownership:"Project ownership",workers:"Required workers",inputs:"Inputs and utilities",ready:"Met",missing:"Missing",demoMet:"Assumed available in demo",noProject:"Acquire a project from the library first.",hireNeeded:"Hire {n} workers to meet this project's requirement.",allReady:"All readiness checks are met. Shift controls will be enabled in the next production step.",start:"Start 8-hour work cycle"},
- fr:{choose:"Choisir un projet acquis",none:"Aucun projet acquis",ownership:"Propriété du projet",workers:"Employés requis",inputs:"Intrants et services",ready:"Validé",missing:"Manquants",demoMet:"Disponibles (hypothèse de démonstration)",noProject:"Acquérez d'abord un projet dans la bibliothèque.",hireNeeded:"Recrutez {n} employés pour satisfaire les besoins du projet.",allReady:"Toutes les conditions sont remplies. Le contrôle de production sera activé dans l'étape suivante.",start:"Démarrer un poste de 8 heures"},
- ar:{choose:"اختر مشروعاً تم الحصول عليه",none:"لا توجد مشاريع مقتناة",ownership:"ملكية المشروع",workers:"عدد العمال المطلوب",inputs:"المدخلات والخدمات",ready:"متحقق",missing:"ناقص",demoMet:"متاح افتراضياً في التجربة",noProject:"اقتَنِ مشروعاً من المكتبة أولاً.",hireNeeded:"ينقصك توظيف {n} عاملاً لاستكمال العدد المطلوب لهذا المشروع.",allReady:"اكتملت متطلبات الجاهزية. سيتم تفعيل التحكم بالإنتاج في المرحلة التالية.",start:"بدء وردية 8 ساعات"}
+ en:{choose:"Choose an acquired project",none:"No acquired projects",ownership:"Project ownership",workers:"Required workers",ready:"Met",missing:"Missing",noProject:"Acquire a project from the library first.",hireNeeded:"Hire {n} workers to meet this project's requirement.",allReady:"Worker requirements are met. Shift controls will be enabled in the next production step.",start:"Start 8-hour work cycle"},
+ fr:{choose:"Choisir un projet acquis",none:"Aucun projet acquis",ownership:"Propriété du projet",workers:"Employés requis",ready:"Validé",missing:"Manquants",noProject:"Acquérez d'abord un projet dans la bibliothèque.",hireNeeded:"Recrutez {n} employés pour satisfaire les besoins du projet.",allReady:"Toutes les conditions sont remplies. Le contrôle de production sera activé dans l'étape suivante.",start:"Démarrer un poste de 8 heures"},
+ ar:{choose:"اختر مشروعاً تم الحصول عليه",none:"لا توجد مشاريع مقتناة",ownership:"ملكية المشروع",workers:"عدد العمال المطلوب",ready:"متحقق",missing:"ناقص",noProject:"اقتَنِ مشروعاً من المكتبة أولاً.",hireNeeded:"ينقصك توظيف {n} عاملاً لاستكمال العدد المطلوب لهذا المشروع.",allReady:"اكتمل عدد العمال المطلوب. سيتم تفعيل التحكم بالإنتاج في المرحلة التالية.",start:"بدء وردية 8 ساعات"}
 };
 
   const DEMO_KEY="vorterra-demo-v1";
@@ -1128,17 +1128,17 @@ const opsLabels={
   $("operationSelectLabel").textContent=labels.choose;
   $("opAssetsLabel").textContent=labels.ownership;
   $("opWorkersLabel").textContent=labels.workers;
-  $("opInputsLabel").textContent=labels.inputs;
+  
   $("startShiftButton").textContent=labels.start;
   if(!project){
-   set("opAssetsStatus",labels.missing,"idle");set("opWorkersStatus",labels.missing,"idle");set("opInputsStatus",labels.missing,"idle");
+   set("opAssetsStatus",labels.missing,"idle");set("opWorkersStatus",labels.missing,"idle");
    $("operationMessage").textContent=labels.noProject;$("startShiftButton").disabled=true;return;
   }
   set("opAssetsStatus",labels.ready,"ok");
   const hired=Number((demoState.workerAssignments||{})[project.id]||0);
   const required=Number(project.workers||0),remaining=Math.max(0,required-hired);
   set("opWorkersStatus",remaining?labels.missing+" · "+remaining+"/"+required:labels.ready+" · "+hired+"/"+required,remaining?"missing":"ok");
-  set("opInputsStatus",labels.demoMet,"ok");
+  
   $("operationMessage").textContent=remaining?labels.hireNeeded.replace("{n}",remaining):labels.allReady;
   $("startShiftButton").disabled=remaining>0;
  }
