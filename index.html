@@ -604,6 +604,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
     <label><span id="transportUnitLabel">الوحدة</span><input name="unit" required maxlength="24" placeholder="ton, m³, pallet..."></label>
     <label><span id="transportPickupLabel">مكان الاستلام</span><input name="pickup" required maxlength="140"></label>
     <label><span id="transportDeliveryLabel">مكان التسليم</span><input name="delivery" required maxlength="140"></label>
+    <div id="transportRouteEstimate" class="dnote" aria-live="polite">أدخل مدينتي الاستلام والتسليم لحساب المسافة والمدة تلقائيًا.</div>
     <label><span id="transportPriceLabel">أجرة النقل (VOR)</span><input name="price" type="number" min="0.01" step="0.01" required></label>
     <button class="dprimary" type="submit" id="transportRequestSubmit">نشر طلب النقل وحجز الأجرة</button>
    </form>
@@ -673,8 +674,7 @@ button{grid-column:1/-1;padding:11px;border-radius:12px;border:0;cursor:pointer;
   <select id="iC" aria-label="اختر البلد / Select country" required>
    <option value="" selected disabled>اختر البلد / Select country</option>
   </select>
-  <select id="iY" aria-label="اختر المدينة / Select city" required disabled><option value="" selected disabled>اختر البلد أولاً / Select country first</option></select>
-  <input id="iYManual" type="text" aria-label="اكتب اسم المدينة / Enter city" placeholder="اكتب اسم المدينة / Enter city" maxlength="80" autocomplete="address-level2" hidden>
+  <input id="iY" type="text" aria-label="اكتب اسم المدينة / Enter city" placeholder="اكتب اسم المدينة / Enter city" maxlength="80" autocomplete="address-level2" required>
   <button id="issueCard" type="submit">إصدار البطاقة ✦</button>
  </form>
  <div class="registration-gate" id="registrationGate" hidden>
@@ -722,32 +722,9 @@ function play(){b.classList.remove('play');void b.offsetWidth;b.classList.add('p
 play();
 const identityForm=document.getElementById('identityForm');
 const countrySelect=document.getElementById('iC');
-const citySelect=document.getElementById('iY');
-const countryNames=["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Canada","Cape Verde","Central African Republic","Chad","Chile","China","Colombia","Comoros","Congo","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Democratic Republic of the Congo","Denmark","Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador","Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea","Guinea-Bissau","Guyana","Haiti","Honduras","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia","Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg","Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands","Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway","Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Samoa","San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles","Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia","South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste","Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Vanuatu","Vatican City","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
-countryNames.forEach(name=>{const option=document.createElement('option');option.value=name;option.textContent=name;countrySelect.appendChild(option)});
-const cityManual=document.getElementById('iYManual');
-countrySelect.addEventListener('change',async()=>{
- const country=countrySelect.value;
- citySelect.disabled=true;citySelect.hidden=false;cityManual.hidden=true;cityManual.required=false;cityManual.value='';
- citySelect.innerHTML='<option value="" selected disabled>جارٍ تحميل المدن… / Loading cities…</option>';
- document.getElementById('oC').textContent=country||'—';document.getElementById('oY').textContent='—';
- try{
-  const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),7000);let response;
-  try{response=await fetch('https://countriesnow.space/api/v0.1/countries/cities',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({country}),signal:controller.signal});}finally{clearTimeout(timeout);}
-  if(!response.ok)throw new Error('City service unavailable');
-  const result=await response.json();
-  const cities=Array.isArray(result.data)?[...new Set(result.data.filter(city=>typeof city==='string'&&city.trim()).map(city=>city.trim()))].sort((a,b)=>a.localeCompare(b)):[];
-  if(!cities.length)throw new Error('No city list returned');
-  citySelect.innerHTML='<option value="" selected disabled>اختر المدينة / Select city</option>'+cities.map(city=>'<option value="'+city.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')+'">'+city.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</option>').join('');
-  citySelect.disabled=false;
- }catch(error){
-  console.warn('VORTERRA city list unavailable; enabling manual city entry:',error);
-  citySelect.hidden=true;citySelect.disabled=true;cityManual.hidden=false;cityManual.required=true;
-  cityManual.placeholder='الخدمة غير متاحة — اكتب اسم المدينة / Enter city';
- }
-});
-citySelect.addEventListener('change',()=>{document.getElementById('oY').textContent=citySelect.value||'—'});
-cityManual.addEventListener('input',()=>{document.getElementById('oY').textContent=cityManual.value.trim()||'—'});
+const cityInput=document.getElementById('iY');
+countrySelect.addEventListener('change',()=>{document.getElementById('oC').textContent=countrySelect.value||'—';document.getElementById('oY').textContent=cityInput.value.trim()||'—'});
+cityInput.addEventListener('input',()=>{document.getElementById('oY').textContent=cityInput.value.trim()||'—'});
 identityForm.addEventListener('submit',event=>{
  event.preventDefault();
  if(!identityForm.reportValidity())return;
@@ -778,9 +755,7 @@ async function savePlayerCardProfile(user){
  const firstName=document.getElementById('iN')?.value.trim()||'';
  const lastName=document.getElementById('iL')?.value.trim()||'';
  const country=document.getElementById('iC')?.value||'';
- const citySelect=document.getElementById('iY');
- const manualCity=document.getElementById('iYManual');
- const city=(!citySelect.hidden&&!citySelect.disabled?citySelect.value:manualCity?.value.trim())||'';
+ const city=document.getElementById('iY')?.value.trim()||'';
  if(!firstName||!lastName||!country||!city)throw new Error('أكمل بيانات البطاقة الأربعة أولاً.');
  const {data,error}=await vortERRAAuth.from('profiles').update({
   first_name:firstName,last_name:lastName,country,city,
@@ -1530,7 +1505,8 @@ const opsLabels={
     const info=document.createElement("div"),title=document.createElement("strong"),detail=document.createElement("small");
     title.textContent=contract.cargo_description+" · "+Number(contract.quantity).toLocaleString()+" "+contract.unit;
     const statusText=t[contract.status==="in_transit"?"transit":contract.status]||contract.status;
-    detail.textContent=statusText+" · "+t.from+": "+contract.pickup_location+" · "+t.to+": "+contract.delivery_location+" · "+Number(contract.price_vor).toFixed(2)+" VOR";
+    const routeInfo=contract.distance_km!=null?" · "+Number(contract.distance_km).toFixed(1)+" km · "+contract.estimated_minutes+" min":"";
+    detail.textContent=statusText+" · "+t.from+": "+contract.pickup_location+" · "+t.to+": "+contract.delivery_location+routeInfo+" · "+Number(contract.price_vor).toFixed(2)+" VOR";
     info.append(title,detail);card.appendChild(info);
     if(contract.status==="open"&&!own){
      const projectSelect=document.createElement("select");projectSelect.className="dproject-hire-select";
@@ -1566,12 +1542,51 @@ const opsLabels={
   try{if(!args.p_transport_project_id&&rpc==="accept_transport_contract")throw new Error(langNow==="ar"?"اختر مشروع نقل أولاً.":langNow==="fr"?"Choisissez un projet de transport.":"Choose a transport project first.");const {error}=await vortERRAAuth.rpc(rpc,args);if(error)throw error;await loadLiveTransportContracts();if(typeof refreshWalletBalances==="function")await refreshWalletBalances(currentAuthUser)}
   catch(error){alert((langNow==="ar"?"تعذر تنفيذ العملية: ":langNow==="fr"?"Échec de l’opération : ":"Action failed: ")+(error.message||""));button.disabled=false}
  }
+ async function geocodeTransportPlace(place){
+  const response=await fetch("https://photon.komoot.io/api/?limit=1&q="+encodeURIComponent(place),{headers:{Accept:"application/json"}});
+  if(!response.ok)throw new Error("تعذر تحديد موقع المدينة.");
+  const data=await response.json(),coords=data?.features?.[0]?.geometry?.coordinates;
+  if(!Array.isArray(coords)||coords.length<2)throw new Error("لم نعثر على المدينة. اكتب اسم المدينة مع البلد.");
+  return {lon:Number(coords[0]),lat:Number(coords[1])};
+ }
+ async function calculateTransportRoute(pickup,delivery){
+  const [a,b]=await Promise.all([geocodeTransportPlace(pickup),geocodeTransportPlace(delivery)]);
+  const response=await fetch("https://router.project-osrm.org/route/v1/driving/"+a.lon+","+a.lat+";"+b.lon+","+b.lat+"?overview=false");
+  if(!response.ok)throw new Error("تعذر حساب مسار الطريق.");
+  const data=await response.json(),route=data?.routes?.[0];
+  if(!route||!Number.isFinite(route.distance))throw new Error("لا يوجد مسار بري متاح بين المدينتين.");
+  const km=route.distance/1000;return {distanceKm:km,minutes:Math.ceil(km/10)};
+ }
  function bindTransportRequestForm(){
   const form=$("transportRequestForm");if(!form||form.dataset.bound)return;form.dataset.bound="1";
+  const pickup=form.elements.pickup,delivery=form.elements.delivery,preview=$("transportRouteEstimate");
+  let route=null,routeKey="";
+  const refreshRoute=async()=>{
+   const key=pickup.value.trim()+"|"+delivery.value.trim();
+   if(!pickup.value.trim()||!delivery.value.trim()){route=null;routeKey="";preview.textContent=lang==="ar"?"أدخل مدينتي الاستلام والتسليم لحساب المسافة والمدة تلقائيًا.":lang==="fr"?"Saisissez les villes de départ et d’arrivée pour calculer la distance et la durée.":"Enter pickup and delivery cities to calculate distance and travel time.";return}
+   if(key===routeKey&&route)return;
+   route=null;routeKey="";preview.textContent=lang==="ar"?"جارٍ حساب مسافة الطريق…":lang==="fr"?"Calcul de l’itinéraire…":"Calculating road distance…";
+   try{
+    const result=await calculateTransportRoute(pickup.value.trim(),delivery.value.trim());
+    if(key!==pickup.value.trim()+"|"+delivery.value.trim())return;
+    route=result;routeKey=key;
+    preview.textContent=lang==="ar"?"المسافة البرية: "+result.distanceKm.toFixed(1)+" كم · المدة المقدرة: "+result.minutes+" دقيقة (10 كم/دقيقة).":lang==="fr"?"Distance routière : "+result.distanceKm.toFixed(1)+" km · Durée estimée : "+result.minutes+" min (10 km/min).":"Road distance: "+result.distanceKm.toFixed(1)+" km · Estimated time: "+result.minutes+" min (10 km/min).";
+   }catch(error){route=null;routeKey="";preview.textContent=(lang==="ar"?"تعذر حساب المسافة: ":lang==="fr"?"Calcul impossible : ":"Could not calculate route: ")+(error.message||"")}
+  };
+  pickup.addEventListener("change",refreshRoute);pickup.addEventListener("blur",refreshRoute);
+  delivery.addEventListener("change",refreshRoute);delivery.addEventListener("blur",refreshRoute);
   form.addEventListener("submit",async event=>{
-   event.preventDefault();const values=Object.fromEntries(new FormData(form).entries());const button=form.querySelector('button[type="submit"]');button.disabled=true;
-   try{const {error}=await vortERRAAuth.rpc("create_transport_request",{p_cargo:values.cargo,p_quantity:Number(values.quantity),p_unit:values.unit,p_pickup:values.pickup,p_delivery:values.delivery,p_price_vor:Number(values.price)});if(error)throw error;form.reset();alert(lang==="ar"?"تم نشر طلب النقل وحجز الأجرة.":lang==="fr"?"Demande publiée et paiement bloqué.":"Transport request published and payment reserved.");await loadLiveTransportContracts();if(typeof refreshWalletBalances==="function")await refreshWalletBalances(currentAuthUser)}
-   catch(error){alert((lang==="ar"?"تعذر نشر طلب النقل: ":lang==="fr"?"Impossible de publier la demande : ":"Could not publish transport request: ")+(error.message||""))}
+   event.preventDefault();const values=Object.fromEntries(new FormData(form).entries()),button=form.querySelector('button[type="submit"]');button.disabled=true;
+   try{
+    const key=pickup.value.trim()+"|"+delivery.value.trim();
+    if(!route||routeKey!==key)await refreshRoute();
+    if(!route||routeKey!==pickup.value.trim()+"|"+delivery.value.trim())throw new Error(lang==="ar"?"تعذر تحديد المسافة. تحقق من أسماء المدينتين ثم حاول مجددًا.":"Could not determine route distance. Check both city names and try again.");
+    const {error}=await vortERRAAuth.rpc("create_transport_request",{p_cargo:values.cargo,p_quantity:Number(values.quantity),p_unit:values.unit,p_pickup:values.pickup,p_delivery:values.delivery,p_price_vor:Number(values.price),p_distance_km:Number(route.distanceKm.toFixed(2)),p_estimated_minutes:route.minutes});
+    if(error)throw error;
+    form.reset();route=null;routeKey="";preview.textContent=lang==="ar"?"أدخل مدينتي الاستلام والتسليم لحساب المسافة والمدة تلقائيًا.":"Enter pickup and delivery cities to calculate distance and travel time.";
+    alert(lang==="ar"?"تم نشر طلب النقل وحفظ المسافة والمدة.":lang==="fr"?"Demande publiée ; distance et durée enregistrées.":"Request published; distance and duration saved.");
+    await loadLiveTransportContracts();if(typeof refreshWalletBalances==="function")await refreshWalletBalances(currentAuthUser);
+   }catch(error){alert((lang==="ar"?"تعذر نشر طلب النقل: ":lang==="fr"?"Impossible de publier la demande : ":"Could not publish transport request: ")+(error.message||""))}
    finally{button.disabled=false}
   });
  }
