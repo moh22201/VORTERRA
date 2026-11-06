@@ -1491,12 +1491,14 @@ const opsLabels={
   try{
    const {data:userData,error:userError}=await vortERRAAuth.auth.getUser();if(userError)throw userError;
    const user=userData.user;if(!user)return;
-   const [{data:inventory,error:inventoryError},{data:owned,error:ownedError},{data:listings,error:listError}]=await Promise.all([
+   const [{data:inventory,error:inventoryError},{data:utilityStock,error:utilityStockError},{data:owned,error:ownedError},{data:listings,error:listError}]=await Promise.all([
     vortERRAAuth.from("player_inventory").select("item_key,unit,quantity").eq("owner_id",user.id).gt("quantity",0).order("item_key"),
+    vortERRAAuth.rpc("get_market_utility_sellable_stock"),
     vortERRAAuth.from("player_projects").select("id,project_key,acquisition_type,expires_at,operating_status").eq("owner_id",user.id).eq("acquisition_type","purchase").eq("operating_status","idle"),
     vortERRAAuth.from("market_listings").select("id,owner_id,listing_type,product_name,quantity,unit_price,asset_name,rent_duration,unit,project_id,lease_months,created_at").eq("status","active").order("created_at",{ascending:false}).limit(100)
    ]);
-   if(inventoryError)throw inventoryError;if(ownedError)throw ownedError;if(listError)throw listError;
+   if(inventoryError)throw inventoryError;if(utilityStockError)throw utilityStockError;if(ownedError)throw ownedError;if(listError)throw listError;
+   const sellableInventory=[...(inventory||[]),...(utilityStock||[])];
    const setLabel=(id,value)=>{const el=$(id);if(el)el.textContent=value};
    setLabel("marketSaleItemLabel",langNow==="ar"?"اختر منتجاً من مخزونك":langNow==="fr"?"Choisir un article de votre stock":"Choose an item from your inventory");
    setLabel("marketRentProjectLabel",langNow==="ar"?"اختر مشروعاً تملكه":langNow==="fr"?"Choisir un projet que vous possédez":"Choose a project you own");
@@ -1505,9 +1507,9 @@ const opsLabels={
    const monthsSelect=$("marketRentMonths");
    if(monthsSelect){monthsSelect.options[0].textContent=langNow==="ar"?"شهر واحد":langNow==="fr"?"1 mois":"1 month";monthsSelect.options[1].textContent=langNow==="ar"?"3 أشهر":langNow==="fr"?"3 mois":"3 months"}
    const options=(select,rows,label,empty,mapper)=>{if(!select)return;select.innerHTML="";const first=document.createElement("option");first.value="";first.textContent=rows.length?label:empty;select.appendChild(first);rows.forEach(row=>{const option=document.createElement("option");option.value=mapper(row).value;option.textContent=mapper(row).label;select.appendChild(option)});select.disabled=!rows.length};
-   options(itemSelect,inventory||[],t.chooseItem,t.none,row=>({value:row.item_key+"::"+row.unit,label:row.item_key+" · "+Number(row.quantity).toLocaleString()+" "+row.unit}));
+   options(itemSelect,sellableInventory,t.chooseItem,t.none,row=>({value:row.item_key+"::"+row.unit,label:row.item_key+" · "+Number(row.quantity).toLocaleString()+" "+row.unit}));
    options(projectSelect,owned||[],t.chooseProject,t.noProjects,row=>{const p=projects.find(x=>x.id===row.project_key);return {value:row.id,label:p?.name?.[langNow]||p?.name?.en||row.project_key}});
-   const itemLookup=new Map((inventory||[]).map(x=>[x.item_key+"::"+x.unit,x]));
+   const itemLookup=new Map(sellableInventory.map(x=>[x.item_key+"::"+x.unit,x]));
    if(saleMine)saleMine.innerHTML="";if(saleOthers)saleOthers.innerHTML="";if(rentList)rentList.innerHTML="";
    const projectName=key=>{const p=projects.find(x=>x.id===key);return p?.name?.[langNow]||p?.name?.en||key||"Project"};
    const addCard=(target,item,kind)=>{
@@ -1524,8 +1526,8 @@ const opsLabels={
      try{
       const rpc=own?"cancel_market_listing":kind==="sale"?"buy_market_sale_listing":"rent_market_project";
       const args=own?{p_listing_id:item.id}:{p_listing_id:item.id};
-      const {error}=await vortERRAAuth.rpc(rpc,args);if(error)throw error;
-      alert(own?t.cancelled:kind==="sale"?t.bought:t.rented);await loadLiveMarketplace();
+      const {data:rpcData,error}=await vortERRAAuth.rpc(rpc,args);if(error)throw error;
+      alert(own?t.cancelled:rpcData?.payment_deferred_until_consumption?(langNow==="ar"?"تم تسليم الكهرباء/المياه إلى موزع مدينتك، وتتم التسوية بعد الاستهلاك.":langNow==="fr"?"Électricité/eau livrée au distributeur de votre ville; règlement après consommation.":"Utility supply delivered to your city distributor; payment is settled after consumption."):kind==="sale"?t.bought:t.rented);await loadLiveMarketplace();
       if(!own&&kind==="rent"){await loadActualOwnedProjects();renderOperations()}
       if(typeof refreshWalletBalances==="function")await refreshWalletBalances(user);
      }catch(error){alert(t.failed+(error.message||""));button.disabled=false;button.textContent=own?t.cancel:(kind==="sale"?t.buy:t.rent)}
@@ -1537,7 +1539,7 @@ const opsLabels={
     if(item.listing_type==="rent")addCard(rentList,item,"rent");
    });
    [[saleMine,"my sale listings"],[saleOthers,"sales"],[rentList,"rental offers"]].forEach(([el,label])=>{if(el&&!el.children.length){const empty=document.createElement("div");empty.className="dempty";empty.textContent=t.empty;el.appendChild(empty)}});
-   const note=$("marketLiveNote");if(note)note.textContent=langNow==="ar"?"البيع مرتبط بالمخزون، والإيجار مرتبط بمشاريع مملوكة مع سقف السعر المعتمد.":langNow==="fr"?"Les ventes sont liées au stock et les locations aux projets détenus, avec un plafond de prix.":"Sales reserve real inventory; project rentals are ownership-checked and price-capped.";
+   const note=$("marketLiveNote");if(note)note.textContent=langNow==="ar"?"الكهرباء والمياه تُعرضان من مخزون المحطة وتُسلّمان إلى موزع مدينة المشتري؛ التسوية بعد الاستهلاك. بقية المنتجات من المستودع العام.":langNow==="fr"?"L'électricité et l'eau proviennent du stock de la station et sont livrées au distributeur de la ville de l'acheteur; règlement après consommation. Les autres produits viennent de l'entrepôt.":"Electricity and water are listed from station stock and delivered to the buyer's city distributor; settlement follows consumption. Other goods come from the general warehouse.";
   }catch(error){console.error("Marketplace:",error);const note=$("marketLiveNote");if(note)note.textContent=(langNow==="ar"?"تعذر تحميل السوق: ":langNow==="fr"?"Impossible de charger le marché : ":"Could not load marketplace: ")+(error.message||"")}
  }
  function bindMarketplaceForms(){
