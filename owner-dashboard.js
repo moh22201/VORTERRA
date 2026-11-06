@@ -88,7 +88,7 @@
     }[language()];
     const set=(q,v)=>{const el=document.querySelector(q);if(el)el.textContent=v};
     set('label[for="withdrawalAmount"]',copy.amount);set('.withdraw-help',copy.rules);set('#withdrawalSubmit',copy.submit);set('[data-wallet-panel="withdraw"] .dpanelhead b',language()==="ar"?"طلب السحب":language()==="fr"?"Demande de retrait":"Withdrawal request");
-    set("#myWithdrawalHistory",copy.history);set("#walletRulesText",copy.walletRules);set("#walletPreviewNote",copy.manual);
+    set("#myWithdrawalHistory",copy.history);set("#walletRulesText",copy.walletRules);set("#walletStatusNote",copy.manual);
   }
 
   function bindWithdrawalForm(){
