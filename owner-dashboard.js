@@ -9,6 +9,8 @@
     return el;
   };
   const money = value => Number(value || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' VOR';
+  let initInFlight = false;
+  let initializedForUser = null;
 
   async function loadAdminPanel(panel, status) {
     status.textContent = 'Loading platform data…';
@@ -74,9 +76,13 @@
   }
 
   async function init() {
+    if (initInFlight) return;
+    initInFlight = true;
     try {
       const {data: sessionData, error: sessionError} = await auth.auth.getSession();
       if (sessionError || !sessionData?.session) return;
+      const userId = sessionData.session.user.id;
+      if (initializedForUser === userId) return;
       const dashboard = document.getElementById('dashboard');
       const side = dashboard?.querySelector('.dside');
       const main = dashboard?.querySelector('.dmain');
@@ -105,6 +111,7 @@
       }
       side.insertBefore(button, footer || null);
       main.appendChild(panel);
+      initializedForUser = userId;
       button.addEventListener('click', () => {
         if (typeof window.openDashboardPanel === 'function') window.openDashboardPanel('owner-admin');
         else {
@@ -117,9 +124,19 @@
       await refreshData();
     } catch (error) {
       // Non-administrators simply do not receive the administrative navigation item.
+    } finally {
+      initInFlight = false;
     }
   }
 
+  auth.auth.onAuthStateChange((event, session) => {
+    if (session) init();
+    else {
+      initializedForUser = null;
+      document.querySelector('#dashboard [data-view="owner-admin"]')?.remove();
+      document.querySelector('#dashboard [data-panel="owner-admin"]')?.remove();
+    }
+  });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, {once: true});
   else init();
 })();
