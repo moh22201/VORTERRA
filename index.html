@@ -1095,6 +1095,7 @@ document.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect()
    const rows=[];
    if(production)rows.push("<b>"+L[lang].prod+":</b> "+production);
    if(cap)rows.push("<b>"+L[lang].store+":</b> "+cap);
+   if(p.id==="electricity"||p.id==="water")rows.push("<b>"+(lang==="ar"?"نظام المخزون":lang==="fr"?"Stockage":"Storage rule")+":</b> "+(lang==="ar"?"يبقى الإنتاج غير المباع في المحطة. يتوقف التشغيل عند امتلاء المخزون ويتطلب وجود عمال.":lang==="fr"?"La production invendue reste dans la station. L’exploitation s’arrête lorsque le stockage est plein et nécessite des employés.":"Unsold output stays at the station. Production pauses when storage is full and requires active workers."));
    if(fleet)rows.push("<b>"+L[lang].fleet+":</b> "+fleet+(payload?" · "+payload:""));
    if(p.maintenance_teams)rows.push("<b>"+L[lang].teams+":</b> "+p.maintenance_teams);
    if(p.inputs_per_shift)rows.push("<b>"+L[lang].input+":</b> "+p.inputs_per_shift.map(x=>(names[lang][x.item]||x.item)+" "+number(x.quantity)+" "+unit(x.unit)).join(", "));
