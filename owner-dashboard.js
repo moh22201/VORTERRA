@@ -308,8 +308,12 @@
       const balance=document.getElementById(ids[0]);
       if(balance)balance.innerHTML=playerNumber(walletResult.data?.available_balance||0)+' <small>VOR</small>';
       const assets=document.getElementById(ids[1]);if(assets)assets.textContent=String(assetsResult.count||0).padStart(2,"0");
-      const contracts=document.getElementById(ids[2]);if(contracts)contracts.textContent="0";
-      const workers=document.getElementById(ids[3]);if(workers)workers.textContent="0";
+      const contracts=document.getElementById(ids[2]);if(contracts)contracts.textContent="—";
+      const workers=document.getElementById(ids[3]);if(workers)workers.textContent="—";
+      const contractsNote=document.getElementById("playerOverviewContractsNote");
+      if(contractsNote)contractsNote.textContent=language()==="ar"?"لم يُفعّل بعد":language()==="fr"?"Pas encore activé":"Not active yet";
+      const workersNote=document.getElementById("playerOverviewWorkersNote");
+      if(workersNote)workersNote.textContent=language()==="ar"?"لم يُفعّل بعد":language()==="fr"?"Pas encore activé":"Not active yet";
       const activity=document.getElementById("playerRecentActivity");
       if(activity){
         activity.innerHTML="";
