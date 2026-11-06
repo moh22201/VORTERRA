@@ -87,8 +87,6 @@
       button.dataset.view = 'owner-admin';
       button.append($('span', '', '▣'), $('span', '', 'Platform Control'));
       const footer = side.querySelector('footer');
-      side.insertBefore(button, footer || null);
-
       const panel = $('section', 'dview');
       panel.dataset.panel = 'owner-admin';
       const toolbar = $('div', 'dtoolbar');
@@ -99,9 +97,14 @@
       toolbar.append(title, refresh);
       const status = $('p', 'dmuted', 'Checking administrator permissions…');
       panel.append(toolbar, status);
-      main.appendChild(panel);
-
       const refreshData = () => loadAdminPanel(panel, status).catch(() => {});
+      try {
+        await loadAdminPanel(panel, status);
+      } catch (error) {
+        return;
+      }
+      side.insertBefore(button, footer || null);
+      main.appendChild(panel);
       button.addEventListener('click', () => {
         if (typeof window.openDashboardPanel === 'function') window.openDashboardPanel('owner-admin');
         else {
